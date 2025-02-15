@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { traceOptions, getAllChildRouters } from '$lib/core/trace.svelte.js';
-	import { resolveHashValue, routePatternsKey, RouterEngine } from '$lib/core/RouterEngine.svelte.js';
+	import {
+		resolveHashValue,
+		routePatternsKey,
+		RouterEngine
+	} from '$lib/core/RouterEngine.svelte.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { PatternRouteInfo } from '$lib/types.js';
 	import type { HTMLTableAttributes } from 'svelte/elements';
@@ -28,8 +32,8 @@
 		 * 	   <RouterTrace {hash} />
 		 * {/key}
 		 * ```
-		 * 
-		 * Unlike other components, the `RouterTrace` component does not need a hash value if a router engine object is 
+		 *
+		 * Unlike other components, the `RouterTrace` component does not need a hash value if a router engine object is
 		 * provided in its stead via the `router` property.
 		 */
 		hash?: boolean | string;
@@ -71,7 +75,7 @@
 			Children: {childRouterRefs.length}
 		</button>
 		{#if showChildrenMenu}
-			<ul class={["children-menu", `children-menu-${childrenMenuPosition}`]}>
+			<ul class={['children-menu', `children-menu-${childrenMenuPosition}`]}>
 				{#each childRouterRefs as ref}
 					{@const childRouter = ref.deref()}
 					{#if childRouter}

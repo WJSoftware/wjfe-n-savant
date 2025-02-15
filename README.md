@@ -1,16 +1,21 @@
 # @wjfe/n-savant
 
-> Small router for Svelte v5 SPA's specialized for micro-frontends.
+> The client-side router for Svelte v5 SPA's that invented multi hash routing.
 
 ## Features
 
-This router's code is small, revolving the **900** lines of code, including typing.
+> [!NOTE]
+> #### Small and Unique!
+> 
+> + Less than **900** lines of code, including TypeScript typing.
+> + Always-on path and hash routing.  Simultaneous and independent routing modes.
+> + The router that invented multi hash routing.
 
 + **Reactivity-based**:  All data is reactive, reducing the need for events and imperative programming.
 + **Always-on path and hash routing**:  Add routers that use the URL's path name or the URL's hash value in the same 
 application.  Both routing modes are possible simultaneously.
-+ **Multi-hash routing**:  Unique to this router and not found in any other router library, you can create named paths 
-in the hash value of the URL and create router hierarchies that use a specific named path.
++ **Multi-hash routing**:  This is the first router in the world to do this:  You can create named paths in the hash 
+value of the URL and create router hierarchies that use a specific named path.
 
 ### `<Router>` Component
 
@@ -165,15 +170,17 @@ or matches most of the time, so navigation links are available the mayority/all 
 
 Components (`Router`, `Route`, `Link`, `Fallback` and `RouterTrace`) with the same value of the `hash` property belong 
 to the same "universe".  Components with different hash values belong to different universes, and these universes are 
-parallel universes.  Components with hash value `false` use the URL's path name and will never interere with routers 
+parallel universes.  Components with hash value `false` use the URL's path name and will never interfere with routers 
 that use hash routing (hash value `true` or a path's name).  The main micro-frontend(s) may route using the URL's path 
 name, while specialty MFE's could route using the path in the hash part of the URL.
 
 ### Multi-Hash Routing
 
-Following up from the previous, imagine a scenario where your MFE application would like to show side-by-side two 
-micro-frontends that are router-enabled (meaning they use or need to work with a path).  With traditional routing, you 
-could not have this setup because one MFE would take over the path, leaving the other MFE without one.
+As of Februrary 2025, no other router in the world can do this.
+
+Imagine a scenario where your MFE application would like to show side-by-side two micro-frontends that are 
+router-enabled (meaning they use or need to work with a path).  With traditional routing, you could not have this setup 
+because one MFE would take over the path, leaving the other MFE without one.
 
 Mutli-hash routing creates named paths in the hash value, giving routers the ability to share the hash value with other 
 routers.  A hash value of the form `#path1=/path/1;path2=/path/2;...` could power side-by-side MFE's on, say, 4K 
@@ -182,14 +189,14 @@ layouts.
 ### EXPERIMENTAL - Replacing the `single-spa` Router
 
 It is the author's intent to implement micro-frontends with only `single-spa` parcels and this router.  In other words, 
-abandon the use of `registerApplication()` and `start()` and just mount parcels.
+abandon the use of `registerApplication()` and `start()` and just mount parcels using this router.
 
 [single-spa](https://single-spa.js.org)
 
 ## Unintrusive Philosophy
 
 This mini router library imposes minimal restrictions.  Here are some features provided by other much larger codebases 
-(most notably `dvcol/svelte-simple-router`) that are not provided here because Svelte already has the capability.
+that are not provided here because Svelte already has the capability.
 
 ### Transitions
 
@@ -214,10 +221,10 @@ Nothing prevents you to add transitions to anything.
 Guard routes however you wish.  Maybe with an `{#if}` block, or maybe using the route's `and` property that allows you 
 to specify a predicate function.  There are probably many other ways.
 
-### Exact Property on Routes
+### `Exact` Property on Routes
 
 Not needed.  All matching is exact path matching, and if you want to opt out of the exact route matching, simply add 
-the rest parameter specifier:
+the `rest` parameter specifier (`/*`):
 
 ```svelte
 <Route key="admin" path="/admin/*">
@@ -225,7 +232,8 @@ the rest parameter specifier:
 </Route>
 ```
 
-If you don't care about the value of the parameter, just ignore it.
+Now route matching for this route will behave as "starts with".  If you don't care about the value of the parameter, 
+just ignore it.
 
 ### Lazy-Loading
 
@@ -344,8 +352,10 @@ import { location } from "@wjfe/n-savant";
 
 // Path routing navigation:
 location.navigate('/new/path', { replace: true, state: { custom: 'Hi' }});
+
 // Hash routing navigation:
 location.navigate('#/new/path', { replace: true, state: { custom: 'Hi' }});
+
 // Multi-hash routing navigation:
 location.navigate('/new/path', 'path1', { replace: true, state: { custom: 'Hi' }});
 ```
@@ -360,8 +370,10 @@ Just in case you are wondering:  The navigation logic is already there in `<Link
 ```svelte
 <!-- Path Routing => https://example.com/new/path -->
 <Link hash="false" href="/new/path">Click Me!</Link>
+
 <!-- Hash Routing => https://example.com/#/new/path -->
 <Link hash="true" href="/new/path">Click Me!</Link>
+
 <!-- Multi Hash Routing => https://example.com/#path1=/new/path -->
 <!-- Will also preserve any other named paths -->
 <Link hash="path1" href="/new/path">Click Me!</Link>
@@ -382,6 +394,6 @@ on the router layouts, again, **at your own risk**.
 
 ---
 
-[Full Documentation @ Hashnode Pages](https://wjfe-n-savant.hashnode.pages)
+[Full Documentation @ Hashnode Space](https://wjfe-n-savant.hashnode.space)
 
 If you would like to report a bug or request a feature, head to the [Issues page](https://github.com/WJSoftware/wjfe-n-savant/issues).

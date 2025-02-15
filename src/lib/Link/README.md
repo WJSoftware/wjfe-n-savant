@@ -1,0 +1,57 @@
+# Link
+
+The `Link` component renders HTML anchor elements that behave in accordance to its `hash` property, allowing 
+SPA-friendly navigation (navigation without reloading).
+
+## Props
+
+| Property | Type | Default Value | Bindable | Description |
+|-|-|-|-|-|
+| `hash` | `boolean \| string` | `undefined` | | Sets the hash mode of the component. |
+| `href` | `string` | (none) | | Sets the URL to navigate to. |
+| `replace` | `boolean` | `false` | | Configures the link so it replaces the current URL as opposed to pushing the URL as a new entry in the browser's History API. |
+| `state` | `any` | `undefined` | | Sets the state object to pass to the browser's History API when pushing or replacing the URL. |
+| `activeState` | `ActiveState` | `undefined` | | Sets the various options that are used to automatically style the anchor tag whenever a particular route becomes active. |
+| `prependBasePath` | `boolean` | `false` | | Configures the component to prepend the parent router's base path to the `href` property. |
+| `children` | `Snippet` | `undefined` | | Renders the children of the component. |
+
+[Online Documentation](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/components/link)
+
+## Examples
+
+### Basic Usage
+
+These don't require a parent router:
+
+```svelte
+<!-- Path Routing => https://example.com/new/path -->
+<Link hash="false" href="/new/path">Click Me!</Link>
+
+<!-- Hash Routing => https://example.com/#/new/path -->
+<Link hash="true" href="/new/path">Click Me!</Link>
+
+<!-- Multi Hash Routing => https://example.com/#path1=/new/path -->
+<!-- Will also preserve any other named paths -->
+<Link hash="path1" href="/new/path">Click Me!</Link>
+```
+
+### Usage Within a Parent Router
+
+In this example, the `Link` component will take advantage of the parent router to inherit its base path and to 
+automatically trigger its active appearance based on a specific route becoming active.
+
+```svelte
+<Router basePath="/some/base">
+    <Link
+        hash="path1"
+        href="/admin/users"
+        prependBasePath
+        activeState={{ key: 'adminUsers', class: 'active', }}
+    >
+        Click Me!
+    </Link>
+    <Route key="adminUsers" path="/admin/users">
+        ...
+    </Route>
+</Router>
+```

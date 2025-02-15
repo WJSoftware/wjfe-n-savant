@@ -1,6 +1,7 @@
 # Router
 
-The `Router` component is the root component for a routing tree. It manages the routing state and provides the necessary context for child `Route` components to match the current URL.
+The `Router` component is the root component for a routing tree. It creates the router engine and shares it with its 
+children via context.
 
 ## Props
 
@@ -8,9 +9,11 @@ The `Router` component is the root component for a routing tree. It manages the 
 | - | - | - | - | - |
 | `router` | `RouterEngine` | `undefined` | Yes | Gets or sets the router engine instance to be used by this router. |
 | `basePath` | `string` | `'/'` | | Sets the router's base path, which is a segment of the URL that is implicitly added to all routes. |
-| `id` | `string` | `undefined` | | Gives the router an identifier that shows up in `RouterTracer` components. |
-| `hash` | `boolean \| string` | `undefined` | | Gives the router an identifier that shows up in `RouterTracer` components. |
+| `id` | `string` | `undefined` | | Gives the router an identifier that shows up in `RouterTrace` components. |
+| `hash` | `boolean \| string` | `undefined` | | Sets the hash mode of the router. |
 | `children` | `Snippet` | `undefined` | | Renders the children of the router. |
+
+[Online Documentation](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/components/router)
 
 ## Examples
 

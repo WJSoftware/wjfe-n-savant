@@ -19,14 +19,15 @@
 <script lang="ts" generics="T extends string | RegExp">
 	import { untrack, type Snippet } from 'svelte';
 	import { getRouterContext } from '../Router/Router.svelte';
-	import { resolveHashValue, type RouteStatus } from '$lib/core/RouterEngine.svelte.js';
+	import { resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
+	import type { ParameterValue, RouteStatus } from '$lib/types.js';
 
 	type Props = {
 		/**
 		 * Sets the route's unique key.
 		 *
 		 * Note that uniqueness is not really enforced, but it is assumed.  Make sure you don't duplicate keys in your
-		 * routes, or that you only do it to create disconnected UI pieces that come up under the same routing 
+		 * routes, or that you only do it to create disconnected UI pieces that come up under the same routing
 		 * conditions.
 		 */
 		key: string;
@@ -43,7 +44,7 @@
 		 *
 		 * ### Rest Parameter
 		 *
-		 * You can use a rest parameter to capture the rest of the URL.  For example, the pattern `'/user/:id/*'` will 
+		 * You can use a rest parameter to capture the rest of the URL.  For example, the pattern `'/user/:id/*'` will
 		 * match `'/user/123/abc/def'`, and the `rest` parameter will be `'/abc/def'`.
 		 *
 		 * Because pattern matching is always **exact**, a rest parameter can be used to attain "starts with" matching.
@@ -68,9 +69,11 @@
 		 *
 		 * **IMPORTANT**:  A route without `path` or `amd` is not registered in the router.
 		 */
-		and?: (params: Record<RouteParameters<T>, string> | undefined) => boolean;
+		and?: (params: Record<RouteParameters<T>, ParameterValue> | undefined) => boolean;
 		/**
 		 * Sets a function for additional matching conditions.
+		 *
+		 * Use this one when you need to match based on the final status of all routes.
 		 * @param routeStatus The router's route status object.
 		 * @returns `true` if the route should match, or `false` otherwise.
 		 *
@@ -102,38 +105,38 @@
 		caseSensitive?: boolean;
 		/**
 		 * Sets the hash mode of the route.
-		 * 
+		 *
 		 * If `true`, the component will search for the immediate parent router configured for single hash routing.
-		 * 
-		 * If a string, the component will search for the immediate parent router configured for multi hash routing 
+		 *
+		 * If a string, the component will search for the immediate parent router configured for multi hash routing
 		 * that matches the string.
-		 * 
+		 *
 		 * If `false`, the component will search for the immediate parent router configured for path routing.
-		 * 
-         * If left undefined, it will resolve to one of the previous values based on the `implicitMode` routing option.
-		 * 
-		 * **IMPORTANT**:  Because the hash value directly affects the search for the parent router, it cannot be 
-         * reactively set to different values at will.  If you must do this, destroy and recreate the component 
-         * whenever the hash changes:
-		 * 
+		 *
+		 * If left undefined, it will resolve to one of the previous values based on the `implicitMode` routing option.
+		 *
+		 * **IMPORTANT**:  Because the hash value directly affects the search for the parent router, it cannot be
+		 * reactively set to different values at will.  If you must do this, destroy and recreate the component
+		 * whenever the hash changes:
+		 *
 		 * @example
 		 * ```svelte
 		 * {#key hash}
 		 * 	   <Route {hash} />
 		 * {/key}
-         * ```
+		 * ```
 		 */
 		hash?: boolean | string;
 		/**
-		 * Bindable.  Provides a way to obtain a route's parameters through property binding.  The binding is 
+		 * Bindable.  Provides a way to obtain a route's parameters through property binding.  The binding is
 		 * write-only, so incoming changes have no effect.
 		 */
-		params?: Record<RouteParameters<T>, string>;
+		params?: Record<RouteParameters<T>, ParameterValue>;
 		/**
 		 * Renders the children of the route.
 		 * @param params The route's parameters.
 		 */
-		children?: Snippet<[Record<RouteParameters<T>, string> | undefined]>;
+		children?: Snippet<[Record<RouteParameters<T>, ParameterValue> | undefined]>;
 	};
 
 	let {
@@ -156,15 +159,16 @@
 
 	// Effect that updates the route object in the parent router.
 	$effect.pre(() => {
-		if (!path && !and) {
+		if (!path && !and && !when) {
 			return;
 		}
 		untrack(() => router.routes)[key] =
 			path instanceof RegExp
-				? { regex: path, and }
+				? { regex: path, and, when }
 				: {
 						pattern: path,
 						and,
+						when,
 						caseSensitive
 					};
 		return () => {
@@ -177,6 +181,6 @@
 	});
 </script>
 
-{#if (router.routeStatus[key]?.match ?? true) && (when?.(router.routeStatus) ?? true)}
+{#if (router.routeStatus[key]?.match ?? true) && (untrack(() => router.routes)[key]?.when?.(router.routeStatus) ?? true)}
 	{@render children?.(params)}
 {/if}

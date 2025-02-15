@@ -2,6 +2,7 @@
 	import { location } from '$lib/core/Location.js';
 	import { joinPaths, resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
+	import type { ActiveState } from '$lib/types.js';
 	import { type Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
@@ -58,32 +59,7 @@
 		 * 
 		 * **IMPORTANT**:  This only works if the component is within a `Router` component.
 		 */
-		activeState?: {
-			/**
-			 * Sets the route key that the link will use to determine if it should render as active.
-			 */
-			key?: string;
-			/**
-			 * Sets the class that the link will use when rendering as active.
-			 * 
-			 * For example, set it to `"active"` for Bootstrap setups.
-			 */
-			class?: string;
-			/**
-			 * Sets the style that the link will use when rendering as active.
-			 * 
-			 * This can be a string of CSS styles or an object of key-value pairs.
-			 */
-			style?: HTMLAnchorAttributes['style'] | Record<string, string>;
-			/**
-			 * Sets the value of the `aria-current` attribute when the link is active.
-			 * 
-			 * The possible values are defined by the HTML specification.
-			 * 
-			 * [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-current#values)
-			 */
-			ariaCurrent?: HTMLAnchorAttributes['aria-current'];
-		};
+		activeState?: ActiveState;
 		/**
 		 * Configures the component to prepend the parent router's base path to the `href` property.
 		 * 
