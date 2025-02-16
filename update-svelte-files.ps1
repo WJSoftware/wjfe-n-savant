@@ -13,11 +13,11 @@ function Update-SvelteFiles {
         $readmeFile = $readmeFiles[0].FullName
 
         $readmeContent = Get-Content -Path $readmeFile -Raw -Encoding utf8
-        $componentTagStart = "<!--`n@component"
+        $componentTagStart = "<!--`r`n@component"
         $componentTagEnd = "-->"
 
         $svelteContent = Get-Content -Path $svelteFile -Raw -Encoding utf8
-        $svelteContent += "`n$componentTagStart`n$readmeContent`n$componentTagEnd"
+        $svelteContent += "`r`n$componentTagStart`r`n$readmeContent`r`n$componentTagEnd"
         Set-Content -Path $svelteFile -Value $svelteContent -Encoding utf8NoBOM
     }
 }
