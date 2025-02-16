@@ -24,15 +24,14 @@ SPA-friendly navigation (navigation without reloading).
 These don't require a parent router:
 
 ```svelte
-<!-- Path Routing => https://example.com/new/path -->
-<Link hash="false" href="/new/path">Click Me!</Link>
+<Link hash="false" href="/new/path">Path Routing => https://example.com/new/path</Link>
 
-<!-- Hash Routing => https://example.com/#/new/path -->
-<Link hash="true" href="/new/path">Click Me!</Link>
+<Link hash="true" href="/new/path">Hash Routing => https://example.com/#/new/path</Link>
 
-<!-- Multi Hash Routing => https://example.com/#path1=/new/path -->
-<!-- Will also preserve any other named paths -->
-<Link hash="path1" href="/new/path">Click Me!</Link>
+<Link hash="path1" href="/new/path">
+    Multi Hash Routing => https://example.com/#path1=/new/path
+    Will also preserve any other named paths
+</Link>
 ```
 
 ### Usage Within a Parent Router
