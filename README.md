@@ -7,7 +7,7 @@
 > [!NOTE]
 > #### Small and Unique!
 > 
-> + Less than **900** lines of code, including TypeScript typing.
+> + Less than **1.000** lines of code, including TypeScript typing.
 > + Always-on path and hash routing.  Simultaneous and independent routing modes.
 > + The router that invented multi hash routing.
 
@@ -48,6 +48,10 @@ route's key.
 + **Specify state**:  Set history state upon hyperlink click.
 + **Active state based on route key**:  Automatically set active state and `aria-current` by specifying the route's key.
 + **Replace or push**:  Select the method for pushing state.
+
+### `<LinkContext>` Component
+
++ **Centralize `<Link>` configuration**:  Configures a special context that all `<Link>` components follow.
 
 ### `<RouterTrace>` Component
 
