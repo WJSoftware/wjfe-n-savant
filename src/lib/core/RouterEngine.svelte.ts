@@ -47,12 +47,15 @@ function isRouterEngine(obj: unknown): obj is RouterEngine {
  */
 export function joinPaths(...paths: string[]) {
     const hasLeadingSlash = paths[0].startsWith('/');
-    const hasTrailingSlash = paths[paths.length - 1].endsWith('/');
     const result = paths.reduce((acc, path, index) => {
         const trimmedPath = (path ?? '').replace(/^\/|\/$/g, '');
         return acc + (index > 0 && !acc.endsWith('/') && trimmedPath.length > 0 ? '/' : '') + trimmedPath;
     }, hasLeadingSlash ? '/' : '');
-    return result + (hasTrailingSlash && result !== '/' ? '/' : '');
+    return noTrailingSlash(result);
+}
+
+function noTrailingSlash(path: string) {
+    return path !== '/' && path.endsWith('/') ? path.slice(0, -1) : path;
 }
 
 function routeInfoIsRegexInfo(info: unknown): info is RegexRouteInfo {
@@ -132,7 +135,7 @@ export class RouterEngine {
         return this.#routePatterns;
     }
 
-    #testPath = $derived.by(() => this.#hashId ? (location.hashPaths[this.#hashId] || '/') :this.url.pathname);
+    #testPath = $derived.by(() => noTrailingSlash(this.#hashId ? (location.hashPaths[this.#hashId] || '/') : this.url.pathname));
 
     #routeStatusData = $derived.by(() => {
         const routeStatus = {} as Record<string, RouteStatus>;
