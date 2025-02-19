@@ -42,6 +42,7 @@ export function init(options?: InitOptions): () => void {
 
 export * from "$lib/Link/Link.svelte";
 export { default as Link } from "$lib/Link/Link.svelte";
+export { default as LinkContext } from "$lib/LinkContext/LinkContext.svelte";
 export * from "$lib/Route/Route.svelte";
 export { default as Route } from "$lib/Route/Route.svelte";
 export * from "$lib/Router/Router.svelte";
