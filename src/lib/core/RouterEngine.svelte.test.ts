@@ -94,7 +94,7 @@ describe("RouterEngine", () => {
             // Assert.
             expect(basePath).toBe('/parent/child');
         });
-        test("Should preserve the trailing slash.", () => {
+        test("Should remove the trailing slash.", () => {
             // Arrange.
             const router = new RouterEngine();
             router.basePath = '/abc/';
@@ -103,7 +103,7 @@ describe("RouterEngine", () => {
             const basePath = router.basePath;
 
             // Assert.
-            expect(basePath).toBe('/abc/');
+            expect(basePath).toBe('/abc');
         });
     });
     describe('url', () => {
