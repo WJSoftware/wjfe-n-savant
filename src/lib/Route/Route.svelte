@@ -162,6 +162,7 @@
 		if (!path && !and && !when) {
 			return;
 		}
+		// svelte-ignore ownership_invalid_mutation
 		untrack(() => router.routes)[key] =
 			path instanceof RegExp
 				? { regex: path, and, when }
@@ -172,6 +173,7 @@
 						caseSensitive
 					};
 		return () => {
+			// svelte-ignore ownership_invalid_mutation
 			delete untrack(() => router.routes)[key];
 		};
 	});
