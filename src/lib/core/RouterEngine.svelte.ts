@@ -67,6 +67,9 @@ function escapeRegExp(string: string): string {
 }
 
 function tryParseValue(value: string) {
+    if (value === '' || value === undefined || value === null) {
+        return value;
+    }
     const num = Number(value);
     if (!isNaN(num)) {
         return num;
