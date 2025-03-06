@@ -59,7 +59,7 @@
 				<li class="nav-item">
 					<Link class="nav-link" activeState={{ class: 'active', key: 'home' }} href="/">Home</Link>
 				</li>
-				<Route key="homeMenu" when={(rs) => !rs.pathRouting?.match}>
+				<Route key="homeMenuPr" when={(rs) => !rs.pathRouting?.match}>
 					<li class="nav-item">
 						<Link
 							class="nav-link"
@@ -73,7 +73,7 @@
 				<Route key="pathRouting">
 					<SubNav title="Path Routing" links={pathRoutingLinks} />
 				</Route>
-				<Route key="homeMenu" when={(rs) => !rs.hashRouting?.match}>
+				<Route key="homeMenuHr" when={(rs) => !rs.hashRouting?.match}>
 					<li class="nav-item">
 						<Link
 							class="nav-link"
