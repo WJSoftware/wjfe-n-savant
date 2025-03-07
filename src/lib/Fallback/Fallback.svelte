@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
-	import { type Snippet } from 'svelte';
+	import type { RouteStatus } from '$lib/types.js';
+	import type { Snippet } from 'svelte';
 
 	type Props = {
 		/**
@@ -33,8 +34,11 @@
 		 *
 		 * This rendering is conditioned to the parent router engine's `noMatches` property being `true`.  This means
 		 * that the children will only be rendered when no route matches the current location.
+		 * @param state The state object stored in in the window's History API for the universe the fallback component 
+		 * is associated to.
+		 * @param routeStatus The router's route status data.
 		 */
-		children?: Snippet;
+		children?: Snippet<[any, Record<string, RouteStatus>]>;
 	};
 
 	let { hash, children }: Props = $props();
@@ -43,5 +47,5 @@
 </script>
 
 {#if router?.noMatches}
-	{@render children?.()}
+	{@render children?.(router.state, router.routeStatus)}
 {/if}

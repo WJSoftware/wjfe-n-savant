@@ -135,8 +135,11 @@
 		/**
 		 * Renders the children of the route.
 		 * @param params The route's parameters.
+		 * @param state The state object stored in in the window's History API for the universe the route is associated 
+		 * to.
+		 * @param routeStatus The router's route status object.
 		 */
-		children?: Snippet<[Record<RouteParameters<T>, ParameterValue> | undefined]>;
+		children?: Snippet<[Record<RouteParameters<T>, ParameterValue> | undefined, any, Record<string, RouteStatus>]>;
 	};
 
 	let {
@@ -184,5 +187,5 @@
 </script>
 
 {#if (router.routeStatus[key]?.match ?? true) && (untrack(() => router.routes)[key]?.when?.(router.routeStatus) ?? true)}
-	{@render children?.(params)}
+	{@render children?.(params, router.state, router.routeStatus)}
 {/if}

@@ -17,7 +17,7 @@ they can be embedded anywhere down the hierarchy, including being children of ot
 | `caseSensitive` | `boolean` | `false` | | Sets whether the route's path pattern should be matched case-sensitively. |
 | `hash` | `boolean \| string` | `undefined` | | Sets the hash mode of the route. |
 | `params` | `Record<RouteParameters<T>, ParameterValue>` | `undefined` | Yes | Provides a way to obtain a route's parameters through property binding. |
-| `children` | `Snippet<[Record<RouteParameters<T>, ParameterValue> \| undefined]>` | `undefined` | | Renders the children of the route. |
+| `children` | `Snippet<[Record<RouteParameters<T>, ParameterValue> \| undefined, any, Record<string, RouteStatus>]>` | `undefined` | | Renders the children of the route. |
 
 [Online Documentation](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/components/route)
 

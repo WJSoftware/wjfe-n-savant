@@ -7,6 +7,7 @@ describe('index', () => {
             'location',
             'RouterEngine',
             'joinPaths',
+            'isConformantState',
         ];
 
         // Act.

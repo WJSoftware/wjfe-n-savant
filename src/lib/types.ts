@@ -2,6 +2,29 @@ import type { HTMLAnchorAttributes } from "svelte/elements";
 import type { SvelteURL } from "svelte/reactivity";
 
 /**
+ * Defines the data type of all `hash` properties found in almost all of the library's components.
+ */
+export type Hash = boolean | string;
+
+/**
+ * Defines the valid shape of the state object that must be in the windows History API at all times for proper 
+ * operation of the library.
+ */
+export type State = {
+    /**
+     * Holds the state data associated to path routing.
+     */
+    path: any;
+    /**
+     * Holds the state data associated to hash routing.
+     * 
+     * For single (or traditional) hash routing, the value is stored using the `single` key.  For multi-hash routing, 
+     * the value is stored using the hash identifier as the key.
+     */
+    hash: Record<string, any>;
+}
+
+/**
  * Defines the possible data types for route parameter values.
  */
 export type ParameterValue = string | number | boolean;
@@ -104,10 +127,6 @@ export interface Location {
      */
     readonly url: SvelteURL;
     /**
-     * Gets the current state object.
-     */
-    readonly state: any;
-    /**
      * Gets the current hash path or paths, depending on how the library was initialized.
      * 
      * If the library was initialized with the `hashMode` option set to `single`, do 
@@ -115,6 +134,11 @@ export interface Location {
      * `location.hashPaths.<ID>`, where `<ID>` is the wanted path' identifier.
      */
     readonly hashPaths: Record<string, string>;
+    /**
+     * Gets the current state object associated with the current URL that responds to the given hash value.
+     * @param hash The hash value to get the state for.
+     */
+    getState(hash: Hash): any;
     /**
      * Navigates to the specified URL.
      * 
@@ -176,7 +200,7 @@ export type NavigationEvent = {
     /**
      * The state object that was specified along with the URL.
      */
-    state: any;
+    state: unknown;
     /**
      * The method of navigation that was used.
      */

@@ -1,5 +1,6 @@
 <script lang="ts" module>
 	import { resolveHashValue, RouterEngine } from '$lib/core/RouterEngine.svelte.js';
+	import type { RouteStatus } from '$lib/types.js';
 
 	const parentCtxKey = Symbol();
 	const hashParentCtxKey = Symbol();
@@ -98,8 +99,11 @@
 		 *
 		 * Children content can be anything, but note that that the useful children are the `Route` components.  Any
 		 * other content will be rendered regardless of the current route.
+		 * @param state The state object stored in in the window's History API for the universe the route is associated 
+		 * to.
+		 * @param routeStatus The router's route status data.
 		 */
-		children?: Snippet;
+		children?: Snippet<[any, Record<string, RouteStatus>]>;
 	};
 
 	let { router = $bindable(), basePath, id, hash, children }: Props = $props();
@@ -133,4 +137,4 @@
 	});
 </script>
 
-{@render children?.()}
+{@render children?.(router.state, router.routeStatus)}

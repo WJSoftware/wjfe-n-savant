@@ -11,7 +11,7 @@ route status data is calculated.
 | Property | Type | Default Value | Bindable | Description |
 |-|-|-|-|-|
 | `hash` | `boolean \| string` | `undefined` | | Sets the hash mode of the component. |
-| `children` | `Snippet` | `undefined` | | Renders the children of the component. |
+| `children` | `Snippet<[any, Record<string, RouteStatus>]>` | `undefined` | | Renders the children of the component. |
 
 [Online Documentation](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/components/fallback)
 

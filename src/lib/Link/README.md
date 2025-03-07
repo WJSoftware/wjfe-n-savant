@@ -14,7 +14,7 @@ SPA-friendly navigation (navigation without reloading).
 | `activeState` | `ActiveState` | `undefined` | | Sets the various options that are used to automatically style the anchor tag whenever a particular route becomes active. |
 | `prependBasePath` | `boolean` | `false` | | Configures the component to prepend the parent router's base path to the `href` property. |
 | `preserveQuery` | `boolean \| string \| string[]` | `false` | | Configures the component to preserve the query string whenever it triggers navigation. |
-| `children` | `Snippet` | `undefined` | | Renders the children of the component. |
+| `children` | `Snippet<[any, Record<string, RouteStatus> \| undefined]>` | `undefined` | | Renders the children of the component. |
 
 [Online Documentation](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/components/link)
 

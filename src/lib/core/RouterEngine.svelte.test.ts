@@ -1,8 +1,9 @@
 import { describe, test, expect, beforeAll, afterAll, vi } from "vitest";
 import { routePatternsKey, RouterEngine } from "./RouterEngine.svelte.js";
-import { init, type RouteInfo } from "$lib/index.js";
+import { init, type Hash, type RouteInfo } from "$lib/index.js";
 import { registerRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
+import type { State } from "$lib/types.js";
 
 describe("RouterEngine", () => {
     describe('constructor', () => {
@@ -45,10 +46,12 @@ describe("RouterEngine", () => {
     const pushStateMock = vi.fn((state, _, url) => {
         globalThis.window.location.href = new URL(url).href;
         interceptedState = state;
+        globalThis.window.dispatchEvent(new globalThis.PopStateEvent('popstate'));
     });
     const replaceStateMock = vi.fn((state, _, url) => {
         globalThis.window.location.href = new URL(url).href;
         interceptedState = state;
+        globalThis.window.dispatchEvent(new globalThis.PopStateEvent('popstate'));
     });
     beforeAll(() => {
         cleanup = init();
@@ -71,7 +74,7 @@ describe("RouterEngine", () => {
         };
     });
     afterAll(() => {
-        location.dispose();
+        cleanup();
     });
     describe('basePath', () => {
         test("Should be '/' by default", () => {
@@ -120,16 +123,25 @@ describe("RouterEngine", () => {
         });
     });
     describe('state', () => {
-        test("Should return the current state.", () => {
+        test.each<{ hash: Hash; getter: (state: State) => any }>([
+            {
+                hash: false,
+                getter: (state) => state.path,
+            },
+            {
+                hash: true,
+                getter: (state) => state.hash.single,
+            },
+        ])("Should return the current state for hash $hash .", ({ hash, getter }) => {
             // Arrange.
-            const router = new RouterEngine();
-            const state = { key: "value" };
+            const router = new RouterEngine({ hash });
+            const state: State = { path: 1, hash: { single: 2, custom: 3 } };
 
             // Act.
             globalThis.window.history.pushState(state, '', 'http://example.com/other');
 
             // Assert.
-            expect(router.state).toBe(location.state);
+            expect(router.state).toBe(getter(globalThis.window.history.state));
         });
     });
     describe('routes', () => {
@@ -483,6 +495,58 @@ describe("RouterEngine", () => {
                     }
                 }
             });
+        });
+    });
+});
+
+describe("RouterEngine", () => {
+    let _href: string;
+    let cleanup: () => void;
+    let interceptedState: any = null;
+    const pushStateMock = vi.fn((state, _, url) => {
+        globalThis.window.location.href = new URL(url).href;
+        interceptedState = state;
+        globalThis.window.dispatchEvent(new globalThis.PopStateEvent('popstate'));
+    });
+    const replaceStateMock = vi.fn((state, _, url) => {
+        globalThis.window.location.href = new URL(url).href;
+        interceptedState = state;
+        globalThis.window.dispatchEvent(new globalThis.PopStateEvent('popstate'));
+    });
+    beforeAll(() => {
+        cleanup = init({ hashMode: 'multi' });
+        // @ts-expect-error Many missing features.
+        globalThis.window.location = {
+            get href() {
+                return _href;
+            },
+            set href(value) {
+                _href = value;
+            }
+        };
+        // @ts-expect-error Many missing features.
+        globalThis.window.history = {
+            get state() {
+                return interceptedState;
+            },
+            pushState: pushStateMock,
+            replaceState: replaceStateMock
+        };
+    });
+    afterAll(() => {
+        cleanup();
+    });
+    describe('state', () => {
+        test("Should return the current state for a named hash path.", () => {
+            // Arrange.
+            const router = new RouterEngine({ hash: 'custom' });
+            const state: State = { path: 1, hash: { single: 2, custom: 3 } };
+
+            // Act.
+            globalThis.window.history.pushState(state, '', 'http://example.com/other');
+
+            // Assert.
+            expect(router.state).toBe(state.hash.custom);
         });
     });
 });
