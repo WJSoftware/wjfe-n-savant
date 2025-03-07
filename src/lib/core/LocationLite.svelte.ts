@@ -1,4 +1,4 @@
-import type { BeforeNavigateEvent, Location, NavigateOptions, NavigationCancelledEvent } from "../types.js";
+import type { BeforeNavigateEvent, Hash, Location, NavigateOptions, NavigationCancelledEvent, State } from "../types.js";
 import { on } from "svelte/events";
 import { LocationState } from "./LocationState.svelte.js";
 import { routingOptions } from "./options.js";
@@ -53,13 +53,34 @@ export class LocationLite implements Location {
         return this.#innerState.url;
     }
 
-    get state() {
-        return this.#innerState.state;
+    getState(hash: Hash) {
+        if (typeof hash === 'string') {
+            return this.#innerState.state.hash[hash];
+        }
+        if (hash) {
+            return this.#innerState.state.hash.single;
+        }
+        return this.#innerState.state.path;
     }
 
-    navigate(url: string | URL, options?: NavigateOptions): void;
-    navigate(url: string | URL, hashId: string, options?: NavigateOptions): void;
-    navigate(url: string | URL, hashIdOrOptions?: string | NavigateOptions, options?: NavigateOptions) {
+    #newState(hash: Hash, state: any) {
+        const newState = $state.snapshot(this.#innerState.state);
+        if (typeof hash === 'string') {
+            newState.hash[hash] = state;
+        }
+        else if (hash) {
+            newState.hash.single = state;
+        }
+        else {
+            newState.path = state;
+        }
+        return newState;
+    }
+
+    navigate(url: string, options?: NavigateOptions): void;
+    navigate(url: string, hashId: string, options?: NavigateOptions): void;
+    navigate(url: string, hashIdOrOptions?: string | NavigateOptions, options?: NavigateOptions) {
+        let newState: State;
         if (typeof hashIdOrOptions === 'string') {
             let idExists = false;
             let finalUrl = '';
@@ -75,15 +96,17 @@ export class LocationLite implements Location {
                 finalUrl += `;${hashIdOrOptions}=${url}`;
             }
             url = '#' + finalUrl.substring(1);
+            newState = this.#newState(hashIdOrOptions, options?.state);
         }
         else {
-            options = hashIdOrOptions
+            options = hashIdOrOptions;
+            newState = this.#newState(url.startsWith('#'), options?.state);
         }
         (options?.replace ?
             globalThis.window?.history.replaceState :
-            globalThis.window?.history.pushState).bind(globalThis.window?.history)(options?.state, '', url);
+            globalThis.window?.history.pushState).bind(globalThis.window?.history)(newState, '', url);
         this.#innerState.url.href = globalThis.window?.location.href;
-        this.#innerState.state = options?.state;
+        this.#innerState.state = newState;
     }
 
     dispose() {

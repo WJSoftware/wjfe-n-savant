@@ -1,4 +1,4 @@
-import type { AndUntyped, PatternRouteInfo, RegexRouteInfo, RouteInfo, RouteStatus } from "$lib/types.js";
+import type { AndUntyped, Hash, PatternRouteInfo, RegexRouteInfo, RouteInfo, RouteStatus } from "$lib/types.js";
 import { traceOptions, registerRouter, unregisterRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
 import { routingOptions } from "./options.js";
@@ -102,6 +102,7 @@ export const routePatternsKey = Symbol();
 export class RouterEngine {
     #cleanup = false;
     #parent: RouterEngine | undefined;
+    #resolvedHash: Hash;
     #hashId: string | undefined;
     /**
      * Gets or sets the router's identifier.  This is displayed by the `RouterTracer` component.
@@ -202,30 +203,34 @@ export class RouterEngine {
     /**
      * Initializes a new instance of this class with the specified options.
      */
-    constructor(options: RouterEngineOptions);
+    constructor(options?: RouterEngineOptions);
     /**
      * Initializes a new instance of this class with the specified parent router.
     */
-    constructor(parent?: RouterEngine);
+    constructor(parent: RouterEngine);
     constructor(parentOrOpts?: RouterEngine | RouterEngineOptions) {
         if (!location) {
             throw new Error("The routing library hasn't been initialized.  Execute init() before creating routers.");
         }
         if (isRouterEngine(parentOrOpts)) {
+            this.#resolvedHash = parentOrOpts.#resolvedHash;
             this.#parent = parentOrOpts;
         }
         else {
             this.#parent = parentOrOpts?.parent;
-            const hash = resolveHashValue(parentOrOpts?.hash);
-            if (routingOptions.hashMode === 'multi' && hash && typeof hash !== 'string') {
+            this.#resolvedHash = this.#parent && parentOrOpts?.hash === undefined ? this.#parent.#resolvedHash : resolveHashValue(parentOrOpts?.hash);
+            if (this.#parent && this.#resolvedHash !== this.#parent.#resolvedHash) {
+                throw new Error("The parent router's hash mode must match the child router's hash mode.");
+            }
+            if (routingOptions.hashMode === 'multi' && this.#resolvedHash && typeof this.#resolvedHash !== 'string') {
                 throw new Error("The specified hash value is not valid for the 'multi' hash mode.  Either don't specify a hash for path routing, or correct the hash value.");
             }
-            if (routingOptions.hashMode !== 'multi' && typeof hash === 'string') {
+            if (routingOptions.hashMode !== 'multi' && typeof this.#resolvedHash === 'string') {
                 throw new Error("A hash path ID was given, but is only allowed when the library's hash mode has been set to 'multi'.");
             }
-            this.#hashId = typeof hash === 'string' ?
-                hash :
-                (hash ? 'single' : undefined);
+            this.#hashId = typeof this.#resolvedHash === 'string' ?
+                this.#resolvedHash :
+                (this.#resolvedHash ? 'single' : undefined);
         }
         if (traceOptions.routerHierarchy) {
             registerRouter(this);
@@ -246,7 +251,7 @@ export class RouterEngine {
      * This is a shortcut for `location.state`.
      */
     get state() {
-        return location.state;
+        return location.getState(this.#resolvedHash);
     }
     /**
      * Gets or sets the router's base path.

@@ -11,7 +11,7 @@ children via context.
 | `basePath` | `string` | `'/'` | | Sets the router's base path, which is a segment of the URL that is implicitly added to all routes. |
 | `id` | `string` | `undefined` | | Gives the router an identifier that shows up in `RouterTrace` components. |
 | `hash` | `boolean \| string` | `undefined` | | Sets the hash mode of the router. |
-| `children` | `Snippet` | `undefined` | | Renders the children of the router. |
+| `children` | `Snippet<[any, Record<string, RouteStatus>]>` | `undefined` | | Renders the children of the router. |
 
 [Online Documentation](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/components/router)
 

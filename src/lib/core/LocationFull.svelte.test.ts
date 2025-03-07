@@ -1,16 +1,19 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { LocationFull } from "./LocationFull.js";
-import type { Events, Location } from "$lib/types.js";
+import type { State, Location } from "$lib/types.js";
 import { flushSync } from "svelte";
+import { joinPaths } from "./RouterEngine.svelte.js";
 
 describe("LocationFull", () => {
     const initialUrl = "http://example.com/";
-    let interceptedState: any = null;
+    let interceptedState: State;
     const pushStateMock = vi.fn((state, _, url) => {
+        url = !url.startsWith('http://') ? joinPaths(initialUrl, url) : url;
         globalThis.window.location.href = new URL(url).href;
         interceptedState = state;
     });
     const replaceStateMock = vi.fn((state, _, url) => {
+        url = !url.startsWith('http://') ? joinPaths(initialUrl, url) : url;
         globalThis.window.location.href = new URL(url).href;
         interceptedState = state;
     });
@@ -37,6 +40,7 @@ describe("LocationFull", () => {
     });
     beforeEach(() => {
         globalThis.window.location.href = initialUrl;
+        interceptedState = { path: undefined, hash: {} };
         pushStateMock.mockReset();
         replaceStateMock.mockReset();
         location = new LocationFull();
@@ -48,7 +52,6 @@ describe("LocationFull", () => {
         test("Should create a new instance with the expected default values.", () => {
             // Assert.
             expect(location.url.href).toBe(initialUrl);
-            expect(location.state).toBe(null);
         });
     });
     describe('on', () => {
@@ -171,7 +174,7 @@ describe("LocationFull", () => {
         ] satisfies (keyof History)[])("Should update whenever an external call to %s is made.", (fn) => {
             // Arrange.
             const newUrl = "http://example.com/new";
-            
+
             // Act.
             globalThis.window.history[fn](null, '', newUrl);
             flushSync();
@@ -180,20 +183,22 @@ describe("LocationFull", () => {
             expect(location.url.href).toBe(newUrl);
         });
     });
-    describe('state', () => {
+    describe('getState', () => {
         test.each([
             'pushState',
             'replaceState',
         ] satisfies (keyof History)[])("Should update whenever an external call to %s is made.", (fn) => {
             // Arrange.
-            const state = { test: 'value' };
-            
+            const state: State = { path: { test: 'value' }, hash: { single: '/abc', p1: '/def' } };
+
             // Act.
             globalThis.window.history[fn](state, '', 'http://example.com/new');
             flushSync();
 
             // Assert.
-            expect(location.state).toBe(state);
+            expect(location.getState(false)).toEqual(state.path);
+            expect(location.getState(true)).toEqual(state.hash.single);
+            expect(location.getState('p1')).toEqual(state.hash.p1);
         });
     });
 });

@@ -55,7 +55,7 @@ export class LocationFull extends LocationLite {
             }
         } else {
             const navFn = method === 'push' ? this.#originalPushState : this.#originalReplaceState;
-            navFn(state, '', url);
+            navFn(event.state, '', url);
             this.url.href = globalThis.window?.location.href;
             this.#innerState.state = state;
         }

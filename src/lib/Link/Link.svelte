@@ -3,7 +3,7 @@
 	import { joinPaths, resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
 	import { getLinkContext, type ILinkContext } from '$lib/LinkContext/LinkContext.svelte';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
-	import type { ActiveState } from '$lib/types.js';
+	import type { ActiveState, RouteStatus } from '$lib/types.js';
 	import { type Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
@@ -59,8 +59,12 @@
 			activeState?: ActiveState;
 			/**
 			 * Renders the children of the component.
+			 * @param state The state object stored in in the window's History API for the universe the link is 
+			 * associated to.
+			 * @param routeStatus The router's route status data, if the `Link` component is within the context of a 
+			 * router.
 			 */
-			children?: Snippet;
+			children?: Snippet<[any, Record<string, RouteStatus> | undefined]>;
 		};
 
 	let {
@@ -77,7 +81,8 @@
 		...restProps
 	}: Props = $props();
 
-	const router = getRouterContext(resolveHashValue(hash));
+	const resolvedHash = resolveHashValue(hash);
+	const router = getRouterContext(resolvedHash);
 	const linkContext = getLinkContext();
 
 	const calcReplace = $derived(replace ?? linkContext?.replace ?? false);
@@ -152,5 +157,5 @@
 	onclick={handleClick}
 	{...restProps}
 >
-	{@render children?.()}
+	{@render children?.(location.getState(resolvedHash), router?.routeStatus)}
 </a>
