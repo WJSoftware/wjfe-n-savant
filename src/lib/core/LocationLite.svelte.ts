@@ -81,26 +81,38 @@ export class LocationLite implements Location {
     navigate(url: string, hashId: string, options?: NavigateOptions): void;
     navigate(url: string, hashIdOrOptions?: string | NavigateOptions, options?: NavigateOptions) {
         let newState: State;
-        if (typeof hashIdOrOptions === 'string') {
-            let idExists = false;
-            let finalUrl = '';
-            for (let [id, path] of Object.entries(this.hashPaths)) {
-                if (id === hashIdOrOptions) {
-                    idExists = true;
-                    finalUrl += `;${id}=${url}`;
-                    continue;
-                }
-                finalUrl += `;${id}=${path}`;
+        if (url === '') {
+            url = this.url.href;
+            if (typeof hashIdOrOptions === 'string') {
+                newState = this.#newState(hashIdOrOptions, options?.state);
             }
-            if (!idExists) {
-                finalUrl += `;${hashIdOrOptions}=${url}`;
+            else {
+                options = hashIdOrOptions;
+                newState = this.#newState(url.startsWith('#'), options?.state);
             }
-            url = '#' + finalUrl.substring(1);
-            newState = this.#newState(hashIdOrOptions, options?.state);
         }
         else {
-            options = hashIdOrOptions;
-            newState = this.#newState(url.startsWith('#'), options?.state);
+            if (typeof hashIdOrOptions === 'string') {
+                let idExists = false;
+                let finalUrl = '';
+                for (let [id, path] of Object.entries(this.hashPaths)) {
+                    if (id === hashIdOrOptions) {
+                        idExists = true;
+                        finalUrl += `;${id}=${url}`;
+                        continue;
+                    }
+                    finalUrl += `;${id}=${path}`;
+                }
+                if (!idExists) {
+                    finalUrl += `;${hashIdOrOptions}=${url}`;
+                }
+                url = '#' + finalUrl.substring(1);
+                newState = this.#newState(hashIdOrOptions, options?.state);
+            }
+            else {
+                options = hashIdOrOptions;
+                newState = this.#newState(url.startsWith('#'), options?.state);
+            }
         }
         (options?.replace ?
             globalThis.window?.history.replaceState :

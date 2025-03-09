@@ -220,5 +220,30 @@ describe("LocationLite", () => {
             expect(location.url.hash).toBe(`#${hash}=${newPath}`);
             expect(location.getState(hash)).toBe(state);
         });
+        test("Should update the state whenever shallow routing is used (path routing).", () => {
+            // Arrange.
+            const currentUrl = location.url.href;
+            const newState = 123;
+
+            // Act.
+            location.navigate('', { state: newState });
+
+            // Assert.
+            expect(location.getState(false)).toBe(newState);
+            expect(location.url.href).toBe(currentUrl);
+        });
+        test("Should update the state whenever shallow routing is used (multi hash routing).", () => {
+            // Arrange.
+            const currentUrl = location.url.href;
+            const newState = 123;
+            const pathName = 'p1';
+
+            // Act.
+            location.navigate('', pathName, { state: newState });
+
+            // Assert.
+            expect(location.getState(pathName)).toBe(newState);
+            expect(location.url.href).toBe(currentUrl);
+        });
     });
 });

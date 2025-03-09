@@ -59,9 +59,9 @@
 			activeState?: ActiveState;
 			/**
 			 * Renders the children of the component.
-			 * @param state The state object stored in in the window's History API for the universe the link is 
+			 * @param state The state object stored in in the window's History API for the universe the link is
 			 * associated to.
-			 * @param routeStatus The router's route status data, if the `Link` component is within the context of a 
+			 * @param routeStatus The router's route status data, if the `Link` component is within the context of a
 			 * router.
 			 */
 			children?: Snippet<[any, Record<string, RouteStatus> | undefined]>;
@@ -89,11 +89,13 @@
 	const calcPreserveQuery = $derived(preserveQuery ?? linkContext?.preserveQuery ?? false);
 	const calcPrependBasePath = $derived(prependBasePath ?? linkContext?.prependBasePath ?? false);
 	const isActive = $derived(!!router?.routeStatus[activeState?.key ?? '']?.match);
-	const calcHref = $derived(buildHref());
-
-	function buildHref() {
+	const calcHref = $derived.by(() => {
+		if (href === '') {
+			// Leave untouched for shallow routing.
+			return href;
+		}
 		const pathname = calcPrependBasePath ? joinPaths(router?.basePath ?? '', href) : href;
-		if (hash || !calcPreserveQuery || !location.url.searchParams.size) {
+		if (resolvedHash || !calcPreserveQuery || !location.url.searchParams.size) {
 			return pathname;
 		}
 		let searchParams: URLSearchParams;
@@ -116,15 +118,15 @@
 			}
 		}
 		return `${pathname}?${searchParams}`;
-	}
+	});
 
 	function handleClick(event: MouseEvent) {
 		event.preventDefault();
 		const newState = typeof state === 'function' ? state() : state;
-		if (typeof hash === 'string') {
-			location.navigate(calcHref, hash, { replace: calcReplace, state: newState });
+		if (typeof resolvedHash === 'string') {
+			location.navigate(calcHref, resolvedHash, { replace: calcReplace, state: newState });
 		} else {
-			location.navigate(!!hash ? `#${calcHref}` : calcHref, {
+			location.navigate(resolvedHash && calcHref !== '' ? `#${calcHref}` : calcHref, {
 				replace: calcReplace,
 				state: newState
 			});

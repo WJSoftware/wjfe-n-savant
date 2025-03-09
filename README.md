@@ -7,7 +7,7 @@
 > [!NOTE]
 > #### Small and Unique!
 > 
-> + Less than **1.000** lines of code, including TypeScript typing.
+> + Less than **1,050** lines of code, including TypeScript typing.
 > + Always-on path and hash routing.  Simultaneous and independent routing modes.
 > + The router that invented multi hash routing.
 
@@ -44,10 +44,15 @@ route's key.
 
 ### `<Link>` Component
 
-+ **Drop-in replacement**:  Exchange `<a>` tags with `<Link>` tags and you're done.
++ **Drop-in replacement**:  Exchange `<a>` tags with `<Link>` tags and you're done.[^1]
 + **Specify state**:  Set history state upon hyperlink click.
 + **Active state based on route key**:  Automatically set active state and `aria-current` by specifying the route's key.
 + **Replace or push**:  Select the method for pushing state.
++ **Preserve query string**:  Opt in to preserve existing query string values.
++ **Shallow routing**:  [This Sveltekit](https://svelte.dev/docs/kit/shallow-routing) document explains the concept.
+
+[^1]:  For hyperlink components that only specify a hash and are converted to hash-routing `<Link>` components, remove 
+the pound sign (`#`) from the href.
 
 ### `<LinkContext>` Component
 
@@ -115,25 +120,23 @@ init({ implicitMode: 'hash' });
     import UserView from "./lib/UserView.svelte";
 </script>
 
-<Route>
+<Router>
     <NavBar />
     <div class="container">
-        <Router>
-            <!-- content outside routes is always rendered -->
-            <h1>Routing Demo</h1>
-            <Route key="users" path="/users">
-                <!-- content here -->
-            </Route>
-            <Route key="user" path="/users/:userId">
-                <!-- access parameters via the snippet parameter -->
-                {#snippet children(params)}
-                    <UserView id={params.userId} /> <!-- Intellisense will work here!! -->
-                {/snippet}
-            </Route>
-            ...
-        </Router>
+        <!-- content outside routes is always rendered -->
+        <h1>Routing Demo</h1>
+        <Route key="users" path="/users">
+            <!-- content here -->
+        </Route>
+        <Route key="user" path="/users/:userId">
+            <!-- access parameters via the snippet parameter -->
+            {#snippet children(params)}
+                <UserView id={params.userId} /> <!-- Intellisense will work here!! -->
+            {/snippet}
+        </Route>
+        ...
     </div>
-</Route>
+</Router>
 ```
 
 ### Navigation Links
@@ -217,8 +220,8 @@ Nothing prevents you to add transitions to anything.
 ```
 
 > [!NOTE]
-> This one item might be worthwhile revisting for the cases where synchronized transitions are desired.  This, however, 
-> won't be looked at until Svelte attachments become a thing.
+> This one item might be worthwhile revisiting for the cases where synchronized transitions are desired.  This, 
+> however, won't be looked at until Svelte attachments become a thing.
 
 ### Guarded Routes
 
