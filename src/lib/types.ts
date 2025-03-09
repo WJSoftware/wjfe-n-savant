@@ -143,13 +143,15 @@ export interface Location {
      * Navigates to the specified URL.
      * 
      * It will push new URL's by default.  To instead replace the current URL, set the `replace` option to `true`.
-     * @param url The URL to navigate to.
+     * @param url The URL to navigate to.  Use an empty string (`""`) to navigate to the current URL, a. k. a., shallow 
+     * routing.
      * @param options Options for navigation.
      */
     navigate(url: string | URL, options?: NavigateOptions): void;
     /**
      * Navigates to the specified hash URL for the specified hash identifier.
-     * @param url The URL that will be saved as hash.
+     * @param url The URL that will be saved as hash.  Use an empty string (`""`) to navigate to the current URL, 
+     * a. k. a., shallow routing.
      * @param hashId The hash identifier for the route to set.
      * @param options Options for navigation.
      */
