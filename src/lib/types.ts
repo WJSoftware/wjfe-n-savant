@@ -7,6 +7,12 @@ import type { SvelteURL } from "svelte/reactivity";
 export type Hash = boolean | string;
 
 /**
+ * Defines the possible values for the `preserveQuery` option or component property in components or functions, and 
+ * determines what should happen with the current query string when (potentially) navigating to a new URL.
+ */
+export type PreserveQuery = boolean | string | string[];
+
+/**
  * Defines the valid shape of the state object that must be in the windows History API at all times for proper 
  * operation of the library.
  */
@@ -104,19 +110,38 @@ export type PatternRouteInfo = CoreRouteInfo & {
 export type RouteInfo = RegexRouteInfo | PatternRouteInfo;
 
 /**
- * Defines the options that can be used when calling `Location.navigate`.
+ * Defines the options that can be used when calling `Location.goTo`.
  */
-export type NavigateOptions = {
+export type GoToOptions = {
     /**
      * Whether to replace the current URL in the history stack.
      * @default false
      */
     replace?: boolean;
     /**
-     * The state object to associate with the new URL.
+     * The state object to associate with the new URL that is conformant with what this router library expects.
+     */
+    state?: State;
+    /**
+     * Whether to preserve the current query string in the new URL.
+     * 
+     * New URL's can specify a query string, and if query string preservation is requested, the query parameters from 
+     * the current URL will be appended with the ones from the new URL.
+     */
+    preserveQuery?: PreserveQuery;
+}
+
+export type NavigateOptions = Omit<GoToOptions, 'state'> & {
+    /**
+     * The state data to associate with the new URL and hash value.
      */
     state?: any;
-}
+} & ({
+    hash?: Exclude<Hash, false>;
+} | {
+    hash?: false;
+    preserveHash?: boolean;
+});
 
 /**
  * Defines the capabilities of the location object, central for all routing functionality.
@@ -140,22 +165,34 @@ export interface Location {
      */
     getState(hash: Hash): any;
     /**
-     * Navigates to the specified URL.
+     * Navigates to the specified URL as it is given.
      * 
      * It will push new URL's by default.  To instead replace the current URL, set the `replace` option to `true`.
+     * 
+     * **IMPORTANT:**  This method can only preserve query string values.  This method does not accept a `hash` value, 
+     * meaning that it cannot associate the navigation or state object with a given routing universe.  Use this method 
+     * only when you know this is the desired behavior.  Otherwise, just use `Location.navigate()`.
      * @param url The URL to navigate to.  Use an empty string (`""`) to navigate to the current URL, a. k. a., shallow 
      * routing.
      * @param options Options for navigation.
      */
-    navigate(url: string | URL, options?: NavigateOptions): void;
+    goTo(url: string, options?: GoToOptions): void;
     /**
-     * Navigates to the specified hash URL for the specified hash identifier.
-     * @param url The URL that will be saved as hash.  Use an empty string (`""`) to navigate to the current URL, 
-     * a. k. a., shallow routing.
-     * @param hashId The hash identifier for the route to set.
+     * Navigates to the specified URL, taking into account the specified hash value, making sure navigation and state 
+     * value are associated with the correct routing universe.
+     * 
+     * It will push new URL's by default.  To instead replace the current URL, set the `replace` option to `true`.
+     * 
+     * ### About Paths
+     * 
+     * You should be able to specify relative or full paths, with or without query string values, or even just a query 
+     * string.  The value of `hash` will be used to determine where in the URL to put this path and the specified state 
+     * data.
+     * @param hash The hash value to associate with the navigation.
+     * @param path The path to navigate to.
      * @param options Options for navigation.
      */
-    navigate(url: string | URL, hashId: string, options?: NavigateOptions): void;
+    navigate(url: string, options?: NavigateOptions): void;
     /**
      * Disposes of the location object, cleaning up any resources.
      */

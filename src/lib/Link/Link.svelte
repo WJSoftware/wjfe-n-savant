@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { calculateHref } from '$lib/core/calculateHref.js';
+	import { calculateState } from '$lib/core/calculateState.svelte.js';
 	import { location } from '$lib/core/Location.js';
-	import { joinPaths, resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
+	import { resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
 	import { getLinkContext, type ILinkContext } from '$lib/LinkContext/LinkContext.svelte';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { ActiveState, RouteStatus } from '$lib/types.js';
@@ -84,53 +86,26 @@
 	const resolvedHash = resolveHashValue(hash);
 	const router = getRouterContext(resolvedHash);
 	const linkContext = getLinkContext();
-
 	const calcReplace = $derived(replace ?? linkContext?.replace ?? false);
 	const calcPreserveQuery = $derived(preserveQuery ?? linkContext?.preserveQuery ?? false);
 	const calcPrependBasePath = $derived(prependBasePath ?? linkContext?.prependBasePath ?? false);
 	const isActive = $derived(!!router?.routeStatus[activeState?.key ?? '']?.match);
-	const calcHref = $derived.by(() => {
-		if (href === '') {
-			// Leave untouched for shallow routing.
-			return href;
-		}
-		const pathname = calcPrependBasePath ? joinPaths(router?.basePath ?? '', href) : href;
-		if (resolvedHash || !calcPreserveQuery || !location.url.searchParams.size) {
-			return pathname;
-		}
-		let searchParams: URLSearchParams;
-		if (calcPreserveQuery === true) {
-			searchParams = location.url.searchParams;
-		} else {
-			searchParams = new URLSearchParams();
-			const transferValue = (key: string) => {
-				const value = location.url.searchParams.getAll(key);
-				if (value) {
-					value.forEach((v) => searchParams.append(key, v));
-				}
-			};
-			if (Array.isArray(calcPreserveQuery)) {
-				for (let key of calcPreserveQuery) {
-					transferValue(key);
-				}
-			} else {
-				transferValue(calcPreserveQuery);
-			}
-		}
-		return `${pathname}?${searchParams}`;
-	});
+	const calcHref = $derived(
+		calculateHref(
+			{
+				hash: resolvedHash,
+				preserveQuery: calcPreserveQuery
+			},
+			calcPrependBasePath ? router?.basePath : undefined,
+			href
+		)
+	);
+	$inspect(calcHref).with((t, v) => console.log(`calcHref (${restProps.id || 'no id'}): ${v} (${t})`));
 
 	function handleClick(event: MouseEvent) {
 		event.preventDefault();
-		const newState = typeof state === 'function' ? state() : state;
-		if (typeof resolvedHash === 'string') {
-			location.navigate(calcHref, resolvedHash, { replace: calcReplace, state: newState });
-		} else {
-			location.navigate(resolvedHash && calcHref !== '' ? `#${calcHref}` : calcHref, {
-				replace: calcReplace,
-				state: newState
-			});
-		}
+		const newState = calculateState(resolvedHash, typeof state === 'function' ? state() : state);
+		location.goTo(calcHref, { state: newState, replace: calcReplace });
 	}
 
 	function styleString() {

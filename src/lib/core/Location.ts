@@ -1,4 +1,11 @@
-import type { Location } from "$lib/types.js";
+import type { Location, State } from "$lib/types.js";
+
+/**
+ * Internal symbol for accessing complete state from Location implementations.
+ * This provides access to the full state object for internal library operations
+ * without expanding the public API surface.
+ */
+export const getCompleteStateKey = Symbol('getCompleteState');
 
 /**
  * Global location object.  Use it to monitor or reactively react to URL or state changes.  It also provides the 

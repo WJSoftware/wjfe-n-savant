@@ -35,7 +35,7 @@ export function init(options?: InitOptions): () => void {
     routingOptions.implicitMode = options?.implicitMode ?? routingOptions.implicitMode;
     const newLocation = setLocation(options?.full ? new LocationFull() : new LocationLite());
     return () => {
-        newLocation!.dispose();
+        newLocation?.dispose();
         setLocation(null);
     };
 }
@@ -51,5 +51,8 @@ export * from "$lib/Fallback/Fallback.svelte";
 export { default as Fallback } from "$lib/Fallback/Fallback.svelte";
 export type * from "./types.js";
 export { location } from "./core/Location.js";
+export { isConformantState } from "./core/isConformantState.js";
+export { calculateHref } from "./core/calculateHref.js";
+export { calculateState } from "./core/calculateState.svelte.js";
 export * from './RouterTrace/RouterTrace.svelte';
 export { default as RouterTrace } from './RouterTrace/RouterTrace.svelte';

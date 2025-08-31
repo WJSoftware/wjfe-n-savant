@@ -46,12 +46,21 @@ function isRouterEngine(obj: unknown): obj is RouterEngine {
  * @returns The joined path.
  */
 export function joinPaths(...paths: string[]) {
-    const hasLeadingSlash = paths[0].startsWith('/');
     const result = paths.reduce((acc, path, index) => {
         const trimmedPath = (path ?? '').replace(/^\/|\/$/g, '');
         return acc + (index > 0 && !acc.endsWith('/') && trimmedPath.length > 0 ? '/' : '') + trimmedPath;
-    }, hasLeadingSlash ? '/' : '');
+    }, hasLeadingSlash(paths) ? '/' : '');
     return noTrailingSlash(result);
+}
+
+function hasLeadingSlash(paths: (string | undefined)[]) {
+    for (let path of paths) {
+        if (!path) {
+            continue;
+        }
+        return path.startsWith('/');
+    }
+    return false;
 }
 
 function noTrailingSlash(path: string) {
