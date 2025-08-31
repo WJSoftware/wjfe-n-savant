@@ -100,7 +100,6 @@
 			href
 		)
 	);
-	$inspect(calcHref).with((t, v) => console.log(`calcHref (${restProps.id || 'no id'}): ${v} (${t})`));
 
 	function handleClick(event: MouseEvent) {
 		event.preventDefault();
