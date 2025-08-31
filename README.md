@@ -6,7 +6,7 @@
 
 > **📝 Small and Unique!**
 > 
-> + Less than **1,050** lines of code, including TypeScript typing.
+> + Less than **1,200** lines of code, including TypeScript typing.
 > + Always-on path and hash routing.  Simultaneous and independent routing modes.
 > + The router that invented multi hash routing.
 
