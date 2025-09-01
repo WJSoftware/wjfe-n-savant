@@ -1,9 +1,10 @@
-import { describe, test, expect, beforeEach, beforeAll, vi, afterEach } from "vitest";
+import { describe, test, expect, beforeEach, beforeAll, vi, afterEach, afterAll } from "vitest";
 import { LocationLite } from "./LocationLite.svelte.js";
 import { LocationState } from "./LocationState.svelte.js";
 import type { Hash, Location, State } from "$lib/types.js";
 import { joinPaths } from "./RouterEngine.svelte.js";
 import { init } from "$lib/index.js";
+import { location as iLoc } from "./Location.js";
 
 describe("LocationLite", () => {
     const initialUrl = "http://example.com/";
@@ -143,43 +144,110 @@ describe("LocationLite", () => {
             expect(location.getState('abc')).toBe(abcHashState);
         });
     });
+});
+
+describe("LocationLite (Integration)", () => {
+    let cleanup: Function;
     describe("navigate", () => {
+        const initialUrl = "http://example.com/";
+        let interceptedState: State;
+        let _href: string;
+        const pushStateMock = vi.fn((state, _, url) => {
+            url = !url.startsWith('http://') ? joinPaths(initialUrl, url) : url;
+            globalThis.window.location.href = new URL(url).href;
+            interceptedState = state;
+        });
+        const replaceStateMock = vi.fn((state, _, url) => {
+            url = !url.startsWith('http://') ? joinPaths(initialUrl, url) : url;
+            globalThis.window.location.href = new URL(url).href;
+            interceptedState = state;
+        });
+        beforeAll(() => {
+            // @ts-expect-error Many missing features.
+            globalThis.window.location = {
+                get href() {
+                    return _href;
+                },
+                set href(value) {
+                    _href = value;
+                }
+            };
+            globalThis.window.location.href = initialUrl;
+            // @ts-expect-error Many missing features.
+            globalThis.window.history = {
+                get state() {
+                    return interceptedState;
+                },
+                pushState: pushStateMock,
+                replaceState: replaceStateMock
+            };
+        })
+        beforeEach(() => {
+            globalThis.window.location.href = initialUrl;
+            interceptedState = { path: undefined, hash: {} };
+            pushStateMock.mockReset();
+            replaceStateMock.mockReset();
+        });
+        beforeAll(() => {
+            cleanup = init();
+        });
+        afterAll(() => {
+            cleanup?.();
+        });
         test.each([
             {
                 replace: false,
                 expectedMethod: pushStateMock,
                 text: 'pushState',
                 hash: false,
+                hashText: 'path',
             },
             {
                 replace: true,
                 expectedMethod: replaceStateMock,
                 text: 'replaceState',
                 hash: false,
+                hashText: 'path',
             },
             {
                 replace: false,
                 expectedMethod: pushStateMock,
                 text: 'pushState',
                 hash: true,
+                hashText: 'hash.single',
             },
             {
                 replace: true,
                 expectedMethod: replaceStateMock,
                 text: 'replaceState',
                 hash: true,
+                hashText: 'hash.single',
             },
-        ])("Should call $text whenever the 'replace' option is $replace .", ({ replace, expectedMethod, hash }) => {
+        ])("Should call $text whenever the 'replace' option is $replace and save state under $hashText .", ({ replace, expectedMethod, hash }) => {
             // Arrange.
-            const newUrl = (hash ? "#" : '') + "/new";
+            const newUrl = "/new";
             const newState = { some: "state" };
-            const expectedArg = hash ? { hash: { single: newState } } : { path: newState, hash: {} };
+
+            // For hash routing, we need to account for any existing path state that gets preserved
+            let expectedArg: any;
+            if (hash) {
+                // Get the current state to see what path state might be preserved
+                const currentPathState = iLoc.getState(false);
+                expectedArg = { hash: { single: newState } };
+                if (currentPathState !== undefined) {
+                    expectedArg.path = currentPathState;
+                }
+            } else {
+                expectedArg = { path: newState, hash: {} };
+            }
+
+            const expectedUrl = hash ? `#${newUrl}` : newUrl;
 
             // Act.
-            location.navigate(newUrl, { replace, state: newState });
+            iLoc.navigate(newUrl, { replace, hash, state: newState });
 
             // Assert.
-            expect(expectedMethod).toHaveBeenCalledWith(expectedArg, '', newUrl);
+            expect(expectedMethod).toHaveBeenCalledWith(expectedArg, '', expectedUrl);
         });
         test("Should trigger an update on the location's URL and state values when doing path routing navigation.", () => {
             // Arrange.
@@ -187,63 +255,70 @@ describe("LocationLite", () => {
             const state = 123;
 
             // Act.
-            location.navigate(newPath, { state });
+            iLoc.navigate(newPath, { state });
 
             // Assert.
-            expect(location.url.pathname).toBe(newPath);
-            expect(location.getState(false)).toBe(state);
+            expect(iLoc.url.pathname).toBe(newPath);
+            expect(iLoc.getState(false)).toBe(state);
         });
         test("Should trigger an update on the location's URL and state values when doing hash routing navigation.", () => {
             // Arrange.
-            const newPath = '#/new';
+            const newPath = '/new';
             const state = 456;
 
             // Act.
-            location.navigate(newPath, { state });
+            iLoc.navigate(newPath, { state, hash: true });
 
             // Assert.
-            expect(location.url.hash).toBe(newPath);
-            expect(location.getState(true)).toBe(state);
+            expect(iLoc.url.hash).toBe(`#${newPath}`);
+            expect(iLoc.getState(true)).toBe(state);
         });
         test("Should trigger an update on the location's URL and state values when doing multi hash routing navigation.", () => {
             // Arrange.
             const hash = 'abc';
             const newPath = '/new';
             const state = 456;
-            location.dispose();
-            init({ hashMode: 'multi' });
+            cleanup?.();
+            try {
+                cleanup = init({ hashMode: 'multi' });
 
-            // Act.
-            location.navigate(newPath, hash, { state });
+                // Act.
+                iLoc.navigate(newPath, { hash, state });
 
-            // Assert.
-            expect(location.url.hash).toBe(`#${hash}=${newPath}`);
-            expect(location.getState(hash)).toBe(state);
+                // Assert.
+                expect(iLoc.url.hash).toBe(`#${hash}=${newPath}`);
+                expect(iLoc.getState(hash)).toBe(state);
+            }
+            finally {
+                //Clean up.
+                cleanup?.();
+                cleanup = init();
+            }
         });
         test("Should update the state whenever shallow routing is used (path routing).", () => {
             // Arrange.
-            const currentUrl = location.url.href;
+            const currentUrl = iLoc.url.href;
             const newState = 123;
 
             // Act.
-            location.navigate('', { state: newState });
+            iLoc.navigate('', { state: newState });
 
             // Assert.
-            expect(location.getState(false)).toBe(newState);
-            expect(location.url.href).toBe(currentUrl);
+            expect(iLoc.getState(false)).toBe(newState);
+            expect(iLoc.url.href).toBe(currentUrl);
         });
         test("Should update the state whenever shallow routing is used (multi hash routing).", () => {
             // Arrange.
-            const currentUrl = location.url.href;
+            const currentUrl = iLoc.url.href;
             const newState = 123;
             const pathName = 'p1';
 
             // Act.
-            location.navigate('', pathName, { state: newState });
+            iLoc.navigate('', { hash: pathName, state: newState });
 
             // Assert.
-            expect(location.getState(pathName)).toBe(newState);
-            expect(location.url.href).toBe(currentUrl);
+            expect(iLoc.getState(pathName)).toBe(newState);
+            expect(iLoc.url.href).toBe(currentUrl);
         });
     });
 });

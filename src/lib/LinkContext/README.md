@@ -39,7 +39,7 @@ not found, then the context-provided property value is used.  If there is no con
 |-|-|-|-|-|
 | `replace` | `boolean` | `false` | | Configures the link so it replaces the current URL as opposed to pushing the URL as a new entry in the browser's History API. |
 | `prependBasePath` | `boolean` | `false` | | Configures the component to prepend the parent router's base path to the `href` property. |
-| `preserveQuery` | `boolean \| string \| string[]` | `false` | | Configures the component to preserve the query string whenever it triggers navigation. |
+| `preserveQuery` | `PreserveQuery` | `false` | | Configures the component to preserve the query string whenever it triggers navigation. |
 | `children` | `Snippet` | `undefined` | | Renders the children of the component. |
 
 [Online Documentation](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/components/linkcontext)

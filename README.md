@@ -4,10 +4,9 @@
 
 ## Features
 
-> [!NOTE]
-> #### Small and Unique!
+> **📝 Small and Unique!**
 > 
-> + Less than **1,050** lines of code, including TypeScript typing.
+> + Less than **1,200** lines of code, including TypeScript typing.
 > + Always-on path and hash routing.  Simultaneous and independent routing modes.
 > + The router that invented multi hash routing.
 
@@ -219,8 +218,7 @@ Nothing prevents you to add transitions to anything.
 </Route>
 ```
 
-> [!NOTE]
-> This one item might be worthwhile revisiting for the cases where synchronized transitions are desired.  This, 
+> **📝 Note:** This one item might be worthwhile revisiting for the cases where synchronized transitions are desired.  This, 
 > however, won't be looked at until Svelte attachments become a thing.
 
 ### Guarded Routes
@@ -351,26 +349,100 @@ property of router engines (which is reactive) by binding to a router's `router`
 
 ## Navigation
 
+> Since **v0.4.0**
+
+> **💥 BREAKING CHANGE:**  Navigation has been re-done in v0.4.0.
+
 The recommended way of navigating is to create `<Link>` component instances to render links on the document(s).  If 
-needed, however, there's a programmatic way of navigating:  `location.navigate()`.
+needed, however, there are 2 navigation functions in the `location` object:  `navigate()` and `goTo()`.
+
+### `navigate(url, options)` - Routing Universe Aware
+
+This is the preferred method for programmatic navigation as it understands routing universes and properly manages state:
 
 ```typescript
 import { location } from "@wjfe/n-savant";
 
 // Path routing navigation:
-location.navigate('/new/path', { replace: true, state: { custom: 'Hi' }});
+location.navigate('/new/path', { 
+    replace: true, 
+    state: { custom: 'Hi' },
+    hash: false 
+});
 
 // Hash routing navigation:
-location.navigate('#/new/path', { replace: true, state: { custom: 'Hi' }});
+location.navigate('/new/path', { 
+    replace: true, 
+    state: { custom: 'Hi' },
+    hash: true 
+});
 
 // Multi-hash routing navigation:
-location.navigate('/new/path', 'path1', { replace: true, state: { custom: 'Hi' }});
+location.navigate('/new/path', { 
+    replace: true, 
+    state: { custom: 'Hi' },
+    hash: 'path1' 
+});
+
+// Preserve existing query parameters:
+location.navigate('/new/path', { 
+    preserveQuery: true,
+    hash: false
+});
 ```
 
-Navigation in multi-hash scenarios is tricky:  One must make sure other paths remain untouched, and the information 
-about these other paths is stored in `location.hashPaths`.  You could use the second form above for multi-hash routing 
-as long as you understand that it is your responsibility to (possibly) ensure the integrity of other paths defined in 
-the URL's hash value.
+The `navigate()` method automatically:
+- Associates state with the correct routing universe based on the `hash` option
+- Preserves other routing universe states (e.g., when navigating `path1`, other named paths remain intact)
+- Handles URL construction using the robust `calculateHref()` logic
+
+### `goTo(url, options)` - Direct URL Navigation  
+
+This method provides direct URL navigation without routing universe awareness:
+
+```typescript
+import { location } from "@wjfe/n-savant";
+
+// Direct URL navigation:
+location.goTo('https://example.com/new/path', { 
+    replace: true,
+    state: { path: undefined, hash: {} }  // Must provide complete State object
+});
+
+// Shallow routing (navigate to current URL):
+location.goTo('', { replace: true });
+
+// Preserve query parameters:
+location.goTo('/new/path', { 
+    preserveQuery: ['param1', 'param2'] 
+});
+```
+
+**⚠️ Important:** `goTo()` requires you to provide a complete `State` object and does not understand routing universes. Use `navigate()` unless you specifically need direct URL control.
+
+### Options Reference
+
+Both methods support these common options:
+
+- **`replace?: boolean`** - Replace current URL instead of pushing new entry (default: `false`)
+- **`preserveQuery?: PreserveQuery`** - Preserve current query parameters
+  - `true` - Preserve all query parameters
+  - `string` - Preserve specific parameter by name  
+  - `string[]` - Preserve multiple specific parameters
+
+Additional `navigate()` options:
+- **`hash?: Hash`** - Routing universe to associate with (`false`, `true`, or named hash)
+- **`state?: any`** - State data to associate with the navigation
+
+Additional `goTo()` options:
+- **`state?: State`** - Complete state object conforming to library expectations
+
+### Navigation Best Practices
+
+1. **Use `<Link>` components** for user-triggered navigation
+2. **Use `navigate()`** for programmatic navigation within routing universes
+3. **Use `goTo()`** only for direct URL manipulation or external navigation
+4. **Always specify `hash`** in `navigate()` to ensure proper state management
 
 Just in case you are wondering:  The navigation logic is already there in `<Link>` components:
 
@@ -386,8 +458,7 @@ Just in case you are wondering:  The navigation logic is already there in `<Link
 <Link hash="path1" href="/new/path">Click Me!</Link>
 ```
 
-> [!IMPORTANT]
-> Not setting the `hash` property is **not the same** as setting it to `false`.  When `hash` is `undefined`, either 
+> **⚠️ Important:** Not setting the `hash` property is **not the same** as setting it to `false`.  When `hash` is `undefined`, either 
 > because the property is not specified at all, or its value is set to `undefined` explicitly, the value of the 
 > `implicitMode` routing option, which is set when the library is initialized, will be used to resolve a `true` or 
 > `false` value.

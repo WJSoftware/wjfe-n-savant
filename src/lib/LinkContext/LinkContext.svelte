@@ -1,4 +1,5 @@
 <script lang="ts" module>
+	import type { PreserveQuery } from '$lib/types.js';
 	import { getContext, setContext, type Snippet } from 'svelte';
 
 	export type ILinkContext = {
@@ -31,7 +32,7 @@
 		 *
 		 * Set to a string or an array of strings to preserve only the specified query string values.
 		 */
-		preserveQuery?: boolean | string | string[];
+		preserveQuery?: PreserveQuery;
 	};
 
 	class _LinkContext implements ILinkContext {

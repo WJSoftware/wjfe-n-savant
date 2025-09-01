@@ -1,7 +1,12 @@
-import type { BeforeNavigateEvent, Hash, Location, NavigateOptions, NavigationCancelledEvent, State } from "../types.js";
+import type { BeforeNavigateEvent, Hash, Location, GoToOptions, NavigateOptions, NavigationCancelledEvent, State } from "../types.js";
+import { getCompleteStateKey } from "./Location.js";
 import { on } from "svelte/events";
 import { LocationState } from "./LocationState.svelte.js";
 import { routingOptions } from "./options.js";
+import { resolveHashValue } from "./RouterEngine.svelte.js";
+import { calculateHref } from "./calculateHref.js";
+import { calculateState } from "./calculateState.svelte.js";
+import { preserveQueryInUrl } from "./preserveQuery.js";
 
 /**
  * A lite version of the location object.  It does not support event listeners or state-setting call interceptions, 
@@ -35,11 +40,19 @@ export class LocationLite implements Location {
             this.#innerState = new LocationState();
         }
         this.#cleanup = $effect.root(() => {
-            return on(globalThis.window, 'popstate', () => {
-                console.log('popstate');
-                this.#innerState.url.href = globalThis.window?.location?.href;
-                this.#innerState.state = globalThis.window?.history?.state;
+            const cleanups = [] as (() => void)[];
+            ['popstate', 'hashchange'].forEach((event) => {
+                cleanups.push(on(globalThis.window, event, () => {
+                    console.log(event);
+                    this.#innerState.url.href = globalThis.window?.location?.href;
+                    this.#innerState.state = globalThis.window?.history?.state;
+                }));
             });
+            return () => {
+                for (let cleanup of cleanups) {
+                    cleanup();
+                }
+            };
         });
     }
 
@@ -55,70 +68,53 @@ export class LocationLite implements Location {
 
     getState(hash: Hash) {
         if (typeof hash === 'string') {
-            return this.#innerState.state.hash[hash];
+            return this.#innerState.state?.hash[hash];
         }
         if (hash) {
-            return this.#innerState.state.hash.single;
+            return this.#innerState.state?.hash.single;
         }
-        return this.#innerState.state.path;
+        return this.#innerState.state?.path;
     }
 
-    #newState(hash: Hash, state: any) {
-        const newState = $state.snapshot(this.#innerState.state);
-        if (typeof hash === 'string') {
-            newState.hash[hash] = state;
-        }
-        else if (hash) {
-            newState.hash.single = state;
-        }
-        else {
-            newState.path = state;
-        }
-        return newState;
-    }
-
-    navigate(url: string, options?: NavigateOptions): void;
-    navigate(url: string, hashId: string, options?: NavigateOptions): void;
-    navigate(url: string, hashIdOrOptions?: string | NavigateOptions, options?: NavigateOptions) {
-        let newState: State;
-        if (url === '') {
-            url = this.url.href;
-            if (typeof hashIdOrOptions === 'string') {
-                newState = this.#newState(hashIdOrOptions, options?.state);
-            }
-            else {
-                options = hashIdOrOptions;
-                newState = this.#newState(url.startsWith('#'), options?.state);
-            }
-        }
-        else {
-            if (typeof hashIdOrOptions === 'string') {
-                let idExists = false;
-                let finalUrl = '';
-                for (let [id, path] of Object.entries(this.hashPaths)) {
-                    if (id === hashIdOrOptions) {
-                        idExists = true;
-                        finalUrl += `;${id}=${url}`;
-                        continue;
-                    }
-                    finalUrl += `;${id}=${path}`;
-                }
-                if (!idExists) {
-                    finalUrl += `;${hashIdOrOptions}=${url}`;
-                }
-                url = '#' + finalUrl.substring(1);
-                newState = this.#newState(hashIdOrOptions, options?.state);
-            }
-            else {
-                options = hashIdOrOptions;
-                newState = this.#newState(url.startsWith('#'), options?.state);
-            }
-        }
-        (options?.replace ?
-            globalThis.window?.history.replaceState :
-            globalThis.window?.history.pushState).bind(globalThis.window?.history)(newState, '', url);
+    #goTo(url: string, replace: boolean, state: State | undefined) {
+        (
+            replace ?
+                globalThis.window?.history.replaceState :
+                globalThis.window?.history.pushState
+        ).bind(globalThis.window?.history)(state, '', url);
         this.#innerState.url.href = globalThis.window?.location.href;
-        this.#innerState.state = newState;
+        this.#innerState.state = state ?? { path: undefined, hash: {} };
+    }
+
+    goTo(url: string, options?: GoToOptions): void {
+        if (url === '') {
+            // Shallow routing.
+            url = this.url.href;
+        }
+        if (options?.preserveQuery) {
+            url = preserveQueryInUrl(url, options.preserveQuery);
+        }
+        this.#goTo(url, options?.replace ?? false, options?.state);
+    }
+
+    navigate(url: string, options?: NavigateOptions): void {
+        const resolvedHash = resolveHashValue(options?.hash);
+        if (url === '') {
+            // Shallow routing.
+            url = this.url.href;
+        }
+        else {
+            url = calculateHref({
+                ...options,
+                hash: resolvedHash,
+            }, url);
+        }
+        const newState = calculateState(resolvedHash, options?.state);
+        this.#goTo(url, options?.replace ?? false, newState);
+    }
+
+    [getCompleteStateKey](): State {
+        return $state.snapshot(this.#innerState.state);
     }
 
     dispose() {
