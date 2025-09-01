@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { calculateHref } from '$lib/core/calculateHref.js';
-	import { calculateState } from '$lib/core/calculateState.svelte.js';
+	import { calculateState } from '$lib/core/calculateState.js';
 	import { location } from '$lib/core/Location.js';
 	import { resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
 	import { getLinkContext, type ILinkContext } from '$lib/LinkContext/LinkContext.svelte';

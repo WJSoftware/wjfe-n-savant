@@ -60,7 +60,7 @@ export function calculateHref(...allArgs: (CalculateHrefOptions | string | undef
     options.preserveQuery ??= false;
     const dissected = dissectHrefs(...paths);
     if (options.hash !== false && dissected.hashes.some(h => !!h.length)) {
-        throw new Error("Specifying hashes in the 'href' property is only allowed for path routing.");
+        throw new Error("Specifying hashes in HREF's is only allowed for path routing.");
     }
     let searchParams: URLSearchParams | undefined;
     let joinedSearchParams = '';

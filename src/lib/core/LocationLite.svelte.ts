@@ -5,7 +5,7 @@ import { LocationState } from "./LocationState.svelte.js";
 import { routingOptions } from "./options.js";
 import { resolveHashValue } from "./RouterEngine.svelte.js";
 import { calculateHref } from "./calculateHref.js";
-import { calculateState } from "./calculateState.svelte.js";
+import { calculateState } from "./calculateState.js";
 import { preserveQueryInUrl } from "./preserveQuery.js";
 
 /**
