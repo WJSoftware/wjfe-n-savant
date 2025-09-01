@@ -1,21 +1,42 @@
 <script lang="ts">
 	import './app.scss';
 	import NavBar from './lib/NavBar.svelte';
+	import Tooltip from './lib/Tooltip.svelte';
 	import { Router, Route, Fallback, RouterTrace } from '@wjfe/n-savant';
 	import NotFound from './lib/NotFound.svelte';
 	import HomeView from './lib/views/home/HomeView.svelte';
 	import PathRoutingView from './lib/views/path-routing/PathRoutingView.svelte';
 	import HashRoutingView from './lib/views/hash-routing/HashRoutingView.svelte';
-</script>
 
-<svelte:head>
-	<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</svelte:head>
+	let showNavTooltip = $state(false);
+
+	// Show toolti<p after a short delay when app loads
+	$effect(() => {
+		const timer = setTimeout(() => {
+			showNavTooltip = true;
+		}, 2000);
+		
+		// Hide tooltip after 10 seconds or when user interacts
+		const hideTimer = setTimeout(() => {
+			showNavTooltip = false;
+		}, 12000);
+		
+		return () => {
+			clearTimeout(timer);
+			clearTimeout(hideTimer);
+		};
+	});
+</script>
 
 <div class="app">
 	<div class="d-flex flex-column h-100">
 		<Router id="root">
-			<NavBar />
+			<Tooltip shown={showNavTooltip} placement="bottom">
+				{#snippet reference(ref)}
+					<NavBar {@attach ref} />
+				{/snippet}
+				Use these navigation links to test-drive the routing capabilities of @wjfe/n-savant.
+			</Tooltip>
 			<main class="d-flex flex-column flex-fill overflow-auto mt-3">
 				<div class="container-fluid flex-fill d-flex flex-column">
 					<div class="grid flex-fill">

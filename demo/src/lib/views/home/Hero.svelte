@@ -1,6 +1,6 @@
 <script>
     const title = "@wjfe/n-savant Router";
-    const subtitle = "The small router for Svelte that could";
+    const subtitle = "The ultimate routing solution for Svelte PWA's and micro-frontends";
 </script>
 
 <div class="hero text-center p-5 text-bg-primary rounded">
