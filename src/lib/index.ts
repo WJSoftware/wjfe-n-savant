@@ -52,7 +52,5 @@ export { default as Fallback } from "$lib/Fallback/Fallback.svelte";
 export type * from "./types.js";
 export { location } from "./core/Location.js";
 export { isConformantState } from "./core/isConformantState.js";
-export { calculateHref } from "./core/calculateHref.js";
-export { calculateState } from "./core/calculateState.svelte.js";
 export * from './RouterTrace/RouterTrace.svelte';
 export { default as RouterTrace } from './RouterTrace/RouterTrace.svelte';
