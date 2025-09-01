@@ -2,23 +2,28 @@
 	import { Link, Route } from '@wjfe/n-savant';
 	import SubNav from './SubNav.svelte';
 	import { routingMode } from './hash-routing';
+	import type { HTMLAttributes } from 'svelte/elements';
+
+	let {
+		...restProps
+	}: HTMLAttributes<HTMLElement> = $props();
 
 	const pathRoutingLinks = [
 		{ text: 'Home', href: '/path-routing' },
-		{ text: 'Demo', href: '/path-routing/demo' }
+		{ text: 'Start Demo', href: '/path-routing/demo' }
 	];
 	const hashRoutingLinks = [
 		{ text: 'Home', href: '/hash-routing' },
 		{
-			text: 'Demo',
+			text: 'Start Demo',
 			href: '/hash-routing#' + (routingMode === 'multi' ? 'd1=/demo;d2=/demo' : '/demo')
 		}
 	];
 </script>
 
-<nav class="navbar navbar-expand-lg bg-primary-subtle">
+<nav class="navbar navbar-expand-lg bg-primary-subtle" {...restProps}>
 	<div class="container-fluid">
-		<Link class="navbar-brand fw-bold" href="/">
+		<Link class="navbar-brand fw-bold" href="/" id="logoLink">
 			<svg style:height="1.7em" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
 				<!-- Outer circle -->
 				<circle cx="50" cy="50" r="48" stroke="black" stroke-width="2" fill="none" />
@@ -57,7 +62,7 @@
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav">
 				<li class="nav-item">
-					<Link class="nav-link" activeState={{ class: 'active', key: 'home' }} href="/">Home</Link>
+					<Link class="nav-link" activeState={{ class: 'active', key: 'home' }} href="/" id="homeLink">Home</Link>
 				</li>
 				<Route key="homeMenuPr" when={(rs) => !rs.pathRouting?.match}>
 					<li class="nav-item">

@@ -1,5 +1,9 @@
 <script lang="ts">
     import type { HTMLAttributes } from "svelte/elements";
+    import CodeSnippet from "../../CodeSnippet.svelte";
+    import bash from "svelte-highlight/languages/bash";
+    import typescript from "svelte-highlight/languages/typescript";
+    
     type Props = HTMLAttributes<HTMLDivElement>;
 
     let {
@@ -14,9 +18,15 @@
     </div>
     <div class="card-body">
         <p>Install the package:</p>
-        <code><pre>npm install @wjfe/n-savant</pre></code>
+        <CodeSnippet 
+            language={bash} 
+            code="npm install @wjfe/n-savant"
+            title="Installation"
+        />
         <p>Then, in your Svelte app:</p>
-        <code><pre>{`${'<'}script lang="ts">
+        <CodeSnippet 
+            language={typescript} 
+            code={`<scr` + `ipt lang="ts">
     import { Router, Route } from '@wjfe/n-savant';
     import Hero from './lib/Hero.svelte';
     import Features from './lib/Features.svelte';
@@ -29,16 +39,8 @@
     <Route key="features" path="/features">
         <Features />
     </Route>
-</Router>`}</pre></code>
+</Router>`}
+            title="Basic Usage"
+        />
     </div>
 </div>
-
-<!--
-@component
-# Quickstart
-```svelte
-<script>
-    import Quickstart from './lib/Quickstart.svelte';
-</script>
-```
--->

@@ -8,5 +8,9 @@ export const routingMode = globalThis.window.sessionStorage.getItem(routingModeK
 export function toggleRoutingMode() {
     const newMode: HashRoutingMode = routingMode === 'single' ? 'multi' : 'single';
     globalThis.window.sessionStorage.setItem(routingModeKey, newMode);
+    
+    // Clear the hash to avoid conflicts when switching modes
+    globalThis.window.location.hash = '';
+    
     globalThis.window.location.reload();
 }
