@@ -2,6 +2,7 @@ import type { AndUntyped, Hash, PatternRouteInfo, RegexRouteInfo, RouteInfo, Rou
 import { traceOptions, registerRouter, unregisterRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
 import { routingOptions } from "./options.js";
+import { resolveHashValue } from "./resolveHashValue.js";
 
 /**
  * RouterEngine's options.
@@ -22,18 +23,6 @@ export type RouterEngineOptions = {
      * for the `hashMode` option in the `init` function.
      */
     hash?: boolean | string;
-}
-
-/**
- * Resolves the given hash value taking into account the library's routing options.
- * @param hash Hash value to resolve.
- * @returns The resolved hash value.
- */
-export function resolveHashValue(hash: boolean | string | undefined) {
-    if (hash === undefined) {
-        return routingOptions.implicitMode === 'hash';
-    }
-    return hash;
 }
 
 function isRouterEngine(obj: unknown): obj is RouterEngine {

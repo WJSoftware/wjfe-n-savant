@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { traceOptions, getAllChildRouters } from '$lib/core/trace.svelte.js';
 	import {
-		resolveHashValue,
 		routePatternsKey,
 		RouterEngine
 	} from '$lib/core/RouterEngine.svelte.js';
+	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { PatternRouteInfo } from '$lib/types.js';
 	import type { HTMLTableAttributes } from 'svelte/elements';

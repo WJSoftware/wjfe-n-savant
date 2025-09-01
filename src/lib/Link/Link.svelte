@@ -2,7 +2,7 @@
 	import { calculateHref } from '$lib/core/calculateHref.js';
 	import { calculateState } from '$lib/core/calculateState.js';
 	import { location } from '$lib/core/Location.js';
-	import { resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
+	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import { getLinkContext, type ILinkContext } from '$lib/LinkContext/LinkContext.svelte';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { ActiveState, Hash, RouteStatus } from '$lib/types.js';

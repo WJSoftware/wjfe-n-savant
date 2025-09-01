@@ -1,5 +1,6 @@
 <script lang="ts" module>
-	import { resolveHashValue, RouterEngine } from '$lib/core/RouterEngine.svelte.js';
+	import { RouterEngine } from '$lib/core/RouterEngine.svelte.js';
+	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import type { RouteStatus } from '$lib/types.js';
 
 	const parentCtxKey = Symbol();
