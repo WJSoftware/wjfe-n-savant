@@ -10,7 +10,7 @@
 
 	let showNavTooltip = $state(false);
 
-	// Show toolti<p after a short delay when app loads
+	// Show tooltip after a short delay when app loads
 	$effect(() => {
 		const timer = setTimeout(() => {
 			showNavTooltip = true;

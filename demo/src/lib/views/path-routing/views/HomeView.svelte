@@ -290,7 +290,7 @@
 			<div class="alert alert-primary text-center">
 				<h4>🎮 Ready to Try Path Routing?</h4>
 				<p class="mb-3">
-					Click the "Demo" link in the navigation above to see path routing in action! 
+					Click the "Start Demo" link in the navigation above to see path routing in action! 
 					Watch how the URL changes as you navigate between different sections.
 				</p>
 				<p class="mb-0">
