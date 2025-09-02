@@ -91,7 +91,7 @@ export function calculateHref(...allArgs: (CalculateHrefOptions | string | undef
         calculateMultiHashHref(hash, joinPaths(...dissected.paths)) :
         joinPaths(...dissected.paths);
     let hashValue = hash === false ?
-        dissected.hashes.find(h => h.length) || ((preserveHash ? location.url.hash.substring(1) : '') ?? '') :
+        dissected.hashes.find(h => h.length) || (preserveHash ? location.url.hash.substring(1) : '') :
         path;
     return `${hash ? '' : path}${searchParams ? `?${searchParams}` : ''}${hashValue.length ? `#${hashValue}` : ''}`;
 }
