@@ -1,7 +1,9 @@
-import type { State } from "$lib/types.js";
 import { SvelteURL } from "svelte/reactivity";
 import { isConformantState } from "./isConformantState.js";
 
+/**
+ * Helper class used to manage the reactive data of Location implementations.
+ */
 export class LocationState {
     url = new SvelteURL(globalThis.window?.location?.href);
     state;

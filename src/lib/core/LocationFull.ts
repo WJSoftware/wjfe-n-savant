@@ -2,6 +2,9 @@ import type { BeforeNavigateEvent, Events, NavigationCancelledEvent, NavigationE
 import { LocationLite } from "./LocationLite.svelte.js";
 import { LocationState } from "./LocationState.svelte.js";
 
+/**
+ * Location implementation of the library's full mode feature.
+ */
 export class LocationFull extends LocationLite {
     #eventSubs: Record<Events, Record<number, Function>> = {
         beforeNavigate: {},

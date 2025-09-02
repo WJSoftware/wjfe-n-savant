@@ -131,15 +131,29 @@ export type GoToOptions = {
     preserveQuery?: PreserveQuery;
 }
 
+/**
+ * Defines the options that can be used when calling `Location.navigate`.
+ */
 export type NavigateOptions = Omit<GoToOptions, 'state'> & {
     /**
      * The state data to associate with the new URL and hash value.
      */
     state?: any;
 } & ({
+    /**
+     * The hash value that determines the routing universe in which navigation will take place.
+     */
     hash?: Exclude<Hash, false>;
 } | {
+    /**
+     * The hash value that determines the routing universe in which navigation will take place.
+     */
     hash?: false;
+    /**
+     * Determines whether the current hash value should be preserved when navigating.
+     * 
+     * **IMPORTANT**:  This option is only valid for path routing scenarios.
+     */
     preserveHash?: boolean;
 });
 
