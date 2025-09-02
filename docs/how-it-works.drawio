@@ -1,0 +1,153 @@
+<mxfile host="65bd71144e">
+    <diagram id="0hGq_aKdnhjFH05bCRC_" name="Page-1">
+        <mxGraphModel dx="657" dy="952" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="850" background="light-dark(#e3e3e3, #121212)" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="4" value="" style="edgeStyle=none;html=1;" parent="1" source="2" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="&lt;b&gt;init()&lt;/b&gt;&lt;div&gt;Sets reactive location.&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="40" width="200" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="" style="edgeStyle=none;html=1;" parent="1" source="3" target="5" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="&lt;b&gt;&amp;lt;Router&amp;gt;&lt;/b&gt;&lt;div&gt;Adds context.&lt;/div&gt;&lt;div&gt;Links to parent.&lt;/div&gt;&lt;div&gt;Defines reactive matching.&lt;/div&gt;" style="whiteSpace=wrap;html=1;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="120" width="200" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="" style="edgeStyle=none;html=1;" parent="1" source="5" target="7" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="&lt;b&gt;&amp;lt;Route&amp;gt;&lt;/b&gt;&lt;div&gt;Retrieves context.&lt;/div&gt;&lt;div&gt;Registers matching conditions.&lt;/div&gt;" style="whiteSpace=wrap;html=1;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="240" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="" style="edgeStyle=none;html=1;" parent="1" source="7" target="9" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="&lt;b&gt;Reactivity&lt;/b&gt;&lt;div&gt;Reactive matching evaluates routes as soon as they appear.&lt;/div&gt;" style="whiteSpace=wrap;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="340" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" value="" style="edgeStyle=none;html=1;" parent="1" source="9" target="46" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="&lt;b&gt;&amp;lt;Route&amp;gt;&lt;/b&gt;&lt;div&gt;Reactively shows or hides children.&lt;/div&gt;" style="whiteSpace=wrap;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="440" width="200" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="" style="edgeStyle=none;html=1;" parent="1" source="11" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="&lt;b&gt;Change of Reactive State&lt;/b&gt;&lt;div&gt;&lt;ul&gt;&lt;li style=&quot;text-align: left;&quot;&gt;Location&lt;/li&gt;&lt;li style=&quot;text-align: left;&quot;&gt;Read state during route evaluation&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="40" width="200" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="" style="edgeStyle=none;html=1;" parent="1" source="12" target="14" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="&lt;b&gt;Reactivity&lt;/b&gt;&lt;div&gt;All routers re-evaluate all routes&lt;/div&gt;" style="whiteSpace=wrap;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="190" width="200" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="49" value="" style="edgeStyle=none;html=1;" parent="1" source="14" target="48" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="&lt;b&gt;&amp;lt;Route&amp;gt;&lt;/b&gt;&lt;div&gt;Reactively shows or hides children.&lt;/div&gt;" style="whiteSpace=wrap;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="270" width="200" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="First Render" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=20;textShadow=1;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="-80" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="Operation" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=20;textShadow=1;" parent="1" vertex="1">
+                    <mxGeometry x="280" y="-80" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Route Evaluation" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="290" y="440" width="540" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="" style="edgeStyle=none;html=1;" parent="18" source="19" target="20" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Calculate test path" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="18" vertex="1">
+                    <mxGeometry x="40" y="90" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Every route:" style="whiteSpace=wrap;html=1;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="18" vertex="1">
+                    <mxGeometry x="40" y="150" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="54" style="edgeStyle=elbowEdgeStyle;html=1;elbow=vertical;" parent="18" source="22" target="53" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="" style="points=[[0.25,0,0],[0.5,0,0],[0.75,0,0],[1,0.25,0],[1,0.5,0],[1,0.75,0],[0.75,1,0],[0.5,1,0],[0.25,1,0],[0,0.75,0],[0,0.5,0],[0,0.25,0]];shape=mxgraph.bpmn.task;whiteSpace=wrap;rectStyle=rounded;size=10;html=1;container=1;expand=0;collapsible=0;taskMarker=abstract;isLoopStandard=1;fillColor=none;" parent="18" vertex="1">
+                    <mxGeometry x="180" y="20" width="340" height="380" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="" style="edgeStyle=none;html=1;" parent="22" source="23" target="28" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="Test path &amp;amp; extract params" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="22" vertex="1">
+                    <mxGeometry x="20" y="29.23409090909091" width="165.46" height="31.22045454545454" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="Yes" style="edgeStyle=none;html=1;labelBackgroundColor=light-dark(#E3E3E3,#EDEDED);" parent="22" source="28" target="32" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="No" style="edgeStyle=elbowEdgeStyle;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;elbow=vertical;labelBackgroundColor=#E3E3E3;" parent="22" source="28" target="39" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="166.65151515151516" y="328.18181818181813" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="329.6969696969697" y="233.18181818181816"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="28" value="Path Match?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="22" vertex="1">
+                    <mxGeometry x="57.93" y="77.73" width="93.79" height="92.27" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="Yes" style="edgeStyle=none;html=1;labelBackgroundColor=light-dark(#E3E3E3,#EDEDED);" parent="22" source="32" target="34" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="No" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;labelBackgroundColor=light-dark(#E3E3E3,#EDEDED);" parent="22" source="32" target="39" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="104.83232055143" y="310.9090909090909" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="32" value="&lt;font face=&quot;Courier New&quot;&gt;&lt;b&gt;and&lt;/b&gt;&lt;/font&gt; predicate?" style="rhombus;whiteSpace=wrap;html=1;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="22" vertex="1">
+                    <mxGeometry x="57.93" y="200" width="93.79" height="88.64" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="Route Match!" style="whiteSpace=wrap;html=1;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="22" vertex="1">
+                    <mxGeometry x="195.75757575757575" y="223.52045454545458" width="120.08181818181818" height="36.333181818181814" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="Route Mismatch" style="whiteSpace=wrap;html=1;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="22" vertex="1">
+                    <mxGeometry x="44.78727272727276" y="320" width="120.08181818181818" height="36.333181818181814" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" style="edgeStyle=elbowEdgeStyle;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="18" source="20" target="22" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="100" y="160"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="52" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="18" source="50" target="19" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="18" vertex="1">
+                    <mxGeometry x="80" y="20" width="40" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="53" value="" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.start;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="18" vertex="1">
+                    <mxGeometry x="60" y="350" width="80" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="" style="edgeStyle=none;html=1;" parent="1" source="41" target="2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
+                    <mxGeometry x="120" y="-40" width="40" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" value="" style="edgeStyle=none;html=1;" parent="1" source="43" target="11" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
+                    <mxGeometry x="360" y="-40" width="40" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.start" parent="1" vertex="1">
+                    <mxGeometry x="100" y="520" width="80" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="48" value="" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.start" parent="1" vertex="1">
+                    <mxGeometry x="340" y="350" width="80" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
