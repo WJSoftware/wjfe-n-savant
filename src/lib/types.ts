@@ -1,4 +1,4 @@
-import type { HTMLAnchorAttributes } from "svelte/elements";
+import type { ClassValue, HTMLAnchorAttributes } from "svelte/elements";
 import type { SvelteURL } from "svelte/reactivity";
 
 /**
@@ -297,11 +297,13 @@ export type ActiveState = {
      */
     key?: string;
     /**
-     * Sets the class that the link will use when rendering as active.
+     * Sets the class or classes that the link will use when rendering as active.
      * 
      * For example, set it to `"active"` for Bootstrap setups.
+     * 
+     * **TIP**:  You can use any value type that is accepted by the popular `clsx` library.
      */
-    class?: string;
+    class?: ClassValue;
     /**
      * Sets the style that the link will use when rendering as active.
      * 
