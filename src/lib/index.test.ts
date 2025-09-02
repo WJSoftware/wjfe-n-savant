@@ -14,7 +14,6 @@ describe('index', () => {
             'init',
             'getRouterContext',
             'setRouterContext',
-            'isConformantState',
         ];
 
         // Act.
