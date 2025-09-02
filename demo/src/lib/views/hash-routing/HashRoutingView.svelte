@@ -300,7 +300,7 @@
 						<small><strong>Parsed routes:</strong></small>
 						<ul class="mb-0 mt-1">
 							{#each Object.entries(parsedRoutes) as [key, value]}
-								<li><code>{key}</code>: <span class="text-info">{value || '(empty)'}</span></li>
+								<li><code>{key}</code>: <span class="text-success">{value || '(empty)'}</span></li>
 							{/each}
 						</ul>
 					</div>
@@ -335,7 +335,7 @@
 				</div>
 				{#if parsedRoutes.main}
 					<div class="mt-2">
-						<small><strong>Current route:</strong> <span class="text-info">{parsedRoutes.main}</span></small>
+						<small><strong>Current route:</strong> <span class="text-success">{parsedRoutes.main}</span></small>
 					</div>
 				{/if}
 				<div class="mt-3">
@@ -380,8 +380,8 @@
 					<div class="alert alert-info mt-3">
 						<strong>💡 Key points:</strong>
 						<ul class="mb-0 mt-2">
-							<li><code>location.url.hash</code> is reactive and updates automatically</li>
-							<li><code>location.hashPaths</code> provides parsed hash routes</li>
+							<li><code>location.url.hash</code> <span class="badge bg-success">reactive</span> updates automatically</li>
+							<li><code>location.hashPaths</code> <span class="badge bg-success">reactive</span> provides parsed hash routes</li>
 							<li><code>$derived()</code> creates reactive computed values</li>
 							<li><strong>✨ No manual event listeners needed!</strong></li>
 						</ul>
