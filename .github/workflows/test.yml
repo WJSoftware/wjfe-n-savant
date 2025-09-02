@@ -1,0 +1,14 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    uses: WJSoftware/cicd/.github/workflows/npm-test.yml@main
+    with:
+      node-version: 24
+      build-script: build
+      test-script: test
+      build: false

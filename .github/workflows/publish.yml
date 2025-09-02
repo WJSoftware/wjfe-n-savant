@@ -1,0 +1,26 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      npm-tag:
+        description: 'NPM tag to publish the package (e.g., latest, beta, etc.)'
+        required: false
+        default: 'latest'
+        type: string
+      dry-run:
+        description: 'Perform a dry run (true/false)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  publish:
+    uses: WJSoftware/cicd/.github/workflows/npm-publish.yml@main
+    with:
+      node-version: 24
+      build-script: build
+      test-script: test
+      npm-tag: ${{ inputs.npm-tag || 'latest' }}
+      dry-run: ${{ inputs.dry-run || false }}
+    secrets: inherit
