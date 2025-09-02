@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
+	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { RouteStatus } from '$lib/types.js';
 	import type { Snippet } from 'svelte';

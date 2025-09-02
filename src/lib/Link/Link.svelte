@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { calculateHref } from '$lib/core/calculateHref.js';
-	import { calculateState } from '$lib/core/calculateState.svelte.js';
+	import { calculateState } from '$lib/core/calculateState.js';
 	import { location } from '$lib/core/Location.js';
-	import { resolveHashValue } from '$lib/core/RouterEngine.svelte.js';
+	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import { getLinkContext, type ILinkContext } from '$lib/LinkContext/LinkContext.svelte';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
-	import type { ActiveState, RouteStatus } from '$lib/types.js';
+	import type { ActiveState, Hash, RouteStatus } from '$lib/types.js';
 	import { type Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
@@ -41,7 +41,7 @@
 			 * route becomes active.
 			 * - The `prependBasePath` property:  It depends on the parent router to set the base path for the link.
 			 */
-			hash?: boolean | string;
+			hash?: Hash;
 			/**
 			 * Sets the URL to navigate to.  Never use a full URL; always use relative or absolute paths.
 			 */

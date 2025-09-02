@@ -1,6 +1,6 @@
 import { init, location } from '$lib/index.js';
 import { describe, test, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
-import { calculateState } from './calculateState.svelte.js';
+import { calculateState } from './calculateState.js';
 
 describe('calculateState', () => {
     const initialUrl = "http://example.com/";

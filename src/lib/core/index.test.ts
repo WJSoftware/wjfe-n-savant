@@ -8,7 +8,6 @@ describe('index', () => {
             'RouterEngine',
             'joinPaths',
             'isConformantState',
-            'dissectHrefs',
             'calculateHref',
             'calculateState',
         ];

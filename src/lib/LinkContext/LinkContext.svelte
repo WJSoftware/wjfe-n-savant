@@ -36,18 +36,18 @@
 	};
 
 	class _LinkContext implements ILinkContext {
-		replace = $state(false);
-		prependBasePath = $state(false);
-		preserveQuery = $state<ILinkContext['preserveQuery']>(false);
+		replace;
+		prependBasePath;
+		preserveQuery;
 
 		constructor(
 			replace: boolean,
 			prependBasePath: boolean,
-			preserveQuery: ILinkContext['preserveQuery']
+			preserveQuery: PreserveQuery
 		) {
-			this.replace = replace;
-			this.prependBasePath = prependBasePath;
-			this.preserveQuery = preserveQuery;
+			this.replace = $state(replace);
+			this.prependBasePath = $state(prependBasePath);
+			this.preserveQuery = $state(preserveQuery);
 		}
 	}
 
