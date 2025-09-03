@@ -10,6 +10,7 @@
 > + Always-on path and hash routing.  Simultaneous and independent routing modes.
 > + The router that invented multi hash routing.
 
++ **Electron support**:  Works with Electron (all routing modes)
 + **Reactivity-based**:  All data is reactive, reducing the need for events and imperative programming.
 + **Always-on path and hash routing**:  Add routers that use the URL's path name or the URL's hash value in the same 
 application.  Both routing modes are possible simultaneously.
@@ -106,6 +107,21 @@ init();
 // If all you care about is (traditional) hash routing, the recommendation is to change the implicit mode:
 init({ implicitMode: 'hash' });
 ```
+
+#### Electron Variant
+
+In Electron, we must immediately navigate to the homepage (or your preferred initial route) right after initializing if you use path routing:
+
+```typescript
+import { init, location } from "@wjfe/n-savant";
+
+init();
+location.goTo('/');
+```
+
+For applications that also run in the browser, condition the navigation to Electron only.  See the [Electron page](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/introduction/electron-support) online for more details.
+
+> **⚠️ Important:** Hash routing doesn't require this extra step.
 
 ### Define the Routes
 
