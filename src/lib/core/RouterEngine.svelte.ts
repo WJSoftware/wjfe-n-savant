@@ -137,7 +137,7 @@ export class RouterEngine {
         return this.#routePatterns;
     }
 
-    #testPath = $derived.by(() => noTrailingSlash(this.#hashId ? (location.hashPaths[this.#hashId] || '/') : this.url.pathname));
+    #testPath = $derived.by(() => noTrailingSlash(this.#hashId ? (location.hashPaths[this.#hashId] || '/') : this.path));
 
     #routeStatusData = $derived.by(() => {
         const routeStatus = {} as Record<string, RouteStatus>;
@@ -242,6 +242,16 @@ export class RouterEngine {
      */
     get url() {
         return location.url;
+    }
+    /**
+     * Gets the environment's current path.
+     * 
+     * This is a sanitized version of `location.url.pathname` that strips out drive letters for the case of Electron in 
+     * Windows.  It is highly recommended to always use this path whenever possible.
+     */
+    get path() {
+        const hasDriveLetter = this.url.protocol.startsWith('file:') && this.url.pathname[2] === ':';
+        return hasDriveLetter ? this.url.pathname.substring(3) : this.url.pathname;
     }
     /**
      * Gets the browser's current state.
