@@ -57,12 +57,6 @@ export type RouteStatus = {
 export type AndUntyped = (params: Record<string, ParameterValue> | undefined) => boolean;
 
 /**
- * Defines the shape of predicate functions that are used to determine if the route contents should show based on the 
- * route status information of all routes in the router.
- */
-export type WhenPredicate = (routeStatus: Record<string, RouteStatus>) => boolean
-
-/**
  * Defines the core properties of a route definition.
  */
 export type CoreRouteInfo = {
@@ -71,10 +65,9 @@ export type CoreRouteInfo = {
      */
     and?: AndUntyped;
     /**
-     * An optional predicate function that is used to determine if the route contents should show based on the route 
-     * status information of all routes in the router.
+     * A Boolean value that determines if the route's match status should be ignored for fallback purposes.
      */
-    when?: WhenPredicate;
+    ignoreForFallback?: boolean;
 }
 
 /**

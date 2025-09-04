@@ -15,12 +15,12 @@
 		const timer = setTimeout(() => {
 			showNavTooltip = true;
 		}, 2000);
-		
+
 		// Hide tooltip after 10 seconds or when user interacts
 		const hideTimer = setTimeout(() => {
 			showNavTooltip = false;
 		}, 12000);
-		
+
 		return () => {
 			clearTimeout(timer);
 			clearTimeout(hideTimer);
@@ -31,33 +31,35 @@
 <div class="app">
 	<div class="d-flex flex-column h-100">
 		<Router id="root">
-			<Tooltip shown={showNavTooltip} placement="bottom">
-				{#snippet reference(ref)}
-					<NavBar {@attach ref} />
-				{/snippet}
-				Use these navigation links to test-drive the routing capabilities of @wjfe/n-savant.
-			</Tooltip>
-			<main class="d-flex flex-column flex-fill overflow-auto mt-3">
-				<div class="container-fluid flex-fill d-flex flex-column">
-					<div class="grid flex-fill">
-						<Route key="home" path="/">
-							<HomeView />
-						</Route>
-						<Route key="pathRouting" path="/path-routing/*">
-							<PathRoutingView basePath="/path-routing" />
-						</Route>
-						<Route key="hashRouting" path="/hash-routing">
-							<HashRoutingView basePath="/hash-routing" />
-						</Route>
-						<Fallback>
-							<NotFound />
-						</Fallback>
+			{#snippet children(_, rs)}
+				<Tooltip shown={showNavTooltip} placement="bottom">
+					{#snippet reference(ref)}
+						<NavBar {@attach ref} />
+					{/snippet}
+					Use these navigation links to test-drive the routing capabilities of @wjfe/n-savant.
+				</Tooltip>
+				<main class="d-flex flex-column flex-fill overflow-auto mt-3">
+					<div class="container-fluid flex-fill d-flex flex-column">
+						<div class="grid flex-fill">
+							<Route key="home" path="/">
+								<HomeView />
+							</Route>
+							<Route key="pathRouting" path="/path-routing/*">
+								<PathRoutingView basePath="/path-routing" />
+							</Route>
+							<Route key="hashRouting" path="/hash-routing">
+								<HashRoutingView basePath="/hash-routing" />
+							</Route>
+							<Fallback>
+								<NotFound />
+							</Fallback>
+						</div>
 					</div>
-				</div>
-			</main>
-			<Route key="notHome" when={(rs) => !rs.home.match}>
-				<RouterTrace />
-			</Route>
+				</main>
+				{#if !rs.home.match}
+					<RouterTrace />
+				{/if}
+			{/snippet}
 		</Router>
 	</div>
 </div>

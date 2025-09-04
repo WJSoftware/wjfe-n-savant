@@ -127,11 +127,11 @@ export class RouterEngine {
     #routePatterns = $derived(Object.entries(this.routes).reduce((map, [key, route]) => {
         map.set(
             key, routeInfoIsRegexInfo(route) ?
-            { regex: route.regex, and: route.and } :
+            { regex: route.regex, and: route.and, ignoreForFallback: !!route.ignoreForFallback } :
             this.#parseRoutePattern(route)
         );
         return map;
-    }, new Map<string, { regex?: RegExp; and?: AndUntyped; }>()));
+    }, new Map<string, { regex?: RegExp; and?: AndUntyped; ignoreForFallback: boolean; }>()));
 
     [routePatternsKey]() {
         return this.#routePatterns;
@@ -156,7 +156,7 @@ export class RouterEngine {
                 }
             }
             const match = (!!matches || !pattern.regex) && (!pattern.and || pattern.and(routeParams));
-            noMatches = noMatches && !match;
+            noMatches = noMatches && (pattern.ignoreForFallback ? true : !match);
             routeStatus[routeKey] = {
                 match,
                 routeParams,
@@ -179,10 +179,11 @@ export class RouterEngine {
      * @param routeInfo Pattern route information to parse.
      * @returns An object with the regular expression and the optional predicate function.
      */
-    #parseRoutePattern(routeInfo: PatternRouteInfo): { regex?: RegExp; and?: AndUntyped; } {
+    #parseRoutePattern(routeInfo: PatternRouteInfo): { regex?: RegExp; and?: AndUntyped; ignoreForFallback: boolean; } {
         if (!routeInfo.pattern) {
             return {
                 and: routeInfo.and,
+                ignoreForFallback: !!routeInfo.ignoreForFallback
             }
         }
         const fullPattern = joinPaths(this.basePath, routeInfo.pattern === '/' ? '' : routeInfo.pattern);
@@ -196,6 +197,7 @@ export class RouterEngine {
         return {
             regex: new RegExp(`^${regexPattern}$`, routeInfo.caseSensitive ? undefined : 'i'),
             and: routeInfo.and,
+            ignoreForFallback: !!routeInfo.ignoreForFallback
         };
     }
     /**
