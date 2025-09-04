@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll, vi } from "vitest";
+import { describe, test, expect, beforeAll, afterAll, vi, beforeEach } from "vitest";
 import { routePatternsKey, RouterEngine } from "./RouterEngine.svelte.js";
 import { init, type Hash, type RouteInfo } from "$lib/index.js";
 import { registerRouter } from "./trace.svelte.js";
@@ -39,7 +39,7 @@ describe("RouterEngine", () => {
     });
 });
 
-describe("RouterEngine", () => {
+describe("RouterEngine (default init)", () => {
     let _href: string;
     let cleanup: () => void;
     let interceptedState: any = null;
@@ -72,6 +72,9 @@ describe("RouterEngine", () => {
             pushState: pushStateMock,
             replaceState: replaceStateMock
         };
+    });
+    beforeEach(() => {
+        location.url.href = globalThis.window.location.href = "http://example.com";
     });
     afterAll(() => {
         cleanup();
@@ -497,9 +500,73 @@ describe("RouterEngine", () => {
             });
         });
     });
+    describe('noMatches', () => {
+        test("Should be true whenever there are no routes registered.", () => {
+            // Act.
+            const router = new RouterEngine();
+
+            // Assert.
+            expect(router.noMatches).toBe(true);
+        });
+        test("Should be true whenever there are no matching routes.", () => {
+            // Act.
+            const router = new RouterEngine();
+            router.routes['route'] = {
+                pattern: '/:one/:two?',
+                caseSensitive: false,
+            };
+            console.debug('Path:', router.path);
+
+            // Assert.
+            expect(router.noMatches).toBe(true);
+        });
+        test.each([
+            {
+                text: "is",
+                routeCount: 1,
+                totalRoutes: 5
+            },
+            {
+                text: "are",
+                routeCount: 2,
+                totalRoutes: 5
+            },
+            {
+                text: "are",
+                routeCount: 5,
+                totalRoutes: 5
+            },
+        ])("Should be false whenever there $text $routeCount matching route(s) out of $totalRoutes route(s).", ({ routeCount, totalRoutes }) => {
+            // Act.
+            const router = new RouterEngine();
+            for (let i = 0; i < routeCount; i++) {
+                router.routes[`route${i}`] = {
+                    and: () => i < routeCount
+                };
+            }
+
+            // Assert.
+            expect(router.noMatches).toBe(false);
+        });
+        test.each([
+            1, 2, 5
+        ])("Should be true whenever the %d matching route(s) are ignored for fallback.", (routeCount) => {
+            // Act.
+            const router = new RouterEngine();
+            for (let i = 0; i < routeCount; i++) {
+                router.routes[`route${i}`] = {
+                    and: () => true,
+                    ignoreForFallback: true
+                };
+            }
+
+            // Assert.
+            expect(router.noMatches).toBe(true);
+        });
+    });
 });
 
-describe("RouterEngine", () => {
+describe("RouterEngine (multi hash)", () => {
     let _href: string;
     let cleanup: () => void;
     let interceptedState: any = null;

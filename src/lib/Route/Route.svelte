@@ -71,32 +71,11 @@
 		 */
 		and?: (params: Record<RouteParameters<T>, ParameterValue> | undefined) => boolean;
 		/**
-		 * Sets a function for additional matching conditions.
+		 * Sets whether the route's match status should be ignored for fallback purposes.
 		 *
-		 * Use this one when you need to match based on the final status of all routes.
-		 * @param routeStatus The router's route status object.
-		 * @returns `true` if the route should match, or `false` otherwise.
-		 *
-		 * This is shorthand for:
-		 *
-		 * ```svelte
-		 * {#if when(router.routeStatus)}
-		 *     <Route ...>...</Route>
-		 * {/if}
-		 * ```
-		 *
-		 *
-		 * In other words, use it to further condition rendering based on the final status of all routes.
-		 *
-		 * Example:  Match only if the home route did not:
-		 *
-		 * ```svelte
-		 * <Route key="notHome" when={({ home }) => !home.match}>
-		 *    <NotHome />
-		 * </Route>
-		 * ```
+		 * If `true`, the route will not be considered when determining fallback content visibility.
 		 */
-		when?: (routeStatus: Record<string, RouteStatus>) => boolean;
+		ignoreForFallback?: boolean;
 		/**
 		 * Sets whether the route's path pattern should be matched case-sensitively.
 		 *
@@ -146,7 +125,7 @@
 		key,
 		path,
 		and,
-		when,
+		ignoreForFallback = false,
 		caseSensitive = false,
 		hash,
 		params = $bindable(),
@@ -162,17 +141,17 @@
 
 	// Effect that updates the route object in the parent router.
 	$effect.pre(() => {
-		if (!path && !and && !when) {
+		if (!path && !and) {
 			return;
 		}
 		// svelte-ignore ownership_invalid_mutation
 		untrack(() => router.routes)[key] =
 			path instanceof RegExp
-				? { regex: path, and, when }
+				? { regex: path, and, ignoreForFallback }
 				: {
 						pattern: path,
 						and,
-						when,
+						ignoreForFallback,
 						caseSensitive
 					};
 		return () => {
@@ -186,6 +165,6 @@
 	});
 </script>
 
-{#if (router.routeStatus[key]?.match ?? true) && (untrack(() => router.routes)[key]?.when?.(router.routeStatus) ?? true)}
+{#if (router.routeStatus[key]?.match ?? true)}
 	{@render children?.(params, router.state, router.routeStatus)}
 {/if}

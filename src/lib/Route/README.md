@@ -13,7 +13,7 @@ they can be embedded anywhere down the hierarchy, including being children of ot
 | `key` | `string` | (none) | | Sets the route's unique key. |
 | `path` | `string \| RegExp` | (none) | | Sets the route's path pattern, or a regular expression used to test and match the browser's URL. |
 | `and` | `(params: Record<RouteParameters<T>, ParameterValue> \| undefined) => boolean` | `undefined` | | Sets a function for additional matching conditions. |
-| `when` | `(routeStatus: Record<string, RouteStatus>) => boolean` | `undefined` | | Sets a function for additional matching conditions. |
+| `ignoreForFallback` | `boolean` | `false` | | Controls whether the matching status of this route affects the visibility of fallback content. |
 | `caseSensitive` | `boolean` | `false` | | Sets whether the route's path pattern should be matched case-sensitively. |
 | `hash` | `boolean \| string` | `undefined` | | Sets the hash mode of the route. |
 | `params` | `Record<RouteParameters<T>, ParameterValue>` | `undefined` | Yes | Provides a way to obtain a route's parameters through property binding. |
