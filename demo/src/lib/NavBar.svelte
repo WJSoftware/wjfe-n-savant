@@ -4,9 +4,7 @@
 	import { routingMode } from './hash-routing';
 	import type { HTMLAttributes } from 'svelte/elements';
 
-	let {
-		...restProps
-	}: HTMLAttributes<HTMLElement> = $props();
+	let { ...restProps }: HTMLAttributes<HTMLElement> = $props();
 
 	const pathRoutingLinks = [
 		{ text: 'Home', href: '/path-routing' },
@@ -62,32 +60,45 @@
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav">
 				<li class="nav-item">
-					<Link class="nav-link" activeState={{ class: 'active', key: 'home' }} href="/" id="homeLink">Home</Link>
+					<Link
+						class="nav-link"
+						activeState={{ class: 'active', key: 'home' }}
+						href="/"
+						id="homeLink">Home</Link
+					>
 				</li>
-				<Route key="homeMenuPr" when={(rs) => !rs.pathRouting?.match}>
-					<li class="nav-item">
-						<Link
-							class="nav-link"
-							activeState={{ class: 'active', key: 'pathRouting' }}
-							href="/path-routing"
-						>
-							Path Routing
-						</Link>
-					</li>
+				<Route key="homeMenuPr">
+					{#snippet children(rp, _, rs)}
+						{#if !rs.pathRouting?.match}
+							<li class="nav-item">
+								<Link
+									class="nav-link"
+									activeState={{ class: 'active', key: 'pathRouting' }}
+									href="/path-routing"
+								>
+									Path Routing
+								</Link>
+							</li>
+						{/if}
+					{/snippet}
 				</Route>
 				<Route key="pathRouting">
 					<SubNav title="Path Routing" links={pathRoutingLinks} />
 				</Route>
-				<Route key="homeMenuHr" when={(rs) => !rs.hashRouting?.match}>
-					<li class="nav-item">
-						<Link
-							class="nav-link"
-							activeState={{ class: 'active', key: 'hashRouting' }}
-							href="/hash-routing"
-						>
-							Hash Routing
-						</Link>
-					</li>
+				<Route key="homeMenuHr">
+					{#snippet children(rp, _, rs)}
+						{#if !rs.hashRouting?.match}
+							<li class="nav-item">
+								<Link
+									class="nav-link"
+									activeState={{ class: 'active', key: 'hashRouting' }}
+									href="/hash-routing"
+								>
+									Hash Routing
+								</Link>
+							</li>
+						{/if}
+					{/snippet}
 				</Route>
 				<Route key="hashRouting">
 					<SubNav title="Hash Routing" links={hashRoutingLinks} />
