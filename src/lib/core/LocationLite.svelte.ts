@@ -1,26 +1,32 @@
-import type { BeforeNavigateEvent, Hash, Location, GoToOptions, NavigateOptions, NavigationCancelledEvent, State } from "../types.js";
+import type { BeforeNavigateEvent, Hash, Location, GoToOptions, NavigateOptions, NavigationCancelledEvent, State, HistoryApi } from "../types.js";
 import { getCompleteStateKey } from "./Location.js";
-import { on } from "svelte/events";
-import { LocationState } from "./LocationState.svelte.js";
 import { routingOptions } from "./options.js";
 import { resolveHashValue } from "./resolveHashValue.js";
 import { calculateHref } from "./calculateHref.js";
 import { calculateState } from "./calculateState.js";
 import { preserveQueryInUrl } from "./preserveQuery.js";
+import { StockHistoryApi } from "./StockHistoryApi.svelte.js";
+import { isConformantState } from "./isConformantState.js";
+
+export function assertValidState(state: unknown): asserts state is State {
+    if (!isConformantState(state)) {
+        throw new Error('Invalid history state.');
+    }
+}
+
 
 /**
  * A lite version of the location object.  It does not support event listeners or state-setting call interceptions, 
  * which are normally only needed when mixing router libraries.
  */
 export class LocationLite implements Location {
-    #innerState: LocationState;
-    #cleanup: (() => void) | undefined;
+    #historyApi: HistoryApi;
     hashPaths = $derived.by(() => {
         if (routingOptions.hashMode === 'single') {
-            return { single: this.#innerState.url.hash.substring(1) };
+            return { single: this.#historyApi.url.hash.substring(1) };
         }
         const result = {} as Record<string, string>;
-        const paths = this.#innerState.url.hash.substring(1).split(';');
+        const paths = this.#historyApi.url.hash.substring(1).split(';');
         for (let rawPath of paths) {
             const [id, path] = rawPath.split('=');
             if (!id || !path) {
@@ -31,29 +37,8 @@ export class LocationLite implements Location {
         return result;
     });
 
-    constructor() {
-        const [innerState] = arguments;
-        if (innerState instanceof LocationState) {
-            this.#innerState = innerState;
-        }
-        else {
-            this.#innerState = new LocationState();
-        }
-        this.#cleanup = $effect.root(() => {
-            const cleanups = [] as (() => void)[];
-            ['popstate', 'hashchange'].forEach((event) => {
-                cleanups.push(on(globalThis.window, event, () => {
-                    console.log(event);
-                    this.#innerState.url.href = globalThis.window?.location?.href;
-                    this.#innerState.state = globalThis.window?.history?.state;
-                }));
-            });
-            return () => {
-                for (let cleanup of cleanups) {
-                    cleanup();
-                }
-            };
-        });
+    constructor(historyApi?: HistoryApi) {
+        this.#historyApi = historyApi ?? new StockHistoryApi();
     }
 
     on(event: "beforeNavigate", callback: (event: BeforeNavigateEvent) => void): () => void;
@@ -63,34 +48,36 @@ export class LocationLite implements Location {
     }
 
     get url() {
-        return this.#innerState.url;
+        return this.#historyApi.url;
     }
 
     getState(hash: Hash) {
         if (typeof hash === 'string') {
-            return this.#innerState.state?.hash[hash];
+            return this.#historyApi.state?.hash[hash];
         }
         if (hash) {
-            return this.#innerState.state?.hash.single;
+            return this.#historyApi.state?.hash.single;
         }
-        return this.#innerState.state?.path;
+        return this.#historyApi.state?.path;
     }
 
-    #goTo(url: string, replace: boolean, state: State | undefined) {
-        (
-            replace ?
-                globalThis.window?.history.replaceState :
-                globalThis.window?.history.pushState
-        ).bind(globalThis.window?.history)(state, '', url);
-        this.#innerState.url.href = globalThis.window?.location.href;
-        this.#innerState.state = state ?? { path: undefined, hash: {} };
-    }
-
-    goTo(url: string, options?: GoToOptions): void {
+    #goTo(url: string, replace: boolean, state: unknown) {
+        state ??= { path: undefined, hash: {} };
+        assertValidState(state);
         if (url === '') {
             // Shallow routing.
             url = this.url.href;
         }
+        (
+            replace ?
+                this.#historyApi.replaceState :
+                this.#historyApi.pushState
+        ).bind(this.#historyApi)(state, '', url);
+        window.location.href = this.#historyApi.url.href;
+        this.#historyApi.state = state;
+    }
+
+    goTo(url: string, options?: GoToOptions): void {
         if (options?.preserveQuery) {
             url = preserveQueryInUrl(url, options.preserveQuery);
         }
@@ -99,11 +86,7 @@ export class LocationLite implements Location {
 
     navigate(url: string, options?: NavigateOptions): void {
         const resolvedHash = resolveHashValue(options?.hash);
-        if (url === '') {
-            // Shallow routing.
-            url = this.url.href;
-        }
-        else {
+        if (url !== '') {
             url = calculateHref({
                 ...options,
                 hash: resolvedHash,
@@ -114,11 +97,10 @@ export class LocationLite implements Location {
     }
 
     [getCompleteStateKey](): State {
-        return $state.snapshot(this.#innerState.state);
+        return $state.snapshot(this.#historyApi.state);
     }
 
     dispose() {
-        this.#cleanup?.();
-        this.#cleanup = undefined;
+        this.#historyApi.dispose();
     }
 }

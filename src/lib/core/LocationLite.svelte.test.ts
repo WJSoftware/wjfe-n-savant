@@ -1,10 +1,10 @@
 import { describe, test, expect, beforeEach, beforeAll, vi, afterEach, afterAll } from "vitest";
 import { LocationLite } from "./LocationLite.svelte.js";
-import { LocationState } from "./LocationState.svelte.js";
 import type { Hash, Location, State } from "$lib/types.js";
 import { joinPaths } from "./RouterEngine.svelte.js";
 import { init } from "$lib/index.js";
 import { location as iLoc } from "./Location.js";
+import { StockHistoryApi } from "./StockHistoryApi.svelte.js";
 
 describe("LocationLite", () => {
     const initialUrl = "http://example.com/";
@@ -55,15 +55,14 @@ describe("LocationLite", () => {
             // Assert.
             expect(location.url.href).toBe(initialUrl);
         });
-        test("Should use the provided LocationState instance.", () => {
+        test("Should use the provided HistoryApi instance.", () => {
             // Arrange.
-            const locationState = new LocationState();
+            const historyApi = new StockHistoryApi();
             // Act.
-            // @ts-expect-error Parameter not disclosed.
-            const location = new LocationLite(locationState);
+            const location = new LocationLite(historyApi);
 
             // Assert.
-            expect(location.url).toBe(locationState.url);
+            expect(location.url).toBe(historyApi.url);
 
             // Cleanup.
             location.dispose();

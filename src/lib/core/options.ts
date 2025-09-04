@@ -3,11 +3,6 @@
  */
 export type RoutingOptions = {
     /**
-     * Whether to initialize the routing library with all features.
-     * @default false
-     */
-    full?: boolean;
-    /**
      * Whether to use a single or multiple hash mode.  In single hash mode, the hash value is always one path; in multi 
      * mode, the hash value can be multiple paths.
      * 
@@ -44,7 +39,24 @@ export type RoutingOptions = {
      * as hash-routing components because the `implicitMode` option was set to `'hash'`.
      */
     implicitMode?: 'hash' | 'path';
-}
+} & ({
+    /**
+     * Whether to initialize the routing library with all features.
+     * @default false
+     */
+    full?: true;
+} | {
+    /**
+     * Whether to initialize the routing library with all features.
+     * @default false
+     */
+    full: false;
+    /**
+     * Whether to route in memory only.  This means that the routing library will not modify the browser's history or 
+     * URL, but to every API in the library, it will look like that.
+     */
+    routeInMemory?: boolean;
+})
 
 /**
  * Global routing options.
@@ -52,5 +64,6 @@ export type RoutingOptions = {
 export const routingOptions: Required<RoutingOptions> = {
     full: false,
     hashMode: 'single',
-    implicitMode: 'path'
+    implicitMode: 'path',
+    routeInMemory: false
 };
