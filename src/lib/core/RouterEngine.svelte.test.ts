@@ -515,7 +515,6 @@ describe("RouterEngine (default init)", () => {
                 pattern: '/:one/:two?',
                 caseSensitive: false,
             };
-            console.debug('Path:', router.path);
 
             // Assert.
             expect(router.noMatches).toBe(true);
