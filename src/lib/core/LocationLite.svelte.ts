@@ -77,6 +77,10 @@ export class LocationLite implements Location {
     }
 
     #goTo(url: string, replace: boolean, state: State | undefined) {
+        if (url === '') {
+            // Shallow routing.
+            url = this.url.href;
+        }
         (
             replace ?
                 globalThis.window?.history.replaceState :
@@ -87,10 +91,6 @@ export class LocationLite implements Location {
     }
 
     goTo(url: string, options?: GoToOptions): void {
-        if (url === '') {
-            // Shallow routing.
-            url = this.url.href;
-        }
         if (options?.preserveQuery) {
             url = preserveQueryInUrl(url, options.preserveQuery);
         }
@@ -99,11 +99,7 @@ export class LocationLite implements Location {
 
     navigate(url: string, options?: NavigateOptions): void {
         const resolvedHash = resolveHashValue(options?.hash);
-        if (url === '') {
-            // Shallow routing.
-            url = this.url.href;
-        }
-        else {
+        if (url !== '') {
             url = calculateHref({
                 ...options,
                 hash: resolvedHash,
