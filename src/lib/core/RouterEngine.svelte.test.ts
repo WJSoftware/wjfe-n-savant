@@ -4,6 +4,7 @@ import { init, type Hash, type RouteInfo } from "$lib/index.js";
 import { registerRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
 import type { State } from "$lib/types.js";
+import { setupBrowserMocks, addRoutes } from "../../testing/test-utils.js";
 
 describe("RouterEngine", () => {
     describe('constructor', () => {
@@ -16,14 +17,14 @@ describe("RouterEngine", () => {
                 registerRouter: registerRouterMock,
             };
         });
-        test("Should throw an error if the library hasn't been initialized", () => {
+        test("Should throw an error if the library hasn't been initialized.", () => {
             // Act.
             const act = () => new RouterEngine();
 
             // Assert.
             expect(act).toThrowError();
         });
-        test("Should register the router if traceOptions.routerHierarchy is true", () => {
+        test("Should register the router if traceOptions.routerHierarchy is true.", () => {
             // Arrange.
             const cleanup = init({ trace: { routerHierarchy: true } });
 
@@ -40,44 +41,21 @@ describe("RouterEngine", () => {
 });
 
 describe("RouterEngine (default init)", () => {
-    let _href: string;
     let cleanup: () => void;
-    let interceptedState: any = null;
-    const pushStateMock = vi.fn((state, _, url) => {
-        globalThis.window.location.href = new URL(url).href;
-        interceptedState = state;
-        globalThis.window.dispatchEvent(new globalThis.PopStateEvent('popstate'));
-    });
-    const replaceStateMock = vi.fn((state, _, url) => {
-        globalThis.window.location.href = new URL(url).href;
-        interceptedState = state;
-        globalThis.window.dispatchEvent(new globalThis.PopStateEvent('popstate'));
-    });
+    let browserMocks: ReturnType<typeof setupBrowserMocks>;
+    
     beforeAll(() => {
+        browserMocks = setupBrowserMocks("http://example.com/", location);
         cleanup = init();
-        // @ts-expect-error Many missing features.
-        globalThis.window.location = {
-            get href() {
-                return _href;
-            },
-            set href(value) {
-                _href = value;
-            }
-        };
-        // @ts-expect-error Many missing features.
-        globalThis.window.history = {
-            get state() {
-                return interceptedState;
-            },
-            pushState: pushStateMock,
-            replaceState: replaceStateMock
-        };
     });
+    
     beforeEach(() => {
-        location.url.href = globalThis.window.location.href = "http://example.com";
+        browserMocks.setUrl("http://example.com");
     });
+    
     afterAll(() => {
         cleanup();
+        browserMocks.cleanup();
     });
     describe('basePath', () => {
         test("Should be '/' by default", () => {
@@ -141,10 +119,11 @@ describe("RouterEngine (default init)", () => {
             const state: State = { path: 1, hash: { single: 2, custom: 3 } };
 
             // Act.
-            globalThis.window.history.pushState(state, '', 'http://example.com/other');
+            browserMocks.history.pushState(state, '', 'http://example.com/other');
+            browserMocks.triggerPopstate(state); // Notify location service of state change
 
             // Assert.
-            expect(router.state).toBe(getter(globalThis.window.history.state));
+            expect(router.state).toBe(getter(browserMocks.history.state));
         });
     });
     describe('routes', () => {
@@ -536,13 +515,12 @@ describe("RouterEngine (default init)", () => {
                 totalRoutes: 5
             },
         ])("Should be false whenever there $text $routeCount matching route(s) out of $totalRoutes route(s).", ({ routeCount, totalRoutes }) => {
-            // Act.
+            // Arrange.
             const router = new RouterEngine();
-            for (let i = 0; i < routeCount; i++) {
-                router.routes[`route${i}`] = {
-                    and: () => i < routeCount
-                };
-            }
+            const nonMatchingCount = totalRoutes - routeCount;
+            
+            // Act.
+            addRoutes(router, { matching: routeCount, nonMatching: nonMatchingCount });
 
             // Assert.
             expect(router.noMatches).toBe(false);
@@ -550,14 +528,16 @@ describe("RouterEngine (default init)", () => {
         test.each([
             1, 2, 5
         ])("Should be true whenever the %d matching route(s) are ignored for fallback.", (routeCount) => {
-            // Act.
+            // Arrange.
             const router = new RouterEngine();
-            for (let i = 0; i < routeCount; i++) {
-                router.routes[`route${i}`] = {
-                    and: () => true,
-                    ignoreForFallback: true
-                };
-            }
+            
+            // Act.
+            addRoutes(router, { 
+                matching: { 
+                    count: routeCount, 
+                    specs: { ignoreForFallback: true } 
+                } 
+            });
 
             // Assert.
             expect(router.noMatches).toBe(true);
@@ -566,42 +546,19 @@ describe("RouterEngine (default init)", () => {
 });
 
 describe("RouterEngine (multi hash)", () => {
-    let _href: string;
     let cleanup: () => void;
-    let interceptedState: any = null;
-    const pushStateMock = vi.fn((state, _, url) => {
-        globalThis.window.location.href = new URL(url).href;
-        interceptedState = state;
-        globalThis.window.dispatchEvent(new globalThis.PopStateEvent('popstate'));
-    });
-    const replaceStateMock = vi.fn((state, _, url) => {
-        globalThis.window.location.href = new URL(url).href;
-        interceptedState = state;
-        globalThis.window.dispatchEvent(new globalThis.PopStateEvent('popstate'));
-    });
+    let browserMocks: ReturnType<typeof setupBrowserMocks>;
+    
     beforeAll(() => {
+        browserMocks = setupBrowserMocks("http://example.com/", location);
         cleanup = init({ hashMode: 'multi' });
-        // @ts-expect-error Many missing features.
-        globalThis.window.location = {
-            get href() {
-                return _href;
-            },
-            set href(value) {
-                _href = value;
-            }
-        };
-        // @ts-expect-error Many missing features.
-        globalThis.window.history = {
-            get state() {
-                return interceptedState;
-            },
-            pushState: pushStateMock,
-            replaceState: replaceStateMock
-        };
     });
+    
     afterAll(() => {
         cleanup();
+        browserMocks.cleanup();
     });
+    
     describe('state', () => {
         test("Should return the current state for a named hash path.", () => {
             // Arrange.
@@ -609,7 +566,8 @@ describe("RouterEngine (multi hash)", () => {
             const state: State = { path: 1, hash: { single: 2, custom: 3 } };
 
             // Act.
-            globalThis.window.history.pushState(state, '', 'http://example.com/other');
+            browserMocks.history.pushState(state, '', 'http://example.com/other');
+            browserMocks.triggerPopstate(state); // Notify location service of state change
 
             // Assert.
             expect(router.state).toBe(state.hash.custom);
