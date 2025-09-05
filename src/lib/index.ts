@@ -45,7 +45,7 @@ export { default as Link } from "$lib/Link/Link.svelte";
 export { default as LinkContext } from "$lib/LinkContext/LinkContext.svelte";
 export * from "$lib/Route/Route.svelte";
 export { default as Route } from "$lib/Route/Route.svelte";
-export * from "$lib/Router/Router.svelte";
+export { getRouterContext, setRouterContext } from "$lib/Router/Router.svelte";
 export { default as Router } from "$lib/Router/Router.svelte";
 export * from "$lib/Fallback/Fallback.svelte";
 export { default as Fallback } from "$lib/Fallback/Fallback.svelte";

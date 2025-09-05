@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
-	import type { RouteStatus } from '$lib/types.js';
+	import type { RouteStatus, WhenPredicate } from '$lib/types.js';
 	import type { Snippet } from 'svelte';
 
 	type Props = {
@@ -30,6 +30,26 @@
 		 */
 		hash?: boolean | string;
 		/**
+		 * Overrides the default activation conditions for the fallback content inside the component.
+		 * 
+		 * This is useful in complex routing scenarios, where fallback content is being prevented from showing due to 
+		 * certain route or routes matching at certain points, leaving no opportunity for the router to be "out of 
+		 * matching routes".
+		 * 
+		 * **This completely disconnects the `Fallback` component from the router's matching logic.**
+		 * 
+		 * @example
+		 * ```svelte
+		 * <!--
+		 * Here, onlyLayoutRoutesRemain is a function that checks if layout routes are the only ones currently matching.
+		 * -->
+		 * <Fallback when={(rs) => onlyLayoutRoutesRemain(rs)}>
+		 *     ...
+		 * </Fallback>
+		 * ```
+		 */
+		when?: WhenPredicate;
+		/**
 		 * Renders the children of the component.
 		 *
 		 * This rendering is conditioned to the parent router engine's `noMatches` property being `true`.  This means
@@ -41,11 +61,11 @@
 		children?: Snippet<[any, Record<string, RouteStatus>]>;
 	};
 
-	let { hash, children }: Props = $props();
+	let { hash, when, children }: Props = $props();
 
 	const router = getRouterContext(resolveHashValue(hash));
 </script>
 
-{#if router?.noMatches}
+{#if (router && when?.(router.routeStatus, router.noMatches)) || (!when && router?.noMatches)}
 	{@render children?.(router.state, router.routeStatus)}
 {/if}
