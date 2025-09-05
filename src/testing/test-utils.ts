@@ -89,7 +89,7 @@ export function newRandomRouteKey() {
     return `route-${Math.random().toString(36).substring(2, 11)}`;
 }
 
-function addRoute(router: RouterEngine, matching: boolean, options?: { name?: string; } & Omit<RouteInfo, 'and'>) {
+function addRoute(router: RouterEngine, matching: boolean, options?: RouteSpecs['specs']) {
     const { name = newRandomRouteKey() } = options || {};
     delete options?.name;
     router.routes[name] = {
@@ -102,25 +102,25 @@ function addRoute(router: RouterEngine, matching: boolean, options?: { name?: st
 /**
  * Adds a matching route to the router
  */
-export function addMatchingRoute(router: RouterEngine, options?: { name?: string; } & Omit<RouteInfo, 'and'>) {
+export function addMatchingRoute(router: RouterEngine, options?: RouteSpecs['specs']) {
     return addRoute(router, true, options);
 }
 
 /**
  * Adds a non-matching route to the router
  */
-export function addNonMatchingRoute(router: RouterEngine, options?: { name?: string; } & Omit<RouteInfo, 'and'>) {
+export function addNonMatchingRoute(router: RouterEngine, options?: RouteSpecs['specs']) {
     return addRoute(router, false, options);
 }
 
 type RouteSpecs = {
     count: number;
-    specs: Omit<RouteInfo, 'and'>;
+    specs: Omit<RouteInfo, 'and'> & { name?: string; };
 }
 
-export function addRoutes(router: RouterEngine, routes: { matching?: number; nonMatching?: number; }): string[];
-export function addRoutes(router: RouterEngine, routes: { matching?: RouteSpecs ; nonMatching?: RouteSpecs; }): string[];
-export function addRoutes(router: RouterEngine, routes: { matching?: number | RouteSpecs; nonMatching?: number | RouteSpecs; }) {
+export function addRoutes(router: RouterEngine, routes: { matching?: number; nonMatching?: number; }, ...add: (RouteInfo & { name?: string; })[]): string[];
+export function addRoutes(router: RouterEngine, routes: { matching?: RouteSpecs ; nonMatching?: RouteSpecs; }, ...add: (RouteInfo & { name?: string; })[]): string[];
+export function addRoutes(router: RouterEngine, routes: { matching?: number | RouteSpecs; nonMatching?: number | RouteSpecs; }, ...add: (RouteInfo & { name?: string; })[]): string[] {
     const { matching = 0, nonMatching = 0 } = routes;
     const routeNames: string[] = [];
     [[matching, addMatchingRoute] as const, [nonMatching, addNonMatchingRoute] as const].forEach(x => {
@@ -135,6 +135,12 @@ export function addRoutes(router: RouterEngine, routes: { matching?: number | Ro
             }
         }
     });
+    for (let route of add) {
+        const name = route.name || newRandomRouteKey();
+        delete route.name;
+        router.routes[name] = route;
+        routeNames.push(name);
+    }
     return routeNames;
 }
 
