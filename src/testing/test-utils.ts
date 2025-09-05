@@ -1,6 +1,6 @@
-import { type Hash } from "$lib/index.js";
+import { type Hash } from "$lib/types.js";
 import { RouterEngine } from "$lib/core/RouterEngine.svelte.js";
-import { getRouterContextKey } from "../Router/Router.svelte";
+import { getRouterContextKey } from "../lib/Router/Router.svelte";
 import { createRawSnippet } from "svelte";
 import type { RoutingOptions } from "$lib/core/options.js";
 import { resolveHashValue } from "$lib/core/resolveHashValue.js";

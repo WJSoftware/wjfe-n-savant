@@ -2,7 +2,7 @@ import { init } from "$lib/index.js";
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { render } from "@testing-library/svelte";
 import Fallback from "./Fallback.svelte";
-import { addMatchingRoute, addRoutes, createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES } from "$lib/testing/test-utils.js";
+import { addMatchingRoute, addRoutes, createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES } from "../../testing/test-utils.js";
 import { flushSync } from "svelte";
 
 function defaultPropsTests(setup: ReturnType<typeof createRouterTestSetup>) {
