@@ -1,10 +1,10 @@
-import { describe, test, expect, beforeAll, afterAll, vi, beforeEach } from "vitest";
+import { describe, test, expect, beforeAll, afterAll, afterEach, vi, beforeEach } from "vitest";
 import { routePatternsKey, RouterEngine } from "./RouterEngine.svelte.js";
 import { init, type Hash, type RouteInfo } from "$lib/index.js";
 import { registerRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
 import type { State } from "$lib/types.js";
-import { setupBrowserMocks, addRoutes } from "../../testing/test-utils.js";
+import { setupBrowserMocks, addRoutes, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
 
 describe("RouterEngine", () => {
     describe('constructor', () => {
@@ -38,539 +38,620 @@ describe("RouterEngine", () => {
             cleanup();
         });
     });
+    
+    describe('constructor hash validation', () => {
+        let cleanupFn: (() => void) | null = null;
+        
+        afterEach(() => {
+            if (cleanupFn) {
+                cleanupFn();
+                cleanupFn = null;
+            }
+        });
+        
+        test.each([
+            { parentHash: ALL_HASHES.path, childHash: ALL_HASHES.single, mode: 'single' as const, description: "path parent vs hash child" },
+            { parentHash: ALL_HASHES.single, childHash: ALL_HASHES.path, mode: 'single' as const, description: "hash parent vs path child" },
+            { parentHash: ALL_HASHES.multi, childHash: ALL_HASHES.path, mode: 'multi' as const, description: "multi-hash parent vs path child" },
+            { parentHash: ALL_HASHES.path, childHash: ALL_HASHES.multi, mode: 'multi' as const, description: "path parent vs multi-hash child" },
+        ])("Should throw error when parent and child have different hash modes: $description", ({ parentHash, childHash, mode }) => {
+            // Arrange
+            cleanupFn = init({ hashMode: mode });
+            
+            // Act & Assert
+            expect(() => {
+                const parent = new RouterEngine({ hash: parentHash });
+                new RouterEngine({ parent, hash: childHash });
+            }).toThrowError("The parent router's hash mode must match the child router's hash mode.");
+        });
+        
+        test.each([
+            { parentHash: ALL_HASHES.path, mode: 'single' as const, description: "path parent" },
+            { parentHash: ALL_HASHES.single, mode: 'single' as const, description: "hash parent" },
+            { parentHash: ALL_HASHES.multi, mode: 'multi' as const, description: "multi-hash parent" },
+        ])("Should allow child router without explicit hash to inherit parent's hash: $description", ({ parentHash, mode }) => {
+            // Arrange
+            cleanupFn = init({ hashMode: mode });
+            
+            // Act & Assert
+            expect(() => {
+                const parent = new RouterEngine({ hash: parentHash });
+                const child = new RouterEngine(parent); // No explicit hash - should inherit
+                expect(child).toBeDefined();
+            }).not.toThrow();
+        });
+        
+        test("Should throw error when using hash path ID without multi hash mode", () => {
+            // Arrange
+            cleanupFn = init({ hashMode: 'single' });
+            
+            // Act & Assert
+            expect(() => {
+                new RouterEngine({ hash: ALL_HASHES.multi });
+            }).toThrowError("A hash path ID was given, but is only allowed when the library's hash mode has been set to 'multi'.");
+        });
+        
+        test("Should throw error when using non-string hash in multi hash mode", () => {
+            // Arrange
+            cleanupFn = init({ hashMode: 'multi' });
+            
+            // Act & Assert
+            expect(() => {
+                new RouterEngine({ hash: ALL_HASHES.single }); // boolean not allowed in multi mode
+            }).toThrowError("The specified hash value is not valid for the 'multi' hash mode.  Either don't specify a hash for path routing, or correct the hash value.");
+        });
+        
+        test("Should allow valid hash path ID in multi hash mode", () => {
+            // Arrange
+            cleanupFn = init({ hashMode: 'multi' });
+            
+            // Act & Assert
+            expect(() => {
+                const router = new RouterEngine({ hash: ALL_HASHES.multi });
+                expect(router).toBeDefined();
+            }).not.toThrow();
+        });
+    });
 });
 
-describe("RouterEngine (default init)", () => {
-    let cleanup: () => void;
-    let browserMocks: ReturnType<typeof setupBrowserMocks>;
-    
-    beforeAll(() => {
-        browserMocks = setupBrowserMocks("http://example.com/", location);
-        cleanup = init();
-    });
-    
-    beforeEach(() => {
-        browserMocks.setUrl("http://example.com");
-    });
-    
-    afterAll(() => {
-        cleanup();
-        browserMocks.cleanup();
-    });
-    describe('basePath', () => {
-        test("Should be '/' by default", () => {
-            // Act.
-            const router = new RouterEngine();
+// ========================================
+// Comprehensive Universe-Based Tests
+// ========================================
 
-            // Assert.
-            expect(router.basePath).toBe('/');
+ROUTING_UNIVERSES.forEach(universe => {
+    describe(`RouterEngine (${universe.text})`, () => {
+        let cleanup: () => void;
+        let browserMocks: ReturnType<typeof setupBrowserMocks>;
+        
+        beforeAll(() => {
+            browserMocks = setupBrowserMocks("http://example.com/", location);
+            cleanup = init({ 
+                hashMode: universe.hashMode,
+                implicitMode: universe.implicitMode 
+            });
         });
-        test("Should be the parent's basePath plus the router's basePath", () => {
-            // Arrange.
-            const parent = new RouterEngine();
-            parent.basePath = '/parent';
-            const router = new RouterEngine(parent);
-            router.basePath = '/child';
-
-            // Act.
-            const basePath = router.basePath;
-
-            // Assert.
-            expect(basePath).toBe('/parent/child');
+        
+        beforeEach(() => {
+            browserMocks.setUrl("http://example.com");
         });
-        test("Should remove the trailing slash.", () => {
-            // Arrange.
-            const router = new RouterEngine();
-            router.basePath = '/abc/';
-
-            // Act.
-            const basePath = router.basePath;
-
-            // Assert.
-            expect(basePath).toBe('/abc');
+        
+        afterAll(() => {
+            cleanup();
+            browserMocks.cleanup();
         });
-    });
-    describe('url', () => {
-        test("Should return the current URL.", () => {
-            // Arrange.
-            const router = new RouterEngine();
-            location.url.href = "http://example.com/path?query#hash";
-
-            // Act.
-            const url = router.url;
-
-            // Assert.
-            expect(url).toBe(location.url);
+        
+        describe('constructor', () => {
+            test("Should create router with correct hash configuration", () => {
+                // Act.
+                const router = new RouterEngine({ hash: universe.hash });
+                
+                // Assert.
+                expect(router).toBeDefined();
+                // Additional assertions could check internal hash configuration
+            });
         });
-    });
-    describe('state', () => {
-        test.each<{ hash: Hash; getter: (state: State) => any }>([
-            {
-                hash: false,
-                getter: (state) => state.path,
-            },
-            {
-                hash: true,
-                getter: (state) => state.hash.single,
-            },
-        ])("Should return the current state for hash $hash .", ({ hash, getter }) => {
-            // Arrange.
-            const router = new RouterEngine({ hash });
-            const state: State = { path: 1, hash: { single: 2, custom: 3 } };
+        
+        describe('basePath', () => {
+            test("Should be '/' by default", () => {
+                // Act.
+                const router = new RouterEngine({ hash: universe.hash });
 
-            // Act.
-            browserMocks.history.pushState(state, '', 'http://example.com/other');
-            browserMocks.triggerPopstate(state); // Notify location service of state change
+                // Assert.
+                expect(router.basePath).toBe('/');
+            });
+            
+            test("Should be the parent's basePath plus the router's basePath", () => {
+                // Arrange.
+                const parent = new RouterEngine({ hash: universe.hash });
+                parent.basePath = '/parent';
+                const router = new RouterEngine(parent);
+                router.basePath = '/child';
 
-            // Assert.
-            expect(router.state).toBe(getter(browserMocks.history.state));
+                // Act.
+                const basePath = router.basePath;
+
+                // Assert.
+                expect(basePath).toBe('/parent/child');
+            });
+            
+            test("Should remove the trailing slash.", () => {
+                // Arrange.
+                const router = new RouterEngine({ hash: universe.hash });
+                router.basePath = '/abc/';
+
+                // Act.
+                const basePath = router.basePath;
+
+                // Assert.
+                expect(basePath).toBe('/abc');
+            });
         });
-    });
-    describe('routes', () => {
-        test("Should recalculate the route patterns whenever a new route is added.", () => {
-            // Arrange.
-            const router = new RouterEngine();
-            const route: RouteInfo = {
-                pattern: '/path',
-                caseSensitive: false,
-            };
-            expect(Object.keys(router.routes).length).toBe(0);
+        
+        describe('url', () => {
+            test("Should return the current URL.", () => {
+                // Arrange.
+                const router = new RouterEngine({ hash: universe.hash });
+                location.url.href = "http://example.com/path?query#hash";
 
-            // Act.
-            router.routes['route'] = route;
+                // Act.
+                const url = router.url;
 
-            // Assert.
-            expect(router[routePatternsKey]().has('route')).toBe(true);
+                // Assert.
+                expect(url).toBe(location.url);
+            });
         });
-        test("Should recalculate the route patterns whenever a route is removed.", () => {
-            // Arrange.
-            const router = new RouterEngine();
-            const route: RouteInfo = {
-                pattern: '/path',
-                caseSensitive: false,
-            };
-            router.routes['route'] = route;
-            expect(Object.keys(router.routes).length).toBe(1);
+        
+        describe('state', () => {
+            test("Should return the current state for the routing universe", () => {
+                // Arrange.
+                const router = new RouterEngine({ hash: universe.hash });
+                const state: State = { path: 1, hash: { single: 2, p1: 3 } };
 
-            // Act.
-            delete router.routes['route'];
+                // Act.
+                browserMocks.history.pushState(state, '', 'http://example.com/other');
+                browserMocks.triggerPopstate(state);
 
-            // Assert.
-            expect(router[routePatternsKey]().has('route')).toBe(false);
+                // Assert.
+                let expectedState: any;
+                if (universe.hash === false) {
+                    expectedState = state.path;
+                } else if (universe.hash === true) {
+                    expectedState = state.hash.single;
+                } else if (typeof universe.hash === 'string') {
+                    expectedState = state.hash[universe.hash];
+                } else {
+                    // For implicit modes (hash === undefined), the behavior depends on implicitMode
+                    expectedState = universe.implicitMode === 'path' ? state.path : state.hash.single;
+                }
+                expect(router.state).toBe(expectedState);
+            });
         });
-        test("Should recalculate the route patterns whenever a route is updated.", () => {
-            // Arrange.
-            const router = new RouterEngine();
-            const route: RouteInfo = {
-                pattern: '/path',
-                caseSensitive: false,
-            };
-            router.routes['route'] = route;
-            expect(Object.keys(router.routes).length).toBe(1);
+        
+        describe('routes', () => {
+            test("Should recalculate the route patterns whenever a new route is added.", () => {
+                // Arrange.
+                const router = new RouterEngine({ hash: universe.hash });
+                const route: RouteInfo = {
+                    pattern: '/path',
+                    caseSensitive: false,
+                };
+                expect(Object.keys(router.routes).length).toBe(0);
 
-            // Act.
-            router.routes['route'].pattern = '/other';
+                // Act.
+                router.routes['route'] = route;
 
-            // Assert.
-            expect(router[routePatternsKey]().has('route')).toBe(true);
-            expect(router[routePatternsKey]().get('route')!.regex!.test('/other')).toBe(true);
-        });
-        describe('Route Patterns', () => {
-            test.each(
-                [
+                // Assert.
+                expect(router[routePatternsKey]().has('route')).toBe(true);
+            });
+            
+            test("Should recalculate the route patterns whenever a route is removed.", () => {
+                // Arrange.
+                const router = new RouterEngine({ hash: universe.hash });
+                const route: RouteInfo = {
+                    pattern: '/path',
+                    caseSensitive: false,
+                };
+                router.routes['route'] = route;
+                expect(Object.keys(router.routes).length).toBe(1);
+
+                // Act.
+                delete router.routes['route'];
+
+                // Assert.
+                expect(router[routePatternsKey]().has('route')).toBe(false);
+            });
+            
+            test("Should recalculate the route patterns whenever a route is updated.", () => {
+                // Arrange.
+                const router = new RouterEngine({ hash: universe.hash });
+                const route: RouteInfo = {
+                    pattern: '/path',
+                    caseSensitive: false,
+                };
+                router.routes['route'] = route;
+                expect(Object.keys(router.routes).length).toBe(1);
+
+                // Act.
+                router.routes['route'].pattern = '/other';
+
+                // Assert.
+                expect(router[routePatternsKey]().has('route')).toBe(true);
+                expect(router[routePatternsKey]().get('route')!.regex!.test('/other')).toBe(true);
+            });
+            
+            describe('Route Patterns', () => {
+                test.each(
+                    [
+                        {
+                            pattern: '/path',
+                            testPathname: '/path',
+                            text: 'zero parameters',
+                        },
+                        {
+                            pattern: '/:one',
+                            testPathname: '/path',
+                            text: '1 parameter',
+                            params: {
+                                one: 'path',
+                            }
+                        },
+                        {
+                            pattern: '/:one/:two',
+                            testPathname: '/path/value',
+                            text: '2 parameters',
+                            params: {
+                                one: 'path',
+                                two: 'value',
+                            }
+                        },
+                        {
+                            pattern: '/some-:one/:two',
+                            testPathname: '/some-path/value',
+                            text: '2 parameters',
+                            params: {
+                                one: 'path',
+                                two: 'value',
+                            }
+                        },
+                        {
+                            pattern: '/path/:one',
+                            testPathname: '/path/value',
+                            text: '1 parameter',
+                            params: {
+                                one: 'value',
+                            }
+                        },
+                        {
+                            pattern: '/path/:one/sub/:two',
+                            testPathname: '/path/value/sub/other',
+                            text: '2 parameters',
+                            params: {
+                                one: 'value',
+                                two: 'other',
+                            }
+                        },
+                        {
+                            pattern: '/:one/sub/:two',
+                            testPathname: '/value/sub/other',
+                            text: '2 parameters',
+                            params: {
+                                one: 'value',
+                                two: 'other',
+                            }
+                        },
+                        {
+                            pattern: '/path-to.:one/sub/:two',
+                            testPathname: '/path-to.value/sub/other',
+                            text: '2 parameters',
+                            params: {
+                                one: 'value',
+                                two: 'other',
+                            }
+                        },
+                        {
+                            pattern: '/*',
+                            testPathname: '/value',
+                            text: '1 parameter',
+                            params: {
+                                rest: '/value',
+                            }
+                        },
+                        {
+                            pattern: '/*',
+                            testPathname: '/value/two',
+                            text: '1 parameter',
+                            params: {
+                                rest: '/value/two',
+                            }
+                        },
+                        {
+                            pattern: '/path/*',
+                            testPathname: '/path/two',
+                            text: '1 parameter',
+                            params: {
+                                rest: '/two',
+                            }
+                        },
+                        {
+                            pattern: '/path/:one/*',
+                            testPathname: '/path/to/two',
+                            text: '2 parameters',
+                            params: {
+                                one: 'to',
+                                rest: '/two',
+                            }
+                        },
+                        {
+                            pattern: '/path-:one/*',
+                            testPathname: '/path-to/two',
+                            text: '2 parameters',
+                            params: {
+                                one: 'to',
+                                rest: '/two',
+                            }
+                        },
+                    ] as { pattern: string; testPathname: string; text: string; params?: Record<string, string> }[]
+                )("Should identify $text in pattern $pattern testing with $testPathname .", ({ pattern, testPathname, params }) => {
+                    // Arrange.
+                    const router = new RouterEngine({ hash: universe.hash });
+                    const route: RouteInfo = {
+                        pattern,
+                        caseSensitive: false,
+                    };
+                    router.routes['route'] = route;
+
+                    // Act.
+                    const matches = router[routePatternsKey]().get('route')!.regex?.exec(testPathname);
+
+                    // Assert.
+                    expect(matches).toBeDefined();
+                    if (params) {
+                        expect(matches!.groups).toBeDefined();
+                        expect(Object.keys(matches!.groups!).length).toBe(Object.keys(params).length);
+                        for (let key in params) {
+                            expect(matches!.groups![key]).toBe(params[key]);
+                        }
+                    }
+                });
+                
+                test.each([
                     {
                         pattern: '/path',
-                        testPathname: '/path',
-                        text: 'zero parameters',
+                        testPathname: '/other',
                     },
                     {
                         pattern: '/:one',
-                        testPathname: '/path',
-                        text: '1 parameter',
-                        params: {
-                            one: 'path',
-                        }
+                        testPathname: '/path/other',
                     },
                     {
                         pattern: '/:one/:two',
-                        testPathname: '/path/value',
-                        text: '2 parameters',
-                        params: {
-                            one: 'path',
-                            two: 'value',
-                        }
-                    },
-                    {
-                        pattern: '/some-:one/:two',
-                        testPathname: '/some-path/value',
-                        text: '2 parameters',
-                        params: {
-                            one: 'path',
-                            two: 'value',
-                        }
+                        testPathname: '/path',
                     },
                     {
                         pattern: '/path/:one',
-                        testPathname: '/path/value',
-                        text: '1 parameter',
-                        params: {
-                            one: 'value',
-                        }
+                        testPathname: '/path',
                     },
                     {
                         pattern: '/path/:one/sub/:two',
-                        testPathname: '/path/value/sub/other',
-                        text: '2 parameters',
-                        params: {
-                            one: 'value',
-                            two: 'other',
-                        }
+                        testPathname: '/path/value/sub',
                     },
                     {
                         pattern: '/:one/sub/:two',
-                        testPathname: '/value/sub/other',
-                        text: '2 parameters',
-                        params: {
-                            one: 'value',
-                            two: 'other',
-                        }
-                    },
-                    {
-                        pattern: '/path-to.:one/sub/:two',
-                        testPathname: '/path-to.value/sub/other',
-                        text: '2 parameters',
-                        params: {
-                            one: 'value',
-                            two: 'other',
-                        }
-                    },
-                    {
-                        pattern: '/*',
-                        testPathname: '/value',
-                        text: '1 parameter',
-                        params: {
-                            rest: '/value',
-                        }
-                    },
-                    {
-                        pattern: '/*',
-                        testPathname: '/value/two',
-                        text: '1 parameter',
-                        params: {
-                            rest: '/value/two',
-                        }
+                        testPathname: '/value/sub',
                     },
                     {
                         pattern: '/path/*',
-                        testPathname: '/path/two',
+                        testPathname: '/value',
+                    },
+                    {
+                        pattern: '/path/*',
+                        testPathname: '/other/two',
+                    },
+                ])("Should not match pattern $pattern with pathname $testPathname .", ({ pattern, testPathname }) => {
+                    // Arrange.
+                    const router = new RouterEngine({ hash: universe.hash });
+                    const route: RouteInfo = {
+                        pattern,
+                        caseSensitive: false,
+                    };
+                    router.routes['route'] = route;
+
+                    // Act.
+                    const matches = router[routePatternsKey]().get('route')!.regex?.exec(testPathname);
+
+                    // Assert.
+                    expect(matches).toBeNull();
+                });
+                
+                test.each([
+                    {
+                        pattern: '/:one?',
+                        testPathname: '/path',
                         text: '1 parameter',
+                        willMatch: true,
                         params: {
-                            rest: '/two',
-                        }
+                            one: 'path',
+                        },
                     },
                     {
-                        pattern: '/path/:one/*',
-                        testPathname: '/path/to/two',
-                        text: '2 parameters',
-                        params: {
-                            one: 'to',
-                            rest: '/two',
-                        }
+                        pattern: '/:one?',
+                        testPathname: '/',
+                        text: '0 parameters',
+                        willMatch: true,
                     },
                     {
-                        pattern: '/path-:one/*',
-                        testPathname: '/path-to/two',
+                        pattern: '/:one?',
+                        testPathname: '/abc/def',
+                        text: '0 parameters',
+                        willMatch: false,
+                    },
+                    {
+                        pattern: '/:one/:two?',
+                        testPathname: '/abc/def',
                         text: '2 parameters',
+                        willMatch: true,
                         params: {
-                            one: 'to',
-                            rest: '/two',
+                            one: 'abc',
+                            two: 'def',
+                        },
+                    },
+                    {
+                        pattern: '/:one/or%20:two?',
+                        testPathname: '/abc/or%20def',
+                        text: '2 parameters',
+                        willMatch: true,
+                        params: {
+                            one: 'abc',
+                            two: 'def',
+                        },
+                    },
+                    {
+                        pattern: '/:one/:two?',
+                        testPathname: '/abc/',
+                        text: '2 parameters',
+                        willMatch: true,
+                        params: {
+                            one: 'abc',
+                            two: undefined,
+                        },
+                    },
+                    {
+                        pattern: '/:one/:two?',
+                        testPathname: '/abc',
+                        text: '2 parameters',
+                        willMatch: true,
+                        params: {
+                            one: 'abc',
+                            two: undefined,
+                        },
+                    },
+                    {
+                        pattern: '/:one?/:two',
+                        testPathname: '/abc',
+                        text: '2 parameters',
+                        willMatch: true,
+                        params: {
+                            one: undefined,
+                            two: 'abc',
+                        },
+                    },
+                    {
+                        pattern: '/:one?/:two',
+                        testPathname: '/abc/def',
+                        text: '2 parameters',
+                        willMatch: true,
+                        params: {
+                            one: 'abc',
+                            two: 'def',
+                        },
+                    },
+                    {
+                        pattern: '/maybe-:one?/:two',
+                        testPathname: '/maybe-/def',
+                        text: '2 parameters',
+                        willMatch: true,
+                        params: {
+                            one: undefined,
+                            two: 'def',
+                        },
+                    },
+                ] as {
+                    pattern: string;
+                    testPathname: string;
+                    text: string;
+                    willMatch: boolean;
+                    params?: Record<string, string>;
+                }[])("Should match $text in pattern $pattern with pathname $testPathname .", ({ pattern, testPathname, willMatch, params }) => {
+                    // Arrange.
+                    const router = new RouterEngine({ hash: universe.hash });
+                    const route: RouteInfo = {
+                        pattern,
+                        caseSensitive: false,
+                    };
+                    router.routes['route'] = route;
+
+                    // Act.
+                    const matches = router[routePatternsKey]().get('route')!.regex?.exec(testPathname);
+
+                    // Assert.
+                    expect(!!matches).toBe(willMatch);
+                    if (willMatch && params) {
+                        expect(matches!.groups).toBeDefined();
+                        expect(Object.keys(matches!.groups!).length).toBe(Object.keys(params).length);
+                        for (let key in params) {
+                            expect(matches!.groups![key]).toBe(params[key]);
                         }
-                    },
-                ] as { pattern: string; testPathname: string; text: string; params?: Record<string, string> }[]
-            )("Should identify $text in pattern $pattern testing with $testPathname .", ({ pattern, testPathname, params }) => {
-                // Arrange.
-                const router = new RouterEngine();
-                const route: RouteInfo = {
-                    pattern,
-                    caseSensitive: false,
-                };
-                router.routes['route'] = route;
-
+                    }
+                });
+            });
+        });
+        
+        describe('noMatches', () => {
+            test("Should be true whenever there are no routes registered.", () => {
                 // Act.
-                const matches = router[routePatternsKey]().get('route')!.regex?.exec(testPathname);
+                const router = new RouterEngine({ hash: universe.hash });
 
                 // Assert.
-                expect(matches).toBeDefined();
-                if (params) {
-                    expect(matches!.groups).toBeDefined();
-                    expect(Object.keys(matches!.groups!).length).toBe(Object.keys(params).length);
-                    for (let key in params) {
-                        expect(matches!.groups![key]).toBe(params[key]);
-                    }
-                }
+                expect(router.noMatches).toBe(true);
             });
+            
+            test("Should be true whenever there are no matching routes.", () => {
+                // Act.
+                const router = new RouterEngine({ hash: universe.hash });
+                router.routes['route'] = {
+                    pattern: '/:one/:two?',
+                    caseSensitive: false,
+                };
+
+                // Assert.
+                expect(router.noMatches).toBe(true);
+            });
+            
             test.each([
                 {
-                    pattern: '/path',
-                    testPathname: '/other',
+                    text: "is",
+                    routeCount: 1,
+                    totalRoutes: 5
                 },
                 {
-                    pattern: '/:one',
-                    testPathname: '/path/other',
+                    text: "are",
+                    routeCount: 2,
+                    totalRoutes: 5
                 },
                 {
-                    pattern: '/:one/:two',
-                    testPathname: '/path',
+                    text: "are",
+                    routeCount: 5,
+                    totalRoutes: 5
                 },
-                {
-                    pattern: '/path/:one',
-                    testPathname: '/path',
-                },
-                {
-                    pattern: '/path/:one/sub/:two',
-                    testPathname: '/path/value/sub',
-                },
-                {
-                    pattern: '/:one/sub/:two',
-                    testPathname: '/value/sub',
-                },
-                {
-                    pattern: '/path/*',
-                    testPathname: '/value',
-                },
-                {
-                    pattern: '/path/*',
-                    testPathname: '/other/two',
-                },
-            ])("Should not match pattern $pattern with pathname $testPathname .", ({ pattern, testPathname }) => {
+            ])("Should be false whenever there $text $routeCount matching route(s) out of $totalRoutes route(s).", ({ routeCount, totalRoutes }) => {
                 // Arrange.
-                const router = new RouterEngine();
-                const route: RouteInfo = {
-                    pattern,
-                    caseSensitive: false,
-                };
-                router.routes['route'] = route;
-
+                const router = new RouterEngine({ hash: universe.hash });
+                const nonMatchingCount = totalRoutes - routeCount;
+                
                 // Act.
-                const matches = router[routePatternsKey]().get('route')!.regex?.exec(testPathname);
+                addRoutes(router, { matching: routeCount, nonMatching: nonMatchingCount });
 
                 // Assert.
-                expect(matches).toBeNull();
+                expect(router.noMatches).toBe(false);
             });
+            
             test.each([
-                {
-                    pattern: '/:one?',
-                    testPathname: '/path',
-                    text: '1 parameter',
-                    willMatch: true,
-                    params: {
-                        one: 'path',
-                    },
-                },
-                {
-                    pattern: '/:one?',
-                    testPathname: '/',
-                    text: '0 parameters',
-                    willMatch: true,
-                },
-                {
-                    pattern: '/:one?',
-                    testPathname: '/abc/def',
-                    text: '0 parameters',
-                    willMatch: false,
-                },
-                {
-                    pattern: '/:one/:two?',
-                    testPathname: '/abc/def',
-                    text: '2 parameters',
-                    willMatch: true,
-                    params: {
-                        one: 'abc',
-                        two: 'def',
-                    },
-                },
-                {
-                    pattern: '/:one/or%20:two?',
-                    testPathname: '/abc/or%20def',
-                    text: '2 parameters',
-                    willMatch: true,
-                    params: {
-                        one: 'abc',
-                        two: 'def',
-                    },
-                },
-                {
-                    pattern: '/:one/:two?',
-                    testPathname: '/abc/',
-                    text: '2 parameters',
-                    willMatch: true,
-                    params: {
-                        one: 'abc',
-                        two: undefined,
-                    },
-                },
-                {
-                    pattern: '/:one/:two?',
-                    testPathname: '/abc',
-                    text: '2 parameters',
-                    willMatch: true,
-                    params: {
-                        one: 'abc',
-                        two: undefined,
-                    },
-                },
-                {
-                    pattern: '/:one?/:two',
-                    testPathname: '/abc',
-                    text: '2 parameters',
-                    willMatch: true,
-                    params: {
-                        one: undefined,
-                        two: 'abc',
-                    },
-                },
-                {
-                    pattern: '/:one?/:two',
-                    testPathname: '/abc/def',
-                    text: '2 parameters',
-                    willMatch: true,
-                    params: {
-                        one: 'abc',
-                        two: 'def',
-                    },
-                },
-                {
-                    pattern: '/maybe-:one?/:two',
-                    testPathname: '/maybe-/def',
-                    text: '2 parameters',
-                    willMatch: true,
-                    params: {
-                        one: undefined,
-                        two: 'def',
-                    },
-                },
-            ] as {
-                pattern: string;
-                testPathname: string;
-                text: string;
-                willMatch: boolean;
-                params?: Record<string, string>;
-            }[])("Should match $text in pattern $pattern with pathname $testPathname .", ({ pattern, testPathname, willMatch, params }) => {
+                1, 2, 5
+            ])("Should be true whenever the %d matching route(s) are ignored for fallback.", (routeCount) => {
                 // Arrange.
-                const router = new RouterEngine();
-                const route: RouteInfo = {
-                    pattern,
-                    caseSensitive: false,
-                };
-                router.routes['route'] = route;
-
+                const router = new RouterEngine({ hash: universe.hash });
+                
                 // Act.
-                const matches = router[routePatternsKey]().get('route')!.regex?.exec(testPathname);
+                addRoutes(router, { 
+                    matching: { 
+                        count: routeCount, 
+                        specs: { ignoreForFallback: true } 
+                    } 
+                });
 
                 // Assert.
-                expect(!!matches).toBe(willMatch);
-                if (willMatch && params) {
-                    expect(matches!.groups).toBeDefined();
-                    expect(Object.keys(matches!.groups!).length).toBe(Object.keys(params).length);
-                    for (let key in params) {
-                        expect(matches!.groups![key]).toBe(params[key]);
-                    }
-                }
+                expect(router.noMatches).toBe(true);
             });
-        });
-    });
-    describe('noMatches', () => {
-        test("Should be true whenever there are no routes registered.", () => {
-            // Act.
-            const router = new RouterEngine();
-
-            // Assert.
-            expect(router.noMatches).toBe(true);
-        });
-        test("Should be true whenever there are no matching routes.", () => {
-            // Act.
-            const router = new RouterEngine();
-            router.routes['route'] = {
-                pattern: '/:one/:two?',
-                caseSensitive: false,
-            };
-
-            // Assert.
-            expect(router.noMatches).toBe(true);
-        });
-        test.each([
-            {
-                text: "is",
-                routeCount: 1,
-                totalRoutes: 5
-            },
-            {
-                text: "are",
-                routeCount: 2,
-                totalRoutes: 5
-            },
-            {
-                text: "are",
-                routeCount: 5,
-                totalRoutes: 5
-            },
-        ])("Should be false whenever there $text $routeCount matching route(s) out of $totalRoutes route(s).", ({ routeCount, totalRoutes }) => {
-            // Arrange.
-            const router = new RouterEngine();
-            const nonMatchingCount = totalRoutes - routeCount;
-            
-            // Act.
-            addRoutes(router, { matching: routeCount, nonMatching: nonMatchingCount });
-
-            // Assert.
-            expect(router.noMatches).toBe(false);
-        });
-        test.each([
-            1, 2, 5
-        ])("Should be true whenever the %d matching route(s) are ignored for fallback.", (routeCount) => {
-            // Arrange.
-            const router = new RouterEngine();
-            
-            // Act.
-            addRoutes(router, { 
-                matching: { 
-                    count: routeCount, 
-                    specs: { ignoreForFallback: true } 
-                } 
-            });
-
-            // Assert.
-            expect(router.noMatches).toBe(true);
-        });
-    });
-});
-
-describe("RouterEngine (multi hash)", () => {
-    let cleanup: () => void;
-    let browserMocks: ReturnType<typeof setupBrowserMocks>;
-    
-    beforeAll(() => {
-        browserMocks = setupBrowserMocks("http://example.com/", location);
-        cleanup = init({ hashMode: 'multi' });
-    });
-    
-    afterAll(() => {
-        cleanup();
-        browserMocks.cleanup();
-    });
-    
-    describe('state', () => {
-        test("Should return the current state for a named hash path.", () => {
-            // Arrange.
-            const router = new RouterEngine({ hash: 'custom' });
-            const state: State = { path: 1, hash: { single: 2, custom: 3 } };
-
-            // Act.
-            browserMocks.history.pushState(state, '', 'http://example.com/other');
-            browserMocks.triggerPopstate(state); // Notify location service of state change
-
-            // Assert.
-            expect(router.state).toBe(state.hash.custom);
         });
     });
 });

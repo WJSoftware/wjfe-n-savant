@@ -24,6 +24,16 @@ export const ROUTING_UNIVERSES: {
 ] as const;
 
 /**
+ * All possible hash values for testing hash compatibility
+ */
+export const ALL_HASHES = {
+    path: false,        // Path routing
+    single: true,       // Hash routing (single)
+    multi: 'p1',        // Multi-hash routing
+    implicit: undefined // Implicit routing (depends on implicitMode)
+} as const;
+
+/**
  * Creates a router and context setup for testing
  */
 export function createRouterTestSetup(hash: Hash | undefined) {
