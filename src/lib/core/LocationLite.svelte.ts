@@ -43,7 +43,6 @@ export class LocationLite implements Location {
             const cleanups = [] as (() => void)[];
             ['popstate', 'hashchange'].forEach((event) => {
                 cleanups.push(on(globalThis.window, event, () => {
-                    console.log(event);
                     this.#innerState.url.href = globalThis.window?.location?.href;
                     this.#innerState.state = globalThis.window?.history?.state;
                 }));
