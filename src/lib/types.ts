@@ -312,3 +312,9 @@ export type ActiveState = {
      */
     ariaCurrent?: HTMLAnchorAttributes['aria-current'];
 }
+
+export interface HistoryApi extends History {
+    readonly url: SvelteURL;
+    state: State;
+    dispose(): void;
+}

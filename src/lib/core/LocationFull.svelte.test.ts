@@ -79,13 +79,12 @@ describe("LocationFull", () => {
         ])("Should provide the URL, state and method $method via the event object of 'beforeNavigate'.", ({ method, stateFn }) => {
             // Arrange.
             const callback = vi.fn();
-            const state = { test: 'value' };
+            const state = { path: { test: 'value' }, hash: {} };
             location.on('beforeNavigate', callback);
 
             // Act.
             // @ts-expect-error stateFn cannot enumerate history.
             globalThis.window.history[stateFn](state, '', 'http://example.com/other');
-            flushSync();
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({

@@ -1,7 +1,9 @@
+import { InMemoryHistoryApi } from "./core/InMemoryHistoryApi.svelte.js";
 import { setLocation } from "./core/Location.js";
 import { LocationFull } from "./core/LocationFull.js";
 import { LocationLite } from "./core/LocationLite.svelte.js";
 import { routingOptions, type RoutingOptions } from "./core/options.js";
+import { StockHistoryApi } from "./core/StockHistoryApi.svelte.js";
 import { setTraceOptions, type TraceOptions } from "./core/trace.svelte.js";
 
 /**
@@ -33,7 +35,15 @@ export function init(options?: InitOptions): () => void {
     routingOptions.full = options?.full ?? routingOptions.full;
     routingOptions.hashMode = options?.hashMode ?? routingOptions.hashMode;
     routingOptions.implicitMode = options?.implicitMode ?? routingOptions.implicitMode;
-    const newLocation = setLocation(options?.full ? new LocationFull() : new LocationLite());
+    if (!routingOptions.full) {
+        // @ts-expect-error ts(2339) TS narrowing on options is not possible.
+        routingOptions.routeInMemory = options?.routeInMemory ?? routingOptions.routeInMemory;
+    }
+    const newLocation = setLocation(
+        routingOptions.full ?
+            new LocationFull() :
+            new LocationLite(routingOptions.routeInMemory ? new InMemoryHistoryApi() : new StockHistoryApi())
+    );
     return () => {
         newLocation?.dispose();
         setLocation(null);

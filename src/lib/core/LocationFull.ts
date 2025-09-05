@@ -1,6 +1,7 @@
-import type { BeforeNavigateEvent, Events, NavigationCancelledEvent, NavigationEvent } from "$lib/types.js";
+import type { BeforeNavigateEvent, Events, HistoryApi, NavigationCancelledEvent, NavigationEvent } from "$lib/types.js";
 import { LocationLite } from "./LocationLite.svelte.js";
-import { LocationState } from "./LocationState.svelte.js";
+import { StockHistoryApi } from "./StockHistoryApi.svelte.js";
+import { assertValidState } from "./LocationLite.svelte.js";
 
 /**
  * Location implementation of the library's full mode feature.
@@ -13,12 +14,11 @@ export class LocationFull extends LocationLite {
     #nextSubId = 0;
     #originalPushState = globalThis.window?.history.pushState.bind(globalThis.window?.history);
     #originalReplaceState = globalThis.window?.history.replaceState.bind(globalThis.window?.history);
-    #innerState;
+    #historyApi;
     constructor() {
-        const innerState = new LocationState();
-        // @ts-expect-error Base class constructor purposely hides the fact that takes one argument.
-        super(innerState);
-        this.#innerState = innerState;
+        const historyApi = new StockHistoryApi();
+        super(historyApi);
+        this.#historyApi = historyApi;
         globalThis.window.history.pushState = this.#navigate.bind(this, 'push');
         globalThis.window.history.replaceState = this.#navigate.bind(this, 'replace');
     }
@@ -29,7 +29,7 @@ export class LocationFull extends LocationLite {
         super.dispose();
     }
 
-    #navigate(method: NavigationEvent['method'], state: any, _: string, url: string) {
+    #navigate(method: NavigationEvent['method'], state: unknown, _: string, url: string) {
         const event: BeforeNavigateEvent = {
             url,
             state,
@@ -57,10 +57,12 @@ export class LocationFull extends LocationLite {
                 });
             }
         } else {
+            event.state ??= { path: undefined, hash: {} };
+            assertValidState(event.state);
             const navFn = method === 'push' ? this.#originalPushState : this.#originalReplaceState;
             navFn(event.state, '', url);
             this.url.href = globalThis.window?.location.href;
-            this.#innerState.state = state;
+            this.#historyApi.state = event.state;
         }
     }
 

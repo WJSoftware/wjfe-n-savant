@@ -1,20 +1,26 @@
 import { SvelteURL } from "svelte/reactivity";
 import { isConformantState } from "./isConformantState.js";
+import type { State } from "$lib/types.js";
 
 /**
- * Helper class used to manage the reactive data of Location implementations.
+ * Base class for implementations of HistoryApi classes.
  */
 export class LocationState {
-    url = new SvelteURL(globalThis.window?.location?.href);
+    #url;
     state;
 
-    constructor() {
+    constructor(initialHref?: string, initialState?: State) {
+        this.#url = new SvelteURL(initialHref || globalThis.window?.location?.href);
         // Get the current state from History API
-        let historyState = globalThis.window?.history?.state;
+        let historyState = initialState ?? globalThis.window?.history?.state;
         let validState = false;
         this.state = $state((validState = isConformantState(historyState)) ? historyState : { path: undefined, hash: {} });
         if (!validState && historyState != null) {
             console.warn('Non-conformant state data detected in History API. Resetting to clean state.');
         }
+    }
+
+    get url() {
+        return this.#url;
     }
 }
