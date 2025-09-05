@@ -312,3 +312,12 @@ export type ActiveState = {
      */
     ariaCurrent?: HTMLAnchorAttributes['aria-current'];
 }
+
+/**
+ * Defines the type of function accepted by the `Fallback` component via its `when` property.
+ * 
+ * @param routeStatus The current route status data from the parent router.
+ * @param noMatches The value that the parent router has calculated as per standard fallback logic.
+ * @returns `true` if the fallback content should be shown; `false` to prevent content from being shown.
+ */
+export type WhenPredicate = (routeStatus: Record<string, RouteStatus>, noMatches: boolean) => boolean;

@@ -1,7 +1,7 @@
 <script lang="ts" module>
 	import { RouterEngine } from '$lib/core/RouterEngine.svelte.js';
 	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
-	import type { RouteStatus } from '$lib/types.js';
+	import type { Hash, RouteStatus } from '$lib/types.js';
 
 	const parentCtxKey = Symbol();
 	const hashParentCtxKey = Symbol();
@@ -15,10 +15,15 @@
 	 * @param hash Hash value that identifies the desired router context.
 	 * @returns The closest router context found for the specified hash, or `undefined` if there is none.
 	 */
-	export function getRouterContext(hash: boolean | string) {
-		return getContext<RouterEngine | undefined>(
-			typeof hash === 'string' ? multiHashSymbol(hash) : hash ? hashParentCtxKey : parentCtxKey
-		);
+	export function getRouterContext(hash: Hash) {
+		return getContext<RouterEngine | undefined>(getRouterContextKey(hash));
+	}
+
+	/**
+	 * Only exported for unit testing.
+	 */
+	export function getRouterContextKey(hash: Hash) {
+		return typeof hash === 'string' ? multiHashSymbol(hash) : hash ? hashParentCtxKey : parentCtxKey;
 	}
 
 	/**
