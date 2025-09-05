@@ -75,7 +75,7 @@ export function createTestSnippet(contentText: string) {
  * Generates a new random route key
  */
 export function newRandomRouteKey() {
-    return `route-${Math.random().toString(36).substr(2, 9)}`;
+    return `route-${Math.random().toString(36).substring(2, 11)}`;
 }
 
 /**
