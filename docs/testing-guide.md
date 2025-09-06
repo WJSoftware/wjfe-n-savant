@@ -322,6 +322,243 @@ await expect(findByText(content)).rejects.toThrow();
 expect(queryByText(content)).toBeNull();
 ```
 
+### Testing Bindable Properties
+
+**Bindable properties** (declared with `export let` and used with `bind:` in Svelte) require special testing patterns since they involve two-way data binding between parent and child components.
+
+#### **The Getter/Setter Pattern (Recommended)**
+
+The most effective way to test bindable properties is using getter/setter functions in the `render()` props:
+
+```typescript
+test("Should bind property correctly", async () => {
+    // Arrange: Set up binding capture
+    let capturedValue: any;
+    const propertySetter = vi.fn((value) => { capturedValue = value; });
+
+    // Act: Render component with bindable property
+    render(Component, {
+        props: {
+            // Other props...
+            get bindableProperty() { return capturedValue; },
+            set bindableProperty(value) { propertySetter(value); }
+        },
+        context
+    });
+
+    // Trigger the binding (component-specific logic)
+    // e.g., navigate to a route, trigger an event, etc.
+    await triggerBindingUpdate();
+
+    // Assert: Verify binding occurred
+    expect(propertySetter).toHaveBeenCalled();
+    expect(capturedValue).toEqual(expectedValue);
+});
+```
+
+#### **Testing Across Routing Modes**
+
+For components that work across multiple routing universes, test bindable properties for each mode:
+
+```typescript
+function bindablePropertyTests(setup: ReturnType<typeof createRouterTestSetup>, ru: RoutingUniverse) {
+    test("Should bind property when condition is met", async () => {
+        const { hash, context } = setup;
+        let capturedValue: any;
+        const propertySetter = vi.fn((value) => { capturedValue = value; });
+
+        render(Component, {
+            props: {
+                hash,
+                get boundProperty() { return capturedValue; },
+                set boundProperty(value) { propertySetter(value); },
+                // Other component-specific props
+            },
+            context
+        });
+
+        // Trigger binding based on routing mode
+        const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+        const url = shouldUseHash ? "http://example.com/#/test" : "http://example.com/test";
+        location.url.href = url;
+        await vi.waitFor(() => {});
+
+        expect(propertySetter).toHaveBeenCalled();
+        expect(capturedValue).toEqual(expectedValue);
+    });
+
+    test("Should update binding when conditions change", async () => {
+        // Test binding updates during navigation or state changes
+        let capturedValue: any;
+        const propertySetter = vi.fn((value) => { capturedValue = value; });
+
+        render(Component, {
+            props: {
+                hash,
+                get boundProperty() { return capturedValue; },
+                set boundProperty(value) { propertySetter(value); }
+            },
+            context
+        });
+
+        // First state
+        await triggerFirstState();
+        expect(capturedValue).toEqual(firstExpectedValue);
+
+        // Second state
+        await triggerSecondState();
+        expect(capturedValue).toEqual(secondExpectedValue);
+    });
+}
+
+// Apply to all routing universes
+ROUTING_UNIVERSES.forEach((ru) => {
+    describe(`Component - ${ru.text}`, () => {
+        const setup = createRouterTestSetup(ru.hash);
+        // ... setup code ...
+
+        describe("Bindable Properties", () => {
+            bindablePropertyTests(setup, ru);
+        });
+    });
+});
+```
+
+#### **Handling Mode-Specific Limitations**
+
+Some routing modes may have different behavior or limitations. Handle these gracefully:
+
+```typescript
+test("Should handle complex binding scenarios", async () => {
+    let capturedValue: any;
+    const propertySetter = vi.fn((value) => { capturedValue = value; });
+
+    render(Component, {
+        props: {
+            get boundProperty() { return capturedValue; },
+            set boundProperty(value) { propertySetter(value); }
+        },
+        context
+    });
+
+    await triggerBinding();
+
+    expect(propertySetter).toHaveBeenCalled();
+    
+    // Handle mode-specific edge cases
+    if (ru.text === 'MHR') {
+        // Multi Hash Routing may require different URL format or setup
+        // Skip complex assertions that aren't supported yet
+        return;
+    }
+    
+    expect(capturedValue).toEqual(expectedComplexValue);
+});
+```
+
+#### **Type Conversion Awareness**
+
+When testing components that perform automatic type conversion (like RouterEngine), account for expected type changes:
+
+```typescript
+test("Should bind with correct type conversion", async () => {
+    let capturedParams: any;
+    const paramsSetter = vi.fn((value) => { capturedParams = value; });
+
+    render(RouteComponent, {
+        props: {
+            path: "/user/:userId/post/:postId",
+            get params() { return capturedParams; },
+            set params(value) { paramsSetter(value); }
+        },
+        context
+    });
+
+    // Navigate to URL with string parameters
+    location.url.href = "http://example.com/user/123/post/456";
+    await vi.waitFor(() => {});
+
+    expect(paramsSetter).toHaveBeenCalled();
+    // Expect automatic string-to-number conversion
+    expect(capturedParams).toEqual({ 
+        userId: 123,    // number, not "123"
+        postId: 456     // number, not "456"
+    });
+});
+```
+
+#### **Anti-Patterns to Avoid**
+
+❌ **Don't use wrapper components for simple binding tests**:
+```typescript
+// Bad - overcomplicated
+const WrapperComponent = () => {
+    let boundValue = $state();
+    return `<Component bind:property={boundValue} />`;
+};
+```
+
+❌ **Don't test binding implementation details**:
+```typescript
+// Bad - testing internal mechanics
+expect(component.$$.callbacks.boundProperty).toHaveBeenCalled();
+```
+
+❌ **Don't forget routing mode compatibility**:
+```typescript
+// Bad - hardcoded to one routing mode
+location.url.href = "http://example.com/#/test"; // Only works for hash routing
+```
+
+✅ **Use the getter/setter pattern for clean, direct testing**:
+```typescript
+// Good - direct, simple, effective
+render(Component, {
+    props: {
+        get boundProperty() { return capturedValue; },
+        set boundProperty(value) { propertySetter(value); }
+    }
+});
+```
+
+#### **Real-World Example: Route Parameter Binding**
+
+```typescript
+test("Should bind route parameters correctly", async () => {
+    // Arrange
+    const { hash, context } = setup;
+    let capturedParams: any;
+    const paramsSetter = vi.fn((value) => { capturedParams = value; });
+
+    // Act
+    render(TestRouteWithRouter, {
+        props: {
+            hash,
+            routePath: "/user/:userId",
+            get params() { return capturedParams; },
+            set params(value) { paramsSetter(value); },
+            children: createTestSnippet('<div>User {params?.userId}</div>')
+        },
+        context
+    });
+
+    // Navigate to matching route
+    const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+    location.url.href = shouldUseHash ? "http://example.com/#/user/42" : "http://example.com/user/42";
+    await vi.waitFor(() => {});
+
+    // Assert
+    expect(paramsSetter).toHaveBeenCalled();
+    expect(capturedParams).toEqual({ userId: 42 }); // Note: number due to auto-conversion
+});
+```
+
+This pattern provides:
+- **Clear test intent**: What binding behavior is being tested
+- **Routing mode compatibility**: Works across all universe types
+- **Type safety**: Captures actual bound values for verification
+- **Maintainability**: Simple, readable test structure
+
 ### Required Imports
 
 ```typescript
@@ -448,6 +685,7 @@ afterAll(() => {
 6. **File Naming**: Use `.svelte.test.ts` for files that need Svelte runes support
 7. **Reactivity**: Remember to call `flushSync()` after changing reactive state
 8. **Prop vs State Reactivity**: Test both prop changes AND reactive dependency changes
+9. **Bindable Properties**: Use getter/setter pattern in `render()` props instead of wrapper components for testing two-way binding
 
 ## Advanced Testing Infrastructure
 
