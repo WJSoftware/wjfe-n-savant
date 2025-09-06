@@ -13,5 +13,6 @@ export function isConformantState(state: unknown): state is State {
         && state !== null
         && 'hash' in state
         && typeof state.hash === 'object'
-        && state.hash !== null;
+        && state.hash !== null
+        && !Array.isArray(state.hash);
 }
