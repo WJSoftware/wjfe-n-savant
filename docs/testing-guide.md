@@ -199,19 +199,8 @@ beforeAll(() => {
 Use data-driven testing across **all 5 routing universes**:
 
 ```typescript
-export const ROUTING_UNIVERSES: {
-    hash: Hash | undefined;
-    implicitMode: RoutingOptions['implicitMode'];
-    hashMode: Exclude<RoutingOptions['hashMode'], undefined>;
-    text: string;
-    name: string;
-}[] = [
-    { hash: undefined, implicitMode: 'path', hashMode: 'single', text: "IMP", name: "Implicit Path Routing" },
-    { hash: undefined, implicitMode: 'hash', hashMode: 'single', text: "IMH", name: "Implicit Hash Routing" },
-    { hash: false, implicitMode: 'path', hashMode: 'single', text: "PR", name: "Path Routing" },
-    { hash: true, implicitMode: 'path', hashMode: 'single', text: "HR", name: "Hash Routing" },
-    { hash: 'p1', implicitMode: 'path', hashMode: 'multi', text: "MHR", name: "Multi Hash Routing" },
-] as const;
+// Import the complete universe definitions
+import { ROUTING_UNIVERSES } from "../testing/test-utils.js";
 
 ROUTING_UNIVERSES.forEach((ru) => {
     describe(`Component - ${ru.text}`, () => {
@@ -238,6 +227,8 @@ ROUTING_UNIVERSES.forEach((ru) => {
     });
 });
 ```
+
+See `src/testing/test-utils.ts` for the complete `ROUTING_UNIVERSES` array definition with all universe configurations.
 
 ### Context Setup
 
@@ -299,9 +290,15 @@ addNonMatchingRoute(router, 'optionalRouteName');
 // Add multiple routes at once
 addRoutes(router, {
     matching: 2,           // Adds 2 matching routes
-    nonMatching: 1,        // Adds 1 non-matching route
-    ignoreForFallback: 1   // Adds 1 route that ignores fallback
+    nonMatching: 1         // Adds 1 non-matching route
 });
+
+// Add explicit custom routes using rest parameters
+addRoutes(router, 
+    { matching: 1 },
+    { pattern: "/api/:id", name: "api-route" },
+    { regex: /^\/test$/ } // Auto-generated name
+);
 
 // Manual route addition
 router.routes["routeName"] = {
@@ -341,7 +338,7 @@ import {
     createRouterTestSetup, 
     createTestSnippet, 
     ROUTING_UNIVERSES 
-} from "$lib/testing/test-utils.js";
+} from "../testing/test-utils.js"; // Note: moved outside $lib
 ```
 
 ### Snippet Creation for Testing
@@ -452,6 +449,211 @@ afterAll(() => {
 7. **Reactivity**: Remember to call `flushSync()` after changing reactive state
 8. **Prop vs State Reactivity**: Test both prop changes AND reactive dependency changes
 
+## Advanced Testing Infrastructure
+
+### Browser API Mocking
+
+For testing components that rely on `window.location` and `window.history` (like `RouterEngine`), use the comprehensive browser mocking utilities:
+
+```typescript
+import { setupBrowserMocks } from "../testing/test-utils.js";
+
+describe("Component requiring browser APIs", () => {
+    beforeEach(() => {
+        // Automatically mocks window.location, window.history, and integrates with library Location
+        setupBrowserMocks("/initial/path");
+    });
+    
+    test("Should respond to location changes", () => {
+        // Browser APIs are now mocked and integrated with library
+        window.history.pushState({}, "", "/new/path");
+        // Test component behavior
+    });
+});
+```
+
+**What `setupBrowserMocks()` provides**:
+- Complete `window.location` mock with all properties (href, pathname, hash, search, etc.)
+- Full `window.history` mock with `pushState`, `replaceState`, and state management
+- Automatic `popstate` event triggering on location changes
+- Integration with library's `LocationLite` for synchronized state
+- Proper cleanup between tests
+
+### Enhanced Route Management
+
+The `addRoutes()` utility supports multiple approaches for flexible route setup:
+
+```typescript
+// Simple route counts
+addRoutes(router, { matching: 2, nonMatching: 1 });
+
+// RouteSpecs approach for custom route definitions
+addRoutes(router, { 
+    matching: { count: 2, specs: { pattern: "/custom/:id" } },
+    nonMatching: { count: 1, specs: { pattern: "/other" } }
+});
+
+// Rest parameters for explicit route definitions (NEW)
+addRoutes(router, 
+    { matching: 1, nonMatching: 0 },
+    { pattern: "/api/users/:id", name: "user-detail" },
+    { regex: /^\/products\/\d+$/, name: "product" },
+    { pattern: "/settings" } // Name auto-generated if not provided
+);
+
+// Combined approach
+addRoutes(router,
+    { matching: 2 }, // Generate 2 matching routes
+    { pattern: "/custom", name: "custom-route" }, // Add specific route
+    { pattern: "/another" } // Add another with auto-generated name
+);
+```
+
+**Rest Parameters Benefits:**
+- **Explicit control**: Define exact routes with specific patterns/regex
+- **Named routes**: Optional `name` property for predictable route keys
+- **Type safety**: Full IntelliSense support for `RouteInfo` properties
+- **Flexible mixing**: Combine generated routes with explicit definitions
+
+Refer to `src/testing/test-utils.ts` for complete function signatures and type definitions.
+
+### Universe-Based Testing Pattern
+
+**Complete test coverage across all 5 routing universes** using the standardized pattern:
+
+```typescript
+import { ROUTING_UNIVERSES } from "../testing/test-utils.js";
+
+// ✅ Recommended: Test ALL universes with single loop
+ROUTING_UNIVERSES.forEach((universe) => {
+    describe(`Component (${universe.text})`, () => {
+        let cleanup: () => void;
+        let setup: ReturnType<typeof createRouterTestSetup>;
+        
+        beforeAll(() => {
+            cleanup = init({ 
+                implicitMode: universe.implicitMode,
+                hashMode: universe.hashMode
+            });
+            setup = createRouterTestSetup(universe.hash);
+        });
+        
+        afterAll(() => {
+            cleanup();
+            setup.dispose();
+        });
+        
+        beforeEach(() => {
+            setup.init(); // Fresh router per test
+            setupBrowserMocks("/"); // Fresh browser state
+        });
+        
+        test(`Should behave correctly in ${universe.text}`, () => {
+            // Test logic that works across all universes
+            const { hash, context, router } = setup;
+            
+            // Use universe.text for concise test descriptions
+            expect(universe.text).toMatch(/^(IMP|IMH|PR|HR|MHR)$/);
+        });
+    });
+});
+```
+
+**Benefits**:
+- **100% Universe Coverage**: Ensures behavior works across all routing modes
+- **Consistent Test Structure**: Standardized setup and teardown patterns
+- **Efficient Execution**: Vitest's dynamic skipping capabilities maintain performance
+- **Clear Reporting**: Each universe shows as separate test suite with meaningful names
+
+### Self-Documenting Test Constants
+
+Use dictionary-based constants for better maintainability:
+
+```typescript
+// Import self-documenting hash values
+import { ALL_HASHES } from "../testing/test-utils.js";
+
+// Usage in tests
+test("Should validate hash compatibility", () => {
+    expect(() => {
+        new RouterEngine({ hash: ALL_HASHES.single });
+    }).not.toThrow();
+});
+```
+
+See `src/testing/test-utils.ts` for the complete `ALL_HASHES` dictionary definition.
+
+**Dictionary Benefits**:
+- **Self-Documentation**: `ALL_HASHES.single` is clearer than `true`
+- **Single Source of Truth**: Change values in one place
+- **Type Safety**: TypeScript can validate usage
+- **Discoverability**: IDE autocomplete shows available options
+
+### Constructor Validation Testing
+
+For components with runtime validation, test all error scenarios systematically:
+
+```typescript
+describe("Constructor hash validation", () => {
+    test.each([
+        { parent: ALL_HASHES.path, child: ALL_HASHES.single, desc: 'path parent vs hash child' },
+        { parent: ALL_HASHES.single, child: ALL_HASHES.path, desc: 'hash parent vs path child' },
+        { parent: ALL_HASHES.multi, child: ALL_HASHES.path, desc: 'multi-hash parent vs path child' },
+        { parent: ALL_HASHES.path, child: ALL_HASHES.multi, desc: 'path parent vs multi-hash child' }
+    ])("Should throw error when parent and child have different hash modes: '$desc'", ({ parent, child }) => {
+        expect(() => {
+            const parentRouter = new RouterEngine({ hash: parent });
+            new RouterEngine(parentRouter, { hash: child });
+        }).toThrow("Parent and child routers must use the same hash mode");
+    });
+    
+    test.each([
+        { parent: ALL_HASHES.path, desc: 'path parent' },
+        { parent: ALL_HASHES.single, desc: 'hash parent' },
+        { parent: ALL_HASHES.multi, desc: 'multi-hash parent' }
+    ])("Should allow child router without explicit hash to inherit parent's hash: '$desc'", ({ parent }) => {
+        expect(() => {
+            const parentRouter = new RouterEngine({ hash: parent });
+            new RouterEngine(parentRouter);
+        }).not.toThrow();
+    });
+});
+```
+
+### Performance Optimizations
+
+**Browser Mock State Synchronization**:
+```typescript
+// ✅ Automatic state sync - setupBrowserMocks handles this
+// Best practice: pass the library's location object for full integration
+setupBrowserMocks("/initial", libraryLocationObject);
+window.history.pushState({}, "", "/new"); // Automatically triggers popstate
+
+// ❌ Manual sync required (old approach)
+mockLocation.pathname = "/new";
+window.dispatchEvent(new PopStateEvent('popstate')); // Manual event trigger
+```
+
+**Efficient Test Assertions**:
+```typescript
+// ✅ Fast negative assertions
+expect(queryByText("should not exist")).toBeNull();
+
+// ❌ Slow - waits for timeout
+await expect(findByText("should not exist")).rejects.toThrow();
+
+// ✅ Use findByText for elements that should exist
+const element = await findByText("should exist");
+expect(element).toBeInTheDocument();
+```
+
 ## Test Utilities Location
 
-Test utilities are located in `src/lib/testing/` and excluded from the published package via the `"files"` property in `package.json`. During development, they build to `dist/testing/` but are not included in `npm pack`.
+Test utilities are centralized in `src/testing/test-utils.ts` (moved from `src/lib/testing/` for better organization) and excluded from the published package via the `"files"` property in `package.json`. During development, they build to `dist/testing/` but are not included in `npm pack`.
+
+**Key utilities**:
+- `setupBrowserMocks()`: Complete browser API mocking with library integration
+- `addRoutes()`: Enhanced route management with RouteSpecs support
+- `createRouterTestSetup()`: Standardized router setup with proper lifecycle
+- `ROUTING_UNIVERSES`: Complete universe definitions for comprehensive testing
+- `ALL_HASHES`: Self-documenting hash value constants
