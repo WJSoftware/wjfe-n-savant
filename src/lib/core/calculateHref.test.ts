@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { calculateHref, type CalculateHrefOptions } from "./calculateHref.js";
 import { init, location } from "$lib/index.js";
+import { ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
 
 describe("calculateHref", () => {
     describe("(...paths) Overload", () => {
@@ -24,151 +25,231 @@ describe("calculateHref", () => {
                 inputPaths: ["path#hash", "anotherPath#hash2"],
                 expectedHref: "path/anotherPath#hash",
             }
-        ])("Should combine paths $inputPaths as $expectedHref .", ({ inputPaths, expectedHref }) => {
-            // Act.
+        ])("Should combine paths $inputPaths as $expectedHref", ({ inputPaths, expectedHref }) => {
+            // Act
             const href = calculateHref(...inputPaths);
 
-            // Assert.
+            // Assert
             expect(href).toBe(expectedHref);
         });
     });
-    describe("(options, ...paths) Overload", () => {
+
+    // Test across all routing universes for comprehensive coverage
+    ROUTING_UNIVERSES.forEach((universe) => {
+        describe(`(options, ...paths) Overload - ${universe.text}`, () => {
+            let cleanup: Function;
+            
+            beforeAll(() => {
+                cleanup = init({ 
+                    implicitMode: universe.implicitMode,
+                    hashMode: universe.hashMode
+                });
+            });
+            
+            afterAll(() => {
+                cleanup();
+            });
+            
+            const basePath = "/base/path";
+            const baseHash = universe.hashMode === 'multi' 
+                ? "#p1=path/one;p2=path/two" 
+                : "#base/hash";
+            
+            beforeEach(() => {
+                location.url.href = `https://example.com${basePath}${baseHash}`;
+            });
+            
+            describe("Basic navigation", () => {
+                test.each([
+                    {
+                        opts: { hash: universe.hash, preserveHash: false },
+                        url: '/sample/path',
+                        expectedHref: (() => {
+                            if (universe.hash === ALL_HASHES.path) return '/sample/path';
+                            if (universe.hash === ALL_HASHES.single) return '#/sample/path';
+                            if (universe.hash === ALL_HASHES.implicit) {
+                                return universe.implicitMode === 'path' ? '/sample/path' : '#/sample/path';
+                            }
+                            // Multi-hash routing - preserves existing paths and adds/updates the specified hash
+                            if (typeof universe.hash === 'string') {
+                                // This will preserve existing paths and update/add the new one
+                                return `#${universe.hash}=/sample/path;p2=path/two`;
+                            }
+                            return '/sample/path';
+                        })(),
+                        text: "create correct href without preserving hash",
+                    },
+                    {
+                        opts: { hash: universe.hash, preserveHash: true },
+                        url: '/sample/path',
+                        expectedHref: (() => {
+                            if (universe.hash === ALL_HASHES.path) return `/sample/path${baseHash}`;
+                            if (universe.hash === ALL_HASHES.single) return '#/sample/path';
+                            if (universe.hash === ALL_HASHES.implicit) {
+                                return universe.implicitMode === 'path' ? `/sample/path${baseHash}` : '#/sample/path';
+                            }
+                            // Multi-hash routing - preserveHash doesn't apply to hash routing
+                            if (typeof universe.hash === 'string') {
+                                return `#${universe.hash}=/sample/path;p2=path/two`;
+                            }
+                            return `/sample/path${baseHash}`;
+                        })(),
+                        text: "handle hash preservation correctly",
+                    },
+                ])("Should $text in ${universe.text}", ({ opts, url, expectedHref }) => {
+                    // Act
+                    const href = calculateHref(opts, url);
+
+                    // Assert
+                    expect(href).toBe(expectedHref);
+                });
+            });
+
+            describe("Query string preservation", () => {
+                test.each([
+                    { preserveQuery: true, text: 'preserve' },
+                    { preserveQuery: false, text: 'not preserve' },
+                ])("Should $text the query string in ${universe.text}", ({ preserveQuery }) => {
+                    // Arrange
+                    const newPath = "/sample/path";
+                    const query = "a=b&c=d";
+                    location.url.search = `?${query}`;
+                    
+                    const expectedHref = (() => {
+                        const baseHref = (() => {
+                            if (universe.hash === ALL_HASHES.path) return newPath;
+                            if (universe.hash === ALL_HASHES.single) return `#${newPath}`;
+                            if (universe.hash === ALL_HASHES.implicit) {
+                                return universe.implicitMode === 'path' ? newPath : `#${newPath}`;
+                            }
+                            // Multi-hash routing
+                            if (typeof universe.hash === 'string') {
+                                return `#${universe.hash}=${newPath};p2=path/two`;
+                            }
+                            return newPath;
+                        })();
+                        
+                        if (!preserveQuery) return baseHref;
+                        
+                        // Add query string
+                        if (baseHref.startsWith('#')) {
+                            return `?${query}${baseHref}`;
+                        } else {
+                            return `${baseHref}?${query}`;
+                        }
+                    })();
+
+                    // Act
+                    const href = calculateHref({ hash: universe.hash, preserveQuery }, newPath);
+
+                    // Assert
+                    expect(href).toBe(expectedHref);
+                });
+            });
+
+            if (universe.hashMode === 'multi') {
+                describe("Multi-hash routing behavior", () => {
+                    test("Should preserve all existing paths when adding a new path", () => {
+                        // Arrange
+                        const newPath = "/sample/path";
+                        const newHashId = 'new';
+
+                        // Act
+                        const href = calculateHref({ hash: newHashId }, newPath);
+
+                        // Assert
+                        expect(href).toBe(`${baseHash};${newHashId}=${newPath}`);
+                    });
+
+                    test("Should preserve all existing paths when updating an existing path", () => {
+                        // Arrange
+                        const newPath = "/sample/path";
+                        const existingHashId = 'p1';
+                        const expected = baseHash.replace(/(p1=).+;/i, `$1${newPath};`);
+
+                        // Act
+                        const href = calculateHref({ hash: existingHashId }, newPath);
+
+                        // Assert
+                        expect(href).toEqual(expected);
+                    });
+                });
+            }
+
+            if (universe.hash === ALL_HASHES.implicit) {
+                describe("Implicit hash resolution", () => {
+                    test("Should resolve implicit hash according to implicitMode", () => {
+                        // Arrange
+                        const newPath = "/sample/path";
+                        const expectedHref = universe.implicitMode === 'path' ? newPath : `#${newPath}`;
+
+                        // Act
+                        const href = calculateHref({ hash: universe.hash }, newPath);
+
+                        // Assert
+                        expect(href).toBe(expectedHref);
+                    });
+                });
+            }
+        });
+    });
+
+    describe("HREF Validation", () => {
         let cleanup: Function;
+        
         beforeAll(() => {
             cleanup = init();
         });
+        
         afterAll(() => {
             cleanup();
         });
-        const basePath = "/base/path";
-        const baseHash = "#base/hash";
-        beforeEach(() => {
-            location.url.href = `https://example.com${basePath}${baseHash}`;
+
+        test("Should reject HREF with http protocol", () => {
+            expect(() => calculateHref("http://example.com/path"))
+                .toThrow('HREF cannot contain protocol, host, or port. Received: "http://example.com/path"');
         });
-        test.each<{
-            opts: CalculateHrefOptions;
-            url: string;
-            expectedHref: string;
-            text: string;
-            textMode: string;
-        }>([
-            {
-                opts: { hash: false, preserveHash: false },
-                url: '/sample/path',
-                expectedHref: '/sample/path',
-                text: "not preserve hash",
-                textMode: "path routing",
-            },
-            {
-                opts: { hash: false, preserveHash: true },
-                url: '/sample/path',
-                expectedHref: `/sample/path${baseHash}`,
-                text: "preserve hash",
-                textMode: "path routing",
-            },
-            {
-                opts: { hash: true },
-                url: '/sample/path',
-                expectedHref: '#/sample/path',
-                text: "ignore hash",
-                textMode: "hash routing",
-            },
-        ])("Should $text from the URL for $textMode .", ({ opts, url, expectedHref }) => {
-            // Arrange.
 
-            // Act.
-            const href = calculateHref(opts, url);
-
-            // Assert.
-            expect(href).toBe(expectedHref);
+        test("Should reject HREF with https protocol", () => {
+            expect(() => calculateHref("https://example.com/path"))
+                .toThrow('HREF cannot contain protocol, host, or port. Received: "https://example.com/path"');
         });
-        test("Should create a hash HREF when the 'hash' property is set to true.", () => {
-            // Arrange.
-            const newPath = "/sample/path";
-            const hash = true;
 
-            // Act.
-            const href = calculateHref({ hash }, newPath);
-
-            // Assert.
-            expect(href).toBe(`#${newPath}`);
+        test("Should reject HREF with ftp protocol", () => {
+            expect(() => calculateHref("ftp://example.com/path"))
+                .toThrow('HREF cannot contain protocol, host, or port. Received: "ftp://example.com/path"');
         });
-        test.each([
-            {
-                hash: false,
-                preserveQuery: true,
-                text: 'preserve',
-                textMode: 'path routing',
-            },
-            {
-                hash: false,
-                preserveQuery: false,
-                text: 'not preserve',
-                textMode: 'path routing',
-            },
-            {
-                hash: true,
-                preserveQuery: true,
-                text: 'preserve',
-                textMode: 'hash routing',
-            },
-            {
-                hash: true,
-                preserveQuery: false,
-                text: 'not preserve',
-                textMode: 'hash routing',
-            },
-        ])("Should $text the query string when 'preserveQuery' is $preserveQuery under the $textMode mode.", ({ hash, preserveQuery }) => {
-            // Arrange.
-            const newPath = "/sample/path";
-            const query = "a=b&c=d";
-            location.url.search = query;
-            const expected = hash ?
-                (preserveQuery ? `?${query}#${newPath}` : `#${newPath}`) :
-                (preserveQuery ? `${newPath}?${query}` : newPath);
 
-            // Act.
-            const href = calculateHref({ hash, preserveQuery }, newPath);
-
-            // Assert.
-            expect(href).toBe(expected);
+        test("Should reject HREF with protocol-relative URL", () => {
+            expect(() => calculateHref("//example.com/path"))
+                .toThrow('HREF cannot contain protocol, host, or port. Received: "//example.com/path"');
         });
-    });
-    describe("(options, ...paths) Overload - Multi Hash Routing", () => {
-        let cleanup: Function;
-        beforeAll(() => {
-            cleanup = init({ hashMode: 'multi' });
-        });
-        afterAll(() => {
-            cleanup();
-        });
-        const basePath = "/base/path";
-        const baseHash = "#p1=path/one;p2=path/two";
-        beforeEach(() => {
-            location.url.href = `https://example.com${basePath}${baseHash}`;
-        });
-        test("Should preserve all existing paths in the URL's hash when adding a new path.", () => {
-            // Arrange.
-            const newPath = "/sample/path";
-            const hash = 'new';
 
-            // Act.
-            const href = calculateHref({ hash }, newPath);
-
-            // Assert.
-            expect(href).toBe(`${baseHash};${hash}=${newPath}`);
+        test("Should reject HREF with custom protocol", () => {
+            expect(() => calculateHref("custom-protocol://example.com/path"))
+                .toThrow('HREF cannot contain protocol, host, or port. Received: "custom-protocol://example.com/path"');
         });
-        test("Should preserve all existing paths in the URL's hash when updating an existing path.", () => {
-            // Arrange.
-            const newPath = "/sample/path";
-            const hash = 'p1';
-            const expected = baseHash.replace(/(p1=).+;/i, `$1${newPath};`);
 
-            // Act.
-            const href = calculateHref({ hash }, newPath);
+        test("Should reject HREF when passed in options overload", () => {
+            expect(() => calculateHref({}, "https://example.com/path"))
+                .toThrow('HREF cannot contain protocol, host, or port. Received: "https://example.com/path"');
+        });
 
-            // Assert.
-            expect(href).toEqual(expected);
+        test("Should reject HREF among multiple valid paths", () => {
+            expect(() => calculateHref("/valid/path", "https://example.com/invalid", "/another/valid"))
+                .toThrow('HREF cannot contain protocol, host, or port. Received: "https://example.com/invalid"');
+        });
+
+        test("Should allow valid relative paths", () => {
+            expect(() => calculateHref("/path", "relative/path", "../other/path")).not.toThrow();
+        });
+
+        test("Should allow valid paths with query and hash", () => {
+            expect(() => calculateHref("/path?query=value", "relative/path#hash")).not.toThrow();
+        });
+
+        test("Should allow paths that start with protocol-like strings but are not URLs", () => {
+            expect(() => calculateHref("/http-endpoint", "/https-folder")).not.toThrow();
         });
     });
 });

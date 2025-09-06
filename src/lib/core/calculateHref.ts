@@ -72,6 +72,17 @@ export function calculateHref(...allArgs: (CalculateHrefOptions | string | undef
         preserveHash = false
     } = options;
     const allHrefs = allArgs as (string | undefined)[];
+    
+    // Validate that no HREF contains protocol, host, or port
+    for (const href of allHrefs) {
+        if (href && typeof href === 'string') {
+            // Check for absolute URL patterns (protocol://host or //host)
+            if (/^([a-z][a-z0-9+.-]*:)?\/\//i.test(href)) {
+                throw new Error(`HREF cannot contain protocol, host, or port. Received: "${href}"`);
+            }
+        }
+    }
+    
     const dissected = dissectHrefs(...allHrefs);
     if (hash !== false && dissected.hashes.some(h => !!h.length)) {
         throw new Error("Specifying hashes in HREF's is only allowed for path routing.");
