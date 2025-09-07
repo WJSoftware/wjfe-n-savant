@@ -1,6 +1,6 @@
 {
 	"name": "@wjfe/n-savant",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
