@@ -321,3 +321,25 @@ export type ActiveState = {
  * @returns `true` if the fallback content should be shown; `false` to prevent content from being shown.
  */
 export type WhenPredicate = (routeStatus: Record<string, RouteStatus>, noMatches: boolean) => boolean;
+
+/**
+ * Defines the shape of logger objects that can be given to this library during initialization.
+ */
+export interface ILogger {
+    /**
+     * See `console.debug()` for reference.
+     */
+    debug: (...args: any[]) => void;
+    /**
+     * See `console.log()` for reference.
+     */
+    log: (...args: any[]) => void;
+    /**
+     * See `console.warn()` for reference.
+     */
+    warn: (...args: any[]) => void;
+    /**
+     * See `console.error()` for reference.
+     */
+    error: (...args: any[]) => void;
+};

@@ -1,8 +1,10 @@
 import { setLocation } from "./core/Location.js";
 import { LocationFull } from "./core/LocationFull.js";
 import { LocationLite } from "./core/LocationLite.svelte.js";
+import { setLogger } from "./core/Logger.js";
 import { routingOptions, type RoutingOptions } from "./core/options.js";
 import { setTraceOptions, type TraceOptions } from "./core/trace.svelte.js";
+import type { ILogger } from "./types.js";
 
 /**
  * Library's initialization options.
@@ -12,6 +14,15 @@ export type InitOptions = RoutingOptions & {
      * Tracing options that generally should be off for production builds.
      */
     trace?: TraceOptions;
+    /**
+     * Controls logging.  If `true`, the default logger that logs to the console is used.  If `false`, logging is 
+     * turned off.  If an object is provided, it is used as the logger.
+     * 
+     * Logging is turned on by default.
+     * 
+     * **TIP**: You can provide your own logger implementation to integrate with your application's logging system.
+     */
+    logger?: boolean | ILogger;
 }
 
 /**
@@ -30,6 +41,7 @@ export type InitOptions = RoutingOptions & {
  */
 export function init(options?: InitOptions): () => void {
     setTraceOptions(options?.trace);
+    setLogger(options?.logger ?? true);
     routingOptions.full = options?.full ?? routingOptions.full;
     routingOptions.hashMode = options?.hashMode ?? routingOptions.hashMode;
     routingOptions.implicitMode = options?.implicitMode ?? routingOptions.implicitMode;

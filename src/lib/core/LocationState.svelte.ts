@@ -1,5 +1,6 @@
 import { SvelteURL } from "svelte/reactivity";
 import { isConformantState } from "./isConformantState.js";
+import { logger } from "./Logger.js";
 
 /**
  * Helper class used to manage the reactive data of Location implementations.
@@ -14,7 +15,7 @@ export class LocationState {
         let validState = false;
         this.state = $state((validState = isConformantState(historyState)) ? historyState : { path: undefined, hash: {} });
         if (!validState && historyState != null) {
-            console.warn('Non-conformant state data detected in History API. Resetting to clean state.');
+            logger.warn('Non-conformant state data detected in History API. Resetting to clean state.');
         }
     }
 }
