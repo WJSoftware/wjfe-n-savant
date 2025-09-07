@@ -44,6 +44,10 @@ export class LocationLite implements Location {
             ['popstate', 'hashchange'].forEach((event) => {
                 cleanups.push(on(globalThis.window, event, () => {
                     this.#innerState.url.href = globalThis.window?.location?.href;
+                    if (!globalThis.window?.history?.state) {
+                        // Potential <a> hash navigation.  Preserve current state.
+                        this.#goTo(this.#innerState.url.href, true, this.#innerState.state);
+                    }
                     this.#innerState.state = globalThis.window?.history?.state ?? this.#innerState.state;
                 }));
             });
