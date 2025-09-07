@@ -68,6 +68,36 @@ describe("LocationFull", () => {
             // Cleanup.
             unSub();
         });
+        test("Should unregister the provided callback when the returned function is called.", () => {
+            // Arrange.
+            const callback = vi.fn();
+            const unSub = location.on('beforeNavigate', callback);
+
+            // Act.
+            unSub();
+
+            // Assert.
+            globalThis.window.history.pushState(null, '', 'http://example.com/other');
+            expect(callback).not.toHaveBeenCalled();
+        });
+        test("Should not affect other handlers when unregistering one of the event handlers.", () => {
+            // Arrange.
+            const callback1 = vi.fn();
+            const callback2 = vi.fn();
+            const unSub1 = location.on('beforeNavigate', callback1);
+            const unSub2 = location.on('beforeNavigate', callback2);
+
+            // Act.
+            unSub1();
+            
+            // Assert.
+            globalThis.window.history.pushState(null, '', 'http://example.com/other');
+            expect(callback1).not.toHaveBeenCalled();
+            expect(callback2).toHaveBeenCalledOnce();
+
+            // Cleanup.
+            unSub2();
+        });
         test.each([
             {
                 method: 'push',
