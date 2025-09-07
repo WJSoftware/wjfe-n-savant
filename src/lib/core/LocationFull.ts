@@ -1,4 +1,5 @@
 import type { BeforeNavigateEvent, Events, NavigationCancelledEvent, NavigationEvent } from "$lib/types.js";
+import { isConformantState } from "./isConformantState.js";
 import { LocationLite } from "./LocationLite.svelte.js";
 import { LocationState } from "./LocationState.svelte.js";
 
@@ -51,12 +52,16 @@ export class LocationFull extends LocationLite {
             for (let sub of Object.values(this.#eventSubs.navigationCancelled)) {
                 sub({
                     url,
-                    state,
+                    state: event.state,
                     method,
                     cause: event.cancelReason,
                 });
             }
         } else {
+            if (!isConformantState(event.state)) {
+                console.warn("Warning: Non-conformant state object passed to history." + method + "State.  Previous state will prevail.");
+                event.state = this.#innerState.state;
+            }
             const navFn = method === 'push' ? this.#originalPushState : this.#originalReplaceState;
             navFn(event.state, '', url);
             this.url.href = globalThis.window?.location.href;

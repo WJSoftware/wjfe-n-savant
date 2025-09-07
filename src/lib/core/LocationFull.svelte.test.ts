@@ -1,7 +1,6 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { LocationFull } from "./LocationFull.js";
 import type { State, Location } from "$lib/types.js";
-import { flushSync } from "svelte";
 import { joinPaths } from "./RouterEngine.svelte.js";
 
 describe("LocationFull", () => {
@@ -62,7 +61,6 @@ describe("LocationFull", () => {
 
             // Act.
             globalThis.window.history.pushState(null, '', 'http://example.com/other');
-            flushSync();
 
             // Assert.
             expect(callback).toHaveBeenCalledOnce();
@@ -79,13 +77,12 @@ describe("LocationFull", () => {
         ])("Should provide the URL, state and method $method via the event object of 'beforeNavigate'.", ({ method, stateFn }) => {
             // Arrange.
             const callback = vi.fn();
-            const state = { test: 'value' };
+            const state = { path: { test: 'value' }, hash: {} };
             location.on('beforeNavigate', callback);
 
             // Act.
             // @ts-expect-error stateFn cannot enumerate history.
             globalThis.window.history[stateFn](state, '', 'http://example.com/other');
-            flushSync();
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({
@@ -105,7 +102,6 @@ describe("LocationFull", () => {
 
             // Act.
             globalThis.window.history.pushState(null, '', 'http://example.com/other');
-            flushSync();
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({
@@ -126,7 +122,6 @@ describe("LocationFull", () => {
 
             // Act.
             globalThis.window.history.pushState(null, '', 'http://example.com/other');
-            flushSync();
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({
@@ -138,6 +133,27 @@ describe("LocationFull", () => {
                 cancel: expect.any(Function)
             });
         });
+        test.each([
+            'pushState' as const,
+            'replaceState' as const,
+        ])("Should ultimately push the state data via the %s method set by beforeNavigate handlers in event.state.", (stateFn) => {
+            // Arrange.
+            const state = { path: { test: 'value' }, hash: {} };
+            const callback = vi.fn((event) => {
+                event.state = state;
+            });
+            const unSub = location.on('beforeNavigate', callback);
+
+            // Act.
+            globalThis.window.history[stateFn](null, '', 'http://example.com/other');
+
+            // Assert.
+            expect(callback).toHaveBeenCalledOnce();
+            expect(globalThis.window.history.state).deep.equal(state);
+
+            // Cleanup.
+            unSub();
+        });
         test("Should register the provided callback for the 'navigationCancelled' event.", () => {
             // Arrange.
             const callback = vi.fn();
@@ -146,7 +162,6 @@ describe("LocationFull", () => {
 
             // Act.
             globalThis.window.history.pushState(null, '', 'http://example.com/other');
-            flushSync();
 
             // Assert.
             expect(callback).toHaveBeenCalledOnce();
@@ -161,7 +176,6 @@ describe("LocationFull", () => {
 
             // Act.
             globalThis.window.history.pushState(state, '', 'http://example.com/other');
-            flushSync();
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({ url: 'http://example.com/other', cause: 'test', method: 'push', state });
@@ -177,7 +191,6 @@ describe("LocationFull", () => {
 
             // Act.
             globalThis.window.history[fn](null, '', newUrl);
-            flushSync();
 
             // Assert.
             expect(location.url.href).toBe(newUrl);
@@ -193,12 +206,28 @@ describe("LocationFull", () => {
 
             // Act.
             globalThis.window.history[fn](state, '', 'http://example.com/new');
-            flushSync();
 
             // Assert.
             expect(location.getState(false)).toEqual(state.path);
             expect(location.getState(true)).toEqual(state.hash.single);
             expect(location.getState('p1')).toEqual(state.hash.p1);
+        });
+    });
+    describe('Navigation Interception', () => {
+        test.each([
+            'pushState' as const,
+            'replaceState' as const,
+        ])("Should preserve the previous valid state whenever %s is called with non-conformant state.", (stateFn) => {
+            // Arrange.
+            const validState = { path: { test: 'value' }, hash: {} };
+            globalThis.window.history[stateFn](validState, '', 'http://example.com/');
+            const state = { test: 'value' };
+
+            // Act.
+            globalThis.window.history[stateFn](state, '', 'http://example.com/other');
+
+            // Assert.
+            expect(globalThis.window.history.state).deep.equals(validState);
         });
     });
 });
