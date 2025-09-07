@@ -6,7 +6,7 @@
 
 > **📝 Small and Unique!**
 > 
-> + Less than **1,200** lines of code, including TypeScript typing.
+> + Less than **1,250** lines of code, including TypeScript typing.
 > + Always-on path and hash routing.  Simultaneous and independent routing modes.
 > + The router that invented multi hash routing.
 
@@ -121,7 +121,7 @@ location.goTo('/');
 
 For applications that also run in the browser, condition the navigation to Electron only.  See the [Electron page](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/introduction/electron-support) online for more details.
 
-> **⚠️ Important:** Hash routing doesn't require this extra step.
+> **⚠️ Important:** Hash routing doesn't require this extra navigation step.
 
 ### Define the Routes
 
