@@ -57,13 +57,16 @@ describe("LocationFull", () => {
         test("Should register the provided callback for the 'beforeNavigate' event.", () => {
             // Arrange.
             const callback = vi.fn();
-            location.on('beforeNavigate', callback);
+            const unSub = location.on('beforeNavigate', callback);
 
             // Act.
             globalThis.window.history.pushState(null, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledOnce();
+
+            // Cleanup.
+            unSub();
         });
         test.each([
             {
@@ -78,7 +81,7 @@ describe("LocationFull", () => {
             // Arrange.
             const callback = vi.fn();
             const state = { path: { test: 'value' }, hash: {} };
-            location.on('beforeNavigate', callback);
+            const unSub = location.on('beforeNavigate', callback);
 
             // Act.
             // @ts-expect-error stateFn cannot enumerate history.
@@ -93,12 +96,15 @@ describe("LocationFull", () => {
                 cancelReason: undefined,
                 cancel: expect.any(Function)
             });
+
+            // Cleanup.
+            unSub();
         });
         test("Should set wasCancelled to true and cancelReason to the provided reason when the event is cancelled to subsequent callbacks.", () => {
             // Arrange.
             const callback = vi.fn();
-            location.on('beforeNavigate', (event) => event.cancel('test'));
-            location.on('beforeNavigate', callback);
+            const unSub1 = location.on('beforeNavigate', (event) => event.cancel('test'));
+            const unSub2 = location.on('beforeNavigate', callback);
 
             // Act.
             globalThis.window.history.pushState(null, '', 'http://example.com/other');
@@ -112,13 +118,17 @@ describe("LocationFull", () => {
                 cancelReason: 'test',
                 cancel: expect.any(Function)
             });
+
+            // Cleanup.
+            unSub1();
+            unSub2();
         });
         test("Should ignore cancellation reasons from callbacks if the event has already been cancelled.", () => {
             // Arrange.
             const callback = vi.fn();
-            location.on('beforeNavigate', (event) => event.cancel('test'));
-            location.on('beforeNavigate', (event) => event.cancel('ignored'));
-            location.on('beforeNavigate', callback);
+            const unSub1 = location.on('beforeNavigate', (event) => event.cancel('test'));
+            const unSub2 = location.on('beforeNavigate', (event) => event.cancel('ignored'));
+            const unSub3 = location.on('beforeNavigate', callback);
 
             // Act.
             globalThis.window.history.pushState(null, '', 'http://example.com/other');
@@ -132,6 +142,11 @@ describe("LocationFull", () => {
                 cancelReason: 'test',
                 cancel: expect.any(Function)
             });
+
+            // Cleanup.
+            unSub1();
+            unSub2();
+            unSub3();
         });
         test.each([
             'pushState' as const,
@@ -157,28 +172,36 @@ describe("LocationFull", () => {
         test("Should register the provided callback for the 'navigationCancelled' event.", () => {
             // Arrange.
             const callback = vi.fn();
-            location.on('beforeNavigate', (event) => event.cancel());
-            location.on('navigationCancelled', callback);
+            const unSub1 = location.on('beforeNavigate', (event) => event.cancel());
+            const unSub2 = location.on('navigationCancelled', callback);
 
             // Act.
             globalThis.window.history.pushState(null, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledOnce();
+
+            // Cleanup.
+            unSub1();
+            unSub2();
         });
         test("Should transfer the cause of cancellation and the state to the 'navigationCancelled' event.", () => {
             // Arrange.
             const callback = vi.fn();
             const reason = 'test';
             const state = { test: 'value' };
-            location.on('beforeNavigate', (event) => event.cancel(reason));
-            location.on('navigationCancelled', callback);
+            const unSub1 = location.on('beforeNavigate', (event) => event.cancel(reason));
+            const unSub2 = location.on('navigationCancelled', callback);
 
             // Act.
             globalThis.window.history.pushState(state, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({ url: 'http://example.com/other', cause: 'test', method: 'push', state });
+
+            // Cleanup.
+            unSub1();
+            unSub2();
         });
     });
     describe('url', () => {
