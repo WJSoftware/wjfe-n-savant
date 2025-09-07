@@ -14,7 +14,7 @@
 		{ text: 'Home', href: '/hash-routing' },
 		{
 			text: 'Start Demo',
-			href: '/hash-routing#' + (routingMode === 'multi' ? 'd1=/demo;d2=/demo' : '/demo')
+			href: `#${(routingMode === 'multi' ? 'd1=/demo;d2=/demo' : '/demo')}`
 		}
 	];
 </script>

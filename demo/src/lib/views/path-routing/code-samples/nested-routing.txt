@@ -1,0 +1,15 @@
+<Router id="main-router">
+  <Route key="app" path="/app/*">
+    <AppLayout>
+      <!-- Nested router inside AppLayout -->
+      <Router id="app-sub-router" basePath="/app">
+        <Route key="dashboard" path="/dashboard">
+          <Dashboard />
+        </Route>
+        <Route key="profile" path="/profile/:id">
+          <UserProfile />
+        </Route>
+      </Router>
+    </AppLayout>
+  </Route>
+</Router>

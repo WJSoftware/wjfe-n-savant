@@ -1,0 +1,12 @@
+// Initialize with hash as default mode
+init({ implicitMode: 'hash' });
+
+// Now you can omit the hash property!
+<Router id="modals">
+  <Route key="login" path="/login">
+    <LoginModal />
+  </Route>
+  <Route key="settings" path="/settings">
+    <SettingsModal />
+  </Route>
+</Router>

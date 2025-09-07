@@ -1,0 +1,16 @@
+<Router id="main-router">
+  <!-- Path routing -->
+  <Route key="app" path="/app/*">
+    <AppLayout />
+  </Route>
+</Router>
+
+<Router hash id="modal-router">
+  <!-- Hash routing for modals -->
+  <Route hash key="login" path="/login">
+    <LoginModal />
+  </Route>
+  <Route hash key="settings" path="/settings">
+    <SettingsModal />
+  </Route>
+</Router>

@@ -1,0 +1,12 @@
+<!-- Two independent hash routers! -->
+<Router hash="nav" id="sidebar">
+  <Route hash="nav" key="menu" path="/menu">
+    <SidebarMenu />
+  </Route>
+</Router>
+
+<Router hash="content" id="main">
+  <Route hash="content" key="dashboard" path="/dashboard">
+    <Dashboard />
+  </Route>
+</Router>

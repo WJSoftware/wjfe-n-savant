@@ -1,4 +1,8 @@
 <script lang="ts">
+	import Card from '../../Card.svelte';
+	import CardHeader from '../../CardHeader.svelte';
+	import CardBody from '../../CardBody.svelte';
+
 	interface Feature {
 		name: string;
 		liteMode: boolean;
@@ -119,9 +123,9 @@
 	];
 </script>
 
-<div class="card">
-	<h3 class="card-header">Features</h3>
-	<div class="card-body">
+<Card class="h-100">
+	<CardHeader tag="h3">Features</CardHeader>
+	<CardBody>
 		<div class="table-responsive">
 			<table class="table table-striped">
 				<thead>
@@ -146,8 +150,8 @@
 				</tbody>
 			</table>
 		</div>
-	</div>
-</div>
+	</CardBody>
+</Card>
 
 <style>
 	.feature-status {

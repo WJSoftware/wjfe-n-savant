@@ -1,0 +1,11 @@
+<Router id="app-router" basePath="/app">
+  <Route key="home" path="/">
+    <HomePage />
+  </Route>
+  <Route key="about" path="/about">
+    <AboutPage />
+  </Route>
+  <Route key="contact" path="/contact">
+    <ContactPage />
+  </Route>
+</Router>

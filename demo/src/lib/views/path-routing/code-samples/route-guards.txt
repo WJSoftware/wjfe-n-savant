@@ -1,0 +1,15 @@
+<Route 
+  key="admin" 
+  path="/admin/*"
+  and={(params, location) => user.isAdmin}
+>
+  <AdminPanel />
+</Route>
+
+<Route 
+  key="profile" 
+  path="/profile/:userId"
+  and={(params) => params.userId === currentUser.id || user.canViewProfiles}
+>
+  <UserProfile />
+</Route>
