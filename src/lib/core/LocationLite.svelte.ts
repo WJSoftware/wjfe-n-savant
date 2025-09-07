@@ -46,7 +46,7 @@ export class LocationLite implements Location {
                     this.#innerState.url.href = globalThis.window?.location?.href;
                     if (!globalThis.window?.history?.state) {
                         // Potential <a> hash navigation.  Preserve current state.
-                        this.#goTo(this.#innerState.url.href, true, this.#innerState.state);
+                        this.#goTo(this.#innerState.url.href, true, $state.snapshot(this.#innerState.state));
                     }
                     this.#innerState.state = globalThis.window?.history?.state ?? this.#innerState.state;
                 }));
