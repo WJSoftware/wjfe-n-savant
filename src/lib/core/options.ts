@@ -47,10 +47,22 @@ export type RoutingOptions = {
 }
 
 /**
- * Global routing options.
+ * Default routing options used for rollback.
  */
-export const routingOptions: Required<RoutingOptions> = {
+const defaultRoutingOptions: Required<RoutingOptions> = {
     full: false,
     hashMode: 'single',
     implicitMode: 'path'
 };
+
+/**
+ * Global routing options.
+ */
+export const routingOptions: Required<RoutingOptions> = structuredClone(defaultRoutingOptions);
+
+/**
+ * Resets routing options to their default values.
+ */
+export function resetRoutingOptions(): void {
+    Object.assign(routingOptions, structuredClone(defaultRoutingOptions));
+}

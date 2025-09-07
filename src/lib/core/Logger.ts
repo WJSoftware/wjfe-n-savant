@@ -11,8 +11,15 @@ const offLogger: ILogger = {
     error: noop
 };
 
-export let logger: ILogger = stockLogger;
+export let logger: ILogger = offLogger;
 
 export function setLogger(newLogger: boolean | ILogger) {
     logger = newLogger === true ? stockLogger : (newLogger === false ? offLogger : newLogger);
-};
+}
+
+/**
+ * Resets the logger to the default uninitialized state (offLogger).
+ */
+export function resetLogger(): void {
+    logger = offLogger;
+}

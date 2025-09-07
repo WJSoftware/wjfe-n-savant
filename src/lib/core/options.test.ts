@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { routingOptions } from "./options.js";
+import { resetRoutingOptions, routingOptions } from "./options.js";
 
 describe("options", () => {
     test("The routing options' initial values are the expected ones.", () => {
@@ -93,5 +93,25 @@ describe("options", () => {
         
         // Restore original value
         routingOptions.implicitMode = originalValue;
+    });
+
+    test("Should reset all options to defaults when resetRoutingOptions is called.", () => {
+        // Arrange - Modify all options to non-default values
+        routingOptions.full = true;
+        routingOptions.hashMode = 'multi';
+        routingOptions.implicitMode = 'hash';
+
+        // Verify they were changed
+        expect(routingOptions.full).toBe(true);
+        expect(routingOptions.hashMode).toBe('multi');
+        expect(routingOptions.implicitMode).toBe('hash');
+
+        // Act
+        resetRoutingOptions();
+
+        // Assert - Verify all options are back to defaults
+        expect(routingOptions.full).toBe(false);
+        expect(routingOptions.hashMode).toBe('single');
+        expect(routingOptions.implicitMode).toBe('path');
     });
 });
