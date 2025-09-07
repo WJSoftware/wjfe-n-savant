@@ -80,6 +80,7 @@
 		prependBasePath,
 		preserveQuery,
 		children,
+		onclick: incomingOnclick,
 		...restProps
 	}: Props = $props();
 
@@ -101,10 +102,11 @@
 		)
 	);
 
-	function handleClick(event: MouseEvent) {
+	function handleClick(event: MouseEvent & { currentTarget: EventTarget & HTMLAnchorElement }) {
 		event.preventDefault();
 		const newState = calculateState(resolvedHash, typeof state === 'function' ? state() : state);
 		location.goTo(calcHref, { state: newState, replace: calcReplace });
+		incomingOnclick?.(event);
 	}
 
 	function styleString() {
