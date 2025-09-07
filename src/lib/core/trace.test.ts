@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
-import { getAllChildRouters, setTraceOptions, traceOptions } from "./trace.svelte.js";
+import { getAllChildRouters, resetTraceOptions, setTraceOptions, traceOptions } from "./trace.svelte.js";
 import { RouterEngine } from "./RouterEngine.svelte.js";
 import { init } from "$lib/index.js";
 
@@ -26,6 +26,32 @@ describe('setTraceOptions', () => {
 
         // Assert.
         expect(traceOptions.routerHierarchy).toBe(value);
+    });
+});
+
+describe('resetTraceOptions', () => {
+    test("Should reset trace options to defaults.", () => {
+        // Arrange - Set to non-default value
+        setTraceOptions({ routerHierarchy: true });
+        expect(traceOptions.routerHierarchy).toBe(true);
+
+        // Act
+        resetTraceOptions();
+
+        // Assert - Should be back to default
+        expect(traceOptions.routerHierarchy).toBe(false);
+    });
+
+    test("Should reset trace options when already at defaults.", () => {
+        // Arrange - Ensure it's already at default
+        resetTraceOptions();
+        expect(traceOptions.routerHierarchy).toBe(false);
+
+        // Act
+        resetTraceOptions();
+
+        // Assert - Should still be at default
+        expect(traceOptions.routerHierarchy).toBe(false);
     });
 });
 

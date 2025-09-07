@@ -1,10 +1,14 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
-import { logger, setLogger } from "./Logger.js";
+import { logger, resetLogger, setLogger } from "./Logger.js";
 import type { ILogger } from "$lib/types.js";
 
 describe("logger", () => {
-    test("Should default to globalThis.console", () => {
-        expect(logger).toBe(globalThis.console);
+    test("Should default to offLogger (not console)", () => {
+        expect(logger).not.toBe(globalThis.console);
+        expect(logger.debug).toBeDefined();
+        expect(logger.log).toBeDefined();
+        expect(logger.warn).toBeDefined();
+        expect(logger.error).toBeDefined();
     });
 });
 
@@ -156,6 +160,47 @@ describe("setLogger", () => {
             expect(mockLogger.log).toHaveBeenCalledWith("log", true, null);
             expect(mockLogger.warn).toHaveBeenCalledWith("warn", "multiple", "parameters");
             expect(mockLogger.error).toHaveBeenCalledWith("error", { error: "object" });
+        });
+    });
+
+    describe("resetLogger", () => {
+        test("Should reset logger to offLogger (default uninitialized state).", () => {
+            // Arrange - Set logger to console
+            setLogger(true);
+            expect(logger).toBe(globalThis.console);
+
+            // Act
+            resetLogger();
+
+            // Assert - Logger should be back to offLogger
+            expect(logger).not.toBe(globalThis.console);
+            expect(logger.debug).toBeDefined();
+            expect(logger.log).toBeDefined();
+            expect(logger.warn).toBeDefined();
+            expect(logger.error).toBeDefined();
+        });
+
+        test("Should reset logger from custom logger to offLogger.", () => {
+            // Arrange - Set logger to custom logger
+            const customLogger = {
+                debug: vi.fn(),
+                log: vi.fn(),
+                warn: vi.fn(),
+                error: vi.fn()
+            };
+            setLogger(customLogger);
+            expect(logger).toBe(customLogger);
+
+            // Act
+            resetLogger();
+
+            // Assert - Logger should be back to offLogger
+            expect(logger).not.toBe(customLogger);
+            expect(logger).not.toBe(globalThis.console);
+            expect(logger.debug).toBeDefined();
+            expect(logger.log).toBeDefined();
+            expect(logger.warn).toBeDefined();
+            expect(logger.error).toBeDefined();
         });
     });
 });

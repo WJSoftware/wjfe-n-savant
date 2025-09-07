@@ -1,9 +1,9 @@
 import { setLocation } from "./core/Location.js";
 import { LocationFull } from "./core/LocationFull.js";
 import { LocationLite } from "./core/LocationLite.svelte.js";
-import { setLogger } from "./core/Logger.js";
-import { routingOptions, type RoutingOptions } from "./core/options.js";
-import { setTraceOptions, type TraceOptions } from "./core/trace.svelte.js";
+import { resetLogger, setLogger } from "./core/Logger.js";
+import { resetRoutingOptions, routingOptions, type RoutingOptions } from "./core/options.js";
+import { resetTraceOptions, setTraceOptions, type TraceOptions } from "./core/trace.svelte.js";
 import type { ILogger } from "./types.js";
 
 /**
@@ -49,6 +49,9 @@ export function init(options?: InitOptions): () => void {
     return () => {
         newLocation?.dispose();
         setLocation(null);
+        resetRoutingOptions();
+        resetLogger();
+        resetTraceOptions();
     };
 }
 
