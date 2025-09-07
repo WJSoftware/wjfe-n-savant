@@ -1,51 +1,21 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { LocationFull } from "./LocationFull.js";
 import type { State, Location } from "$lib/types.js";
-import { joinPaths } from "./RouterEngine.svelte.js";
+import { setupBrowserMocks, ALL_HASHES } from "../../testing/test-utils.js";
 
 describe("LocationFull", () => {
     const initialUrl = "http://example.com/";
-    let interceptedState: State;
-    const pushStateMock = vi.fn((state, _, url) => {
-        url = !url.startsWith('http://') ? joinPaths(initialUrl, url) : url;
-        globalThis.window.location.href = new URL(url).href;
-        interceptedState = state;
-    });
-    const replaceStateMock = vi.fn((state, _, url) => {
-        url = !url.startsWith('http://') ? joinPaths(initialUrl, url) : url;
-        globalThis.window.location.href = new URL(url).href;
-        interceptedState = state;
-    });
     let location: Location;
-    let _href: string;
-    beforeAll(() => {
-        // @ts-expect-error Many missing features.
-        globalThis.window.location = {
-            get href() {
-                return _href;
-            },
-            set href(value) {
-                _href = value;
-            }
-        };
-        // @ts-expect-error Many missing features.
-        globalThis.window.history = {
-            get state() {
-                return interceptedState;
-            },
-            pushState: pushStateMock,
-            replaceState: replaceStateMock
-        };
-    });
+    let browserMocks: ReturnType<typeof setupBrowserMocks>;
+    
     beforeEach(() => {
-        globalThis.window.location.href = initialUrl;
-        interceptedState = { path: undefined, hash: {} };
-        pushStateMock.mockReset();
-        replaceStateMock.mockReset();
+        browserMocks = setupBrowserMocks(initialUrl);
         location = new LocationFull();
     });
+    
     afterEach(() => {
         location.dispose();
+        browserMocks.cleanup();
     });
     describe('constructor', () => {
         test("Should create a new instance with the expected default values.", () => {
@@ -60,7 +30,7 @@ describe("LocationFull", () => {
             const unSub = location.on('beforeNavigate', callback);
 
             // Act.
-            globalThis.window.history.pushState(null, '', 'http://example.com/other');
+            browserMocks.history.pushState(null, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledOnce();
@@ -77,7 +47,7 @@ describe("LocationFull", () => {
             unSub();
 
             // Assert.
-            globalThis.window.history.pushState(null, '', 'http://example.com/other');
+            browserMocks.history.pushState(null, '', 'http://example.com/other');
             expect(callback).not.toHaveBeenCalled();
         });
         test("Should not affect other handlers when unregistering one of the event handlers.", () => {
@@ -91,7 +61,7 @@ describe("LocationFull", () => {
             unSub1();
             
             // Assert.
-            globalThis.window.history.pushState(null, '', 'http://example.com/other');
+            browserMocks.history.pushState(null, '', 'http://example.com/other');
             expect(callback1).not.toHaveBeenCalled();
             expect(callback2).toHaveBeenCalledOnce();
 
@@ -115,7 +85,7 @@ describe("LocationFull", () => {
 
             // Act.
             // @ts-expect-error stateFn cannot enumerate history.
-            globalThis.window.history[stateFn](state, '', 'http://example.com/other');
+            browserMocks.history[stateFn](state, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({
@@ -137,7 +107,7 @@ describe("LocationFull", () => {
             const unSub2 = location.on('beforeNavigate', callback);
 
             // Act.
-            globalThis.window.history.pushState(null, '', 'http://example.com/other');
+            browserMocks.history.pushState(null, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({
@@ -161,7 +131,7 @@ describe("LocationFull", () => {
             const unSub3 = location.on('beforeNavigate', callback);
 
             // Act.
-            globalThis.window.history.pushState(null, '', 'http://example.com/other');
+            browserMocks.history.pushState(null, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({
@@ -190,11 +160,11 @@ describe("LocationFull", () => {
             const unSub = location.on('beforeNavigate', callback);
 
             // Act.
-            globalThis.window.history[stateFn](null, '', 'http://example.com/other');
+            browserMocks.history[stateFn](null, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledOnce();
-            expect(globalThis.window.history.state).deep.equal(state);
+            expect(browserMocks.history.state).deep.equal(state);
 
             // Cleanup.
             unSub();
@@ -206,7 +176,7 @@ describe("LocationFull", () => {
             const unSub2 = location.on('navigationCancelled', callback);
 
             // Act.
-            globalThis.window.history.pushState(null, '', 'http://example.com/other');
+            browserMocks.history.pushState(null, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledOnce();
@@ -224,7 +194,7 @@ describe("LocationFull", () => {
             const unSub2 = location.on('navigationCancelled', callback);
 
             // Act.
-            globalThis.window.history.pushState(state, '', 'http://example.com/other');
+            browserMocks.history.pushState(state, '', 'http://example.com/other');
 
             // Assert.
             expect(callback).toHaveBeenCalledWith({ url: 'http://example.com/other', cause: 'test', method: 'push', state });
@@ -243,7 +213,7 @@ describe("LocationFull", () => {
             const newUrl = "http://example.com/new";
 
             // Act.
-            globalThis.window.history[fn](null, '', newUrl);
+            browserMocks.history[fn](null, '', newUrl);
 
             // Assert.
             expect(location.url.href).toBe(newUrl);
@@ -258,11 +228,11 @@ describe("LocationFull", () => {
             const state: State = { path: { test: 'value' }, hash: { single: '/abc', p1: '/def' } };
 
             // Act.
-            globalThis.window.history[fn](state, '', 'http://example.com/new');
+            browserMocks.history[fn](state, '', 'http://example.com/new');
 
             // Assert.
-            expect(location.getState(false)).toEqual(state.path);
-            expect(location.getState(true)).toEqual(state.hash.single);
+            expect(location.getState(ALL_HASHES.path)).toEqual(state.path);
+            expect(location.getState(ALL_HASHES.single)).toEqual(state.hash.single);
             expect(location.getState('p1')).toEqual(state.hash.p1);
         });
     });
@@ -273,14 +243,14 @@ describe("LocationFull", () => {
         ])("Should preserve the previous valid state whenever %s is called with non-conformant state.", (stateFn) => {
             // Arrange.
             const validState = { path: { test: 'value' }, hash: {} };
-            globalThis.window.history[stateFn](validState, '', 'http://example.com/');
+            browserMocks.history[stateFn](validState, '', 'http://example.com/');
             const state = { test: 'value' };
 
             // Act.
-            globalThis.window.history[stateFn](state, '', 'http://example.com/other');
+            browserMocks.history[stateFn](state, '', 'http://example.com/other');
 
             // Assert.
-            expect(globalThis.window.history.state).deep.equals(validState);
+            expect(browserMocks.history.state).deep.equals(validState);
         });
     });
 });
