@@ -2,6 +2,7 @@ import type { BeforeNavigateEvent, Events, NavigationCancelledEvent, NavigationE
 import { isConformantState } from "./isConformantState.js";
 import { LocationLite } from "./LocationLite.svelte.js";
 import { LocationState } from "./LocationState.svelte.js";
+import { logger } from "./Logger.js";
 
 /**
  * Location implementation of the library's full mode feature.
@@ -59,7 +60,7 @@ export class LocationFull extends LocationLite {
             }
         } else {
             if (!isConformantState(event.state)) {
-                console.warn("Warning: Non-conformant state object passed to history." + method + "State.  Previous state will prevail.");
+                logger.warn("Warning: Non-conformant state object passed to history." + method + "State.  Previous state will prevail.");
                 event.state = this.#innerState.state;
             }
             const navFn = method === 'push' ? this.#originalPushState : this.#originalReplaceState;

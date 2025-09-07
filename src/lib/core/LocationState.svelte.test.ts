@@ -1,9 +1,10 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { LocationState } from './LocationState.svelte.js';
 import type { State } from '$lib/types.js';
+import { logger } from './Logger.js';
 
-// Mock console.warn to capture warnings
-const mockConsoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+// Mock logger.warn to capture warnings
+const mockLoggerWarn = vi.spyOn(logger, 'warn').mockImplementation(() => {});
 
 // Mock globalThis.window for testing
 const mockWindow = {
@@ -17,7 +18,7 @@ const mockWindow = {
 
 describe('LocationState', () => {
 	beforeEach(() => {
-		mockConsoleWarn.mockClear();
+		mockLoggerWarn.mockClear();
 		// Reset to default mock state
 		mockWindow.history.state = null;
 		vi.stubGlobal('window', mockWindow);
@@ -37,7 +38,7 @@ describe('LocationState', () => {
 
 			// Assert
 			expect(locationState.state).toStrictEqual(validState); // Deep equality since $state() creates new objects
-			expect(mockConsoleWarn).not.toHaveBeenCalled();
+			expect(mockLoggerWarn).not.toHaveBeenCalled();
 		});
 
 		test('Should handle conformant state with undefined path.', () => {
@@ -53,7 +54,7 @@ describe('LocationState', () => {
 
 			// Assert
 			expect(locationState.state).toStrictEqual(validState);
-			expect(mockConsoleWarn).not.toHaveBeenCalled();
+			expect(mockLoggerWarn).not.toHaveBeenCalled();
 		});
 
 		test('Should handle conformant state with empty hash object.', () => {
@@ -69,7 +70,7 @@ describe('LocationState', () => {
 
 			// Assert
 			expect(locationState.state).toStrictEqual(validState);
-			expect(mockConsoleWarn).not.toHaveBeenCalled();
+			expect(mockLoggerWarn).not.toHaveBeenCalled();
 		});
 
 		test('Should handle conformant state with numeric path.', () => {
@@ -85,7 +86,7 @@ describe('LocationState', () => {
 
 			// Assert
 			expect(locationState.state).toStrictEqual(validState);
-			expect(mockConsoleWarn).not.toHaveBeenCalled();
+			expect(mockLoggerWarn).not.toHaveBeenCalled();
 		});
 	});
 
@@ -102,7 +103,7 @@ describe('LocationState', () => {
 				path: undefined,
 				hash: {}
 			});
-			expect(mockConsoleWarn).not.toHaveBeenCalled();
+			expect(mockLoggerWarn).not.toHaveBeenCalled();
 		});
 
 		test('Should create clean state when history.state is undefined without warning.', () => {
@@ -117,7 +118,7 @@ describe('LocationState', () => {
 				path: undefined,
 				hash: {}
 			});
-			expect(mockConsoleWarn).not.toHaveBeenCalled();
+			expect(mockLoggerWarn).not.toHaveBeenCalled();
 		});
 	});
 
@@ -155,8 +156,8 @@ describe('LocationState', () => {
 				path: undefined,
 				hash: {}
 			});
-			expect(mockConsoleWarn).toHaveBeenCalledOnce();
-			expect(mockConsoleWarn).toHaveBeenCalledWith(
+			expect(mockLoggerWarn).toHaveBeenCalledOnce();
+			expect(mockLoggerWarn).toHaveBeenCalledWith(
 				'Non-conformant state data detected in History API. Resetting to clean state.'
 			);
 		});
