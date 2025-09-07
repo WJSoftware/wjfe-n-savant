@@ -1,5 +1,8 @@
 <script lang="ts">
     import type { HTMLAttributes } from "svelte/elements";
+    import Card from "../../Card.svelte";
+    import CardHeader from "../../CardHeader.svelte";
+    import CardBody from "../../CardBody.svelte";
     import CodeSnippet from "../../CodeSnippet.svelte";
     import bash from "svelte-highlight/languages/bash";
     import typescript from "svelte-highlight/languages/typescript";
@@ -12,11 +15,9 @@
     }: Props = $props();
 </script>
 
-<div class={["card", cssClass]} {...restProps}>
-    <div class="card-header">
-        <h2>Quickstart</h2>
-    </div>
-    <div class="card-body">
+<Card class={["h-100", cssClass]} {...restProps}>
+    <CardHeader tag="h2">Quickstart</CardHeader>
+    <CardBody>
         <p>Install the package:</p>
         <CodeSnippet 
             language={bash} 
@@ -42,5 +43,5 @@
 </Router>`}
             title="Basic Usage"
         />
-    </div>
-</div>
+    </CardBody>
+</Card>

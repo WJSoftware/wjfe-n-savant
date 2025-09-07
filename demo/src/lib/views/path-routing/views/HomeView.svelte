@@ -1,100 +1,18 @@
 <script lang="ts">
 	import CodeSnippet from '../../../CodeSnippet.svelte';
+	import Card from '../../../Card.svelte';
+	import CardHeader from '../../../CardHeader.svelte';
+	import CardBody from '../../../CardBody.svelte';
 	import xml from 'svelte-highlight/languages/xml';
 	import typescript from 'svelte-highlight/languages/typescript';
 
-	const basicPathRouterCode = `<Router id="app-router" basePath="/app">
-  <Route key="home" path="/">
-    <HomePage />
-  </Route>
-  <Route key="about" path="/about">
-    <AboutPage />
-  </Route>
-  <Route key="contact" path="/contact">
-    <ContactPage />
-  </Route>
-</Router>`;
-
-	const linkComponentCode = `<!-- ❌ Don't use regular anchor tags -->
-<a href="/profile/123">View Profile</a>
-
-<!-- ✅ Use the Link component instead -->
-<Link href="/profile/123">View Profile</Link>
-
-<!-- 🎯 Link with parameters -->
-<Link href="/settings/account" class="btn btn-primary">
-  Account Settings
-</Link>`;
-
-	const nestedRoutingCode = `<Router id="main-router">
-  <Route key="app" path="/app/*">
-    <AppLayout>
-      <!-- Nested router inside AppLayout -->
-      <Router id="app-sub-router" basePath="/app">
-        <Route key="dashboard" path="/dashboard">
-          <Dashboard />
-        </Route>
-        <Route key="profile" path="/profile/:id">
-          <UserProfile />
-        </Route>
-      </Router>
-    </AppLayout>
-  </Route>
-</Router>`;
-
-	const routeParametersCode = `<!-- Route with single parameter -->
-<Route key="user" path="/user/:id">
-  {#snippet children(params)}
-    <h1>User ID: {params.id}</h1>
-  {/snippet}
-</Route>
-
-<!-- Route with multiple parameters -->
-<Route key="post" path="/blog/:category/:slug">
-  {#snippet children(params)}
-    <BlogPost 
-      category={params.category} 
-      slug={params.slug} 
-    />
-  {/snippet}
-</Route>
-
-<!-- Route with rest parameter (catch-all) -->
-<Route key="files" path="/files/*">
-  {#snippet children(params)}
-    <FileExplorer path={params.rest} />
-  {/snippet}
-</Route>`;
-
-	const urlExamples = `// Basic routes:
-// /                    → Home page
-// /about               → About page
-// /contact             → Contact page
-
-// Parameterized routes:
-// /user/123            → User profile for ID 123
-// /blog/tech/svelte-5  → Blog post in tech category
-// /product/laptop/123  → Product page
-
-// Rest parameters:
-// /files/docs/readme.md     → File explorer
-// /admin/users/permissions  → Admin section`;
-
-	const routeGuardsCode = `<Route 
-  key="admin" 
-  path="/admin/*"
-  and={(params, location) => user.isAdmin}
->
-  <AdminPanel />
-</Route>
-
-<Route 
-  key="profile" 
-  path="/profile/:userId"
-  and={(params) => params.userId === currentUser.id || user.canViewProfiles}
->
-  <UserProfile />
-</Route>`;
+	// Import code samples as raw text
+	import basicPathRouterCode from '../code-samples/basic-path-router.txt?raw';
+	import linkComponentCode from '../code-samples/link-component.txt?raw';
+	import nestedRoutingCode from '../code-samples/nested-routing.txt?raw';
+	import routeParametersCode from '../code-samples/route-parameters.txt?raw';
+	import urlExamples from '../code-samples/url-examples.ts?raw';
+	import routeGuardsCode from '../code-samples/route-guards.txt?raw';
 </script>
 
 <div class="container">
@@ -107,11 +25,11 @@
 	<!-- Hero Section -->
 	<div class="row mt-4">
 		<div class="col-lg-6">
-			<div class="card border-primary h-100">
-				<div class="card-header bg-primary text-white">
-					<h4 class="mb-0">🏗️ Basic Path Routing</h4>
-				</div>
-				<div class="card-body">
+			<Card border="primary" class="h-100">
+				<CardHeader background="primary" textColor="white" tag="h4">
+					🏗️ Basic Path Routing
+				</CardHeader>
+				<CardBody>
 					<p>
 						Path routing is the default mode in <code>@wjfe/n-savant</code>. It feels natural 
 						because it works just like regular websites - but faster!
@@ -125,15 +43,15 @@
 						<strong>SEO Friendly:</strong> Search engines love path-based URLs! They're clean, 
 						predictable, and easy to understand.
 					</div>
-				</div>
-			</div>
+				</CardBody>
+			</Card>
 		</div>
 		<div class="col-lg-6">
-			<div class="card border-success h-100">
-				<div class="card-header bg-success text-white">
-					<h4 class="mb-0">🔗 Link Components</h4>
-				</div>
-				<div class="card-body">
+			<Card border="success" class="h-100">
+				<CardHeader background="success" textColor="white" tag="h4">
+					🔗 Link Components
+				</CardHeader>
+				<CardBody>
 					<p>
 						Replace <code>&lt;a&gt;</code> tags with <code>&lt;Link&gt;</code> components for 
 						smooth navigation without page reloads!
@@ -147,19 +65,19 @@
 						<strong>Important:</strong> Regular anchor tags will cause full page reloads. 
 						Always use <code>&lt;Link&gt;</code> for internal navigation!
 					</div>
-				</div>
-			</div>
+				</CardBody>
+			</Card>
 		</div>
 	</div>
 
 	<!-- Advanced Features -->
 	<div class="row mt-4">
 		<div class="col-lg-6">
-			<div class="card border-warning h-100">
-				<div class="card-header bg-warning text-dark">
-					<h4 class="mb-0">🎯 Route Parameters</h4>
-				</div>
-				<div class="card-body">
+			<Card border="warning" class="h-100">
+				<CardHeader background="warning" textColor="dark" tag="h4">
+					🎯 Route Parameters
+				</CardHeader>
+				<CardBody>
 					<p>
 						Capture dynamic values from URLs using parameters. Perfect for user IDs, 
 						slugs, and dynamic content!
@@ -173,15 +91,15 @@
 						<strong>Pro tip:</strong> Use rest parameters (<code>/*</code>) for file paths 
 						and hierarchical navigation!
 					</div>
-				</div>
-			</div>
+				</CardBody>
+			</Card>
 		</div>
 		<div class="col-lg-6">
-			<div class="card border-info h-100">
-				<div class="card-header bg-info text-white">
-					<h4 class="mb-0">🏢 Nested Routing</h4>
-				</div>
-				<div class="card-body">
+			<Card border="info" class="h-100">
+				<CardHeader background="info" textColor="white" tag="h4">
+					🏢 Nested Routing
+				</CardHeader>
+				<CardBody>
 					<p>
 						Build complex layouts with nested routers. Perfect for admin panels, 
 						dashboards, and multi-level navigation!
@@ -195,19 +113,19 @@
 						<strong>Powerful:</strong> Each router can have its own <code>basePath</code> 
 						and operates independently within its scope.
 					</div>
-				</div>
-			</div>
+				</CardBody>
+			</Card>
 		</div>
 	</div>
 
 	<!-- URL Examples -->
 	<div class="row mt-4">
 		<div class="col-lg-6">
-			<div class="card border-secondary h-100">
-				<div class="card-header bg-secondary text-white">
-					<h4 class="mb-0">🌐 URL Structure</h4>
-				</div>
-				<div class="card-body">
+			<Card border="secondary" class="h-100">
+				<CardHeader background="secondary" textColor="white" tag="h4">
+					🌐 URL Structure
+				</CardHeader>
+				<CardBody>
 					<p>See how different route patterns match real URLs:</p>
 					<CodeSnippet 
 						language={typescript} 
@@ -219,15 +137,15 @@
 							💡 Notice how parameters and rest routes capture dynamic parts of the URL!
 						</small>
 					</div>
-				</div>
-			</div>
+				</CardBody>
+			</Card>
 		</div>
 		<div class="col-lg-6">
-			<div class="card border-dark h-100">
-				<div class="card-header bg-dark text-white">
-					<h4 class="mb-0">🛡️ Route Guards</h4>
-				</div>
-				<div class="card-body">
+			<Card border="dark" class="h-100">
+				<CardHeader background="dark" textColor="white" tag="h4">
+					🛡️ Route Guards
+				</CardHeader>
+				<CardBody>
 					<p>
 						Control access to routes with the <code>and</code> property. Perfect for 
 						authentication and authorization!
@@ -241,19 +159,19 @@
 						<strong>Security:</strong> Route guards help protect sensitive areas but 
 						always validate permissions on the server too!
 					</div>
-				</div>
-			</div>
+				</CardBody>
+			</Card>
 		</div>
 	</div>
 
 	<!-- Key Benefits -->
 	<div class="row mt-5">
 		<div class="col-lg-8 offset-lg-2">
-			<div class="card border-success">
-				<div class="card-header bg-success text-white text-center">
-					<h3 class="mb-0">🎉 Why Path Routing Rocks</h3>
-				</div>
-				<div class="card-body">
+			<Card border="success">
+				<CardHeader background="success" textColor="white" class="text-center" tag="h3">
+					🎉 Why Path Routing Rocks
+				</CardHeader>
+				<CardBody>
 					<div class="row">
 						<div class="col-md-6">
 							<h5>🚀 Performance Benefits</h5>
@@ -279,8 +197,8 @@
 							<strong>The best of both worlds:</strong> Traditional web navigation with modern SPA performance! 🎯
 						</p>
 					</div>
-				</div>
-			</div>
+				</CardBody>
+			</Card>
 		</div>
 	</div>
 

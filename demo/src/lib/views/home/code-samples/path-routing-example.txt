@@ -1,0 +1,10 @@
+<Router id="app">
+  <Route key="home" path="/">
+    <HomePage />
+  </Route>
+  <Route key="profile" path="/user/:id">
+    {#snippet children(params)}
+      <UserProfile userId={params.id} />
+    {/snippet}
+  </Route>
+</Router>

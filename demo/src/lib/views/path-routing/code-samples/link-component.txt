@@ -1,0 +1,10 @@
+<!-- ❌ Don't use regular anchor tags -->
+<a href="/profile/123">View Profile</a>
+
+<!-- ✅ Use the Link component instead -->
+<Link href="/profile/123">View Profile</Link>
+
+<!-- 🎯 Link with parameters -->
+<Link href="/settings/account" class="btn btn-primary">
+  Account Settings
+</Link>

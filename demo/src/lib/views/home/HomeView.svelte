@@ -4,46 +4,17 @@
 	import Quickstart from './Quickstart.svelte';
 	import FeaturesTable from './FeaturesTable.svelte';
 	import CodeSnippet from '../../CodeSnippet.svelte';
+	import Card from '../../Card.svelte';
+	import CardHeader from '../../CardHeader.svelte';
+	import CardBody from '../../CardBody.svelte';
 	import { RouterTrace, Link } from '@wjfe/n-savant';
 	import xml from 'svelte-highlight/languages/xml';
 	import typescript from 'svelte-highlight/languages/typescript';
 
-	const pathRoutingExample = `<Router id="app">
-  <Route key="home" path="/">
-    <HomePage />
-  </Route>
-  <Route key="profile" path="/user/:id">
-    {#snippet children(params)}
-      <UserProfile userId={params.id} />
-    {/snippet}
-  </Route>
-</Router>`;
-
-	const hashRoutingExample = `// Initialize with hash as default mode
-init({ implicitMode: 'hash' });
-
-// Now you can omit the hash property!
-<Router id="modals">
-  <Route key="login" path="/login">
-    <LoginModal />
-  </Route>
-  <Route key="settings" path="/settings">
-    <SettingsModal />
-  </Route>
-</Router>`;
-
-	const multiHashExample = `<!-- Two independent hash routers! -->
-<Router hash="nav" id="sidebar">
-  <Route hash="nav" key="menu" path="/menu">
-    <SidebarMenu />
-  </Route>
-</Router>
-
-<Router hash="content" id="main">
-  <Route hash="content" key="dashboard" path="/dashboard">
-    <Dashboard />
-  </Route>
-</Router>`;
+	// Import code samples as raw text
+	import pathRoutingExample from './code-samples/path-routing-example.txt?raw';
+	import hashRoutingExample from './code-samples/hash-routing-example.txt?raw';
+	import multiHashExample from './code-samples/multi-hash-example.txt?raw';
 </script>
 
 <div class="root" transition:fade={{ duration: 500 }}>
@@ -52,11 +23,12 @@ init({ implicitMode: 'hash' });
 	<!-- Key Features Showcase -->
 	<div class="row mt-5 g-4">
 		<div class="col-lg-4">
-			<div class="card border-primary h-100" transition:fly={{ delay: 100, y: 50, duration: 600 }}>
-				<div class="card-header bg-primary text-white text-center">
-					<h4 class="mb-0">🛣️ Path Routing</h4>
-				</div>
-				<div class="card-body">
+			<div transition:fly={{ delay: 100, y: 50, duration: 600 }}>
+				<Card border="primary" class="h-100">
+					<CardHeader background="primary" textColor="white" class="text-center" tag="h4">
+						🛣️ Path Routing
+					</CardHeader>
+					<CardBody>
 					<p class="card-text">
 						Classic URL path-based routing with modern SPA performance. SEO-friendly, 
 						bookmarkable, and lightning fast!
@@ -71,16 +43,18 @@ init({ implicitMode: 'hash' });
 							Try Path Routing →
 						</Link>
 					</div>
-				</div>
+				</CardBody>
+			</Card>
 			</div>
 		</div>
 		
 		<div class="col-lg-4">
-			<div class="card border-success h-100" transition:fly={{ delay: 200, y: 50, duration: 600 }}>
-				<div class="card-header bg-success text-white text-center">
-					<h4 class="mb-0">🚀 Hash Routing</h4>
-				</div>
-				<div class="card-body">
+			<div transition:fly={{ delay: 200, y: 50, duration: 600 }}>
+				<Card border="success" class="h-100">
+				<CardHeader background="success" textColor="white" class="text-center" tag="h4">
+					🚀 Hash Routing
+				</CardHeader>
+				<CardBody>
 					<p class="card-text">
 						Fragment-based routing that works everywhere! Perfect for modals, 
 						overlays, and client-side navigation. Also works great in Electron apps!
@@ -99,16 +73,18 @@ init({ implicitMode: 'hash' });
 							Try Hash Routing →
 						</Link>
 					</div>
-				</div>
+				</CardBody>
+			</Card>
 			</div>
 		</div>
 		
 		<div class="col-lg-4">
-			<div class="card border-warning h-100" transition:fly={{ delay: 300, y: 50, duration: 600 }}>
-				<div class="card-header bg-warning text-dark text-center">
-					<h4 class="mb-0">🌟 Multi-Hash Magic</h4>
-				</div>
-				<div class="card-body">
+			<div transition:fly={{ delay: 300, y: 50, duration: 600 }}>
+				<Card border="warning" class="h-100">
+				<CardHeader background="warning" textColor="dark" class="text-center" tag="h4">
+					🌟 Multi-Hash Magic
+				</CardHeader>
+				<CardBody>
 					<p class="card-text">
 						<strong>World's first!</strong> Multiple independent hash routers 
 						running simultaneously. Perfect for micro-frontends!
@@ -123,7 +99,8 @@ init({ implicitMode: 'hash' });
 							See Multi-Hash →
 						</Link>
 					</div>
-				</div>
+				</CardBody>
+			</Card>
 			</div>
 		</div>
 	</div>
@@ -131,11 +108,12 @@ init({ implicitMode: 'hash' });
 	<!-- Why Choose N-Savant -->
 	<div class="row mt-5">
 		<div class="col-lg-8 offset-lg-2">
-			<div class="card border-info" transition:fly={{ delay: 400, y: 50, duration: 600 }}>
-				<div class="card-header bg-info text-white text-center">
-					<h3 class="mb-0">🎯 Why Choose @wjfe/n-savant?</h3>
-				</div>
-				<div class="card-body">
+			<div transition:fly={{ delay: 400, y: 50, duration: 600 }}>
+				<Card border="info">
+				<CardHeader background="info" textColor="white" class="text-center" tag="h3">
+					🎯 Why Choose @wjfe/n-savant?
+				</CardHeader>
+				<CardBody>
 					<div class="row">
 						<div class="col-md-6">
 							<h5 class="text-info">🚀 Performance</h5>
@@ -172,7 +150,8 @@ init({ implicitMode: 'hash' });
 							</ul>
 						</div>
 					</div>
-				</div>
+				</CardBody>
+			</Card>
 			</div>
 		</div>
 	</div>
@@ -214,16 +193,18 @@ init({ implicitMode: 'hash' });
 	<!-- Router Trace Section -->
     <div class="row mt-5">
         <div class="col">
-            <div class="card" transition:fly={{ delay: 800, y: 50, duration: 600 }}>
-                <h3 class="card-header">🔍 About the Route Tracer</h3>
-                <div class="card-body">
+            <div transition:fly={{ delay: 800, y: 50, duration: 600 }}>
+                <Card>
+                    <CardHeader tag="h3">🔍 About the Route Tracer</CardHeader>
+                    <CardBody>
                     <p>
                         The following trace shows the current router's state and will appear throughout 
                         the demo pages. It's a powerful debugging tool that shows exactly how routes 
                         are being matched and processed.
                     </p>
                     <RouterTrace />
-                </div>
+                    </CardBody>
+                </Card>
             </div>
         </div>
     </div>
@@ -232,24 +213,6 @@ init({ implicitMode: 'hash' });
 <style>
     .root {
         z-index: 10;
-    }
-
-    .card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .btn {
-        transition: all 0.2s ease;
-    }
-
-    .btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .world-first {
