@@ -1,6 +1,19 @@
 {
 	"name": "@wjfe/n-savant",
 	"version": "0.7.1",
+	"author": {
+		"name": "José Pablo Ramírez Vargas",
+		"email": "webJose@gmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WJSoftware/wjfe-n-savant"
+	},
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/WJSoftware/wjfe-n-savant/issues"
+	},
+	"description": "The client-side router for Svelte v5 SPA's that invented multi hash routing.",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
