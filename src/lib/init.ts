@@ -44,7 +44,10 @@ export function init(options?: InitOptions) {
 }
 
 /**
- * Initializes the routing library in normal mode.  The following features are available:
+ * Initializes the routing library in full mode. All features of normal mode are available, plus the following:
+ * 
+ * - Raising the `beforeNavigate` and `navigationCancelled` events
+ * - Intercepting navigation from other libraries or routers
  * 
  * @returns A cleanup function that reverts the initialization process.
  */
