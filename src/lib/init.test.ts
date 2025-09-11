@@ -86,26 +86,36 @@ let cleanup: (() => void) | undefined;
             expect(traceOptions.routerHierarchy).toBe(initialTraceOptions.routerHierarchy);
             expect(location).toBeNull();
         });
-        test("Should rollback routing options to defaults.", async () => {
+        test("Should throw an error when called a second time without proper prior cleanup.", () => {
             // Arrange.
-            cleanup = fnInfo.fn({
-                hashMode: 'multi',
-                implicitMode: 'hash'
-            });
+            cleanup = fnInfo.fn();
 
-            // Verify options were applied
-            expect(routingOptions.hashMode).toBe('multi');
-            expect(routingOptions.implicitMode).toBe('hash');
+            // Act.
+            const act = () => fnInfo.fn();
 
-            // Act - Cleanup
-            cleanup();
-            cleanup = undefined;
-
-            // Assert - Check that routing options were reset to defaults
-            expect(routingOptions.hashMode).toBe('single');
-            expect(routingOptions.implicitMode).toBe('path');
+            // Assert.
+            expect(act).toThrow();
         });
         describe('cleanup', () => {
+            test("Should rollback routing options to defaults.", async () => {
+                // Arrange.
+                cleanup = fnInfo.fn({
+                    hashMode: 'multi',
+                    implicitMode: 'hash'
+                });
+
+                // Verify options were applied
+                expect(routingOptions.hashMode).toBe('multi');
+                expect(routingOptions.implicitMode).toBe('hash');
+
+                // Act - Cleanup
+                cleanup();
+                cleanup = undefined;
+
+                // Assert - Check that routing options were reset to defaults
+                expect(routingOptions.hashMode).toBe('single');
+                expect(routingOptions.implicitMode).toBe('path');
+            });
             test("Should rollback logger to its uninitialized value.", async () => {
                 // Arrange.
                 const uninitializedLogger = logger;
@@ -162,5 +172,31 @@ let cleanup: (() => void) | undefined;
                 expect(location).toBeNull();
             });
         });
+    });
+});
+
+describe('init + initFull', () => {
+    afterEach(() => {
+        cleanup?.();
+        cleanup = undefined;
+    });
+    test.each([
+        {
+            fn1: init,
+            fn2: initFull,
+        },
+        {
+            fn1: initFull,
+            fn2: init,
+        },
+    ])("Should throw an error when calling $fn2.name without prior cleaning of a call to $fn1.name .", ({ fn1, fn2 }) => {
+        // Arrange.
+        cleanup = fn1();
+
+        // Act.
+        const act = () => fn2();
+
+        // Assert.
+        expect(act).toThrow();
     });
 });
