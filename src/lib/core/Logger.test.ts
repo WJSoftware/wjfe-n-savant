@@ -3,7 +3,7 @@ import { logger, resetLogger, setLogger } from "./Logger.js";
 import type { ILogger } from "$lib/types.js";
 
 describe("logger", () => {
-    test("Should default to offLogger (not console)", () => {
+    test("Should default to offLogger when the library hasn't been initialized.", () => {
         expect(logger).not.toBe(globalThis.console);
         expect(logger.debug).toBeDefined();
         expect(logger.log).toBeDefined();
