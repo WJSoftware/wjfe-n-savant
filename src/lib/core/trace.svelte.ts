@@ -1,17 +1,5 @@
+import type { TraceOptions } from "$lib/types.js";
 import type { RouterEngine } from "./RouterEngine.svelte.js";
-
-/**
- * Library's tracing options.
- */
-export type TraceOptions = {
-    /**
-     * Whether to trace the router hierarchy.
-     * 
-     * This consumes extra RAM and a bit more CPU cycles.  Disable it on production builds.
-     * @default false
-     */
-    routerHierarchy?: boolean;
-};
 
 /**
  * Weak references to all router engines that are created.

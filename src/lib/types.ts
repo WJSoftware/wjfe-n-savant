@@ -210,7 +210,7 @@ export interface Location {
      * This event has the ability to cancel navigation by calling the `cancel` method on the event object.
      * 
      * **IMPORTANT:**  This is a feature only available when initializing the routing library with the 
-     * {@link InitOptions.full} option.
+     * {@link initFull} function.
      * @param event The event to listen for.
      * @param callback The callback to invoke when the event occurs.
      * @returns A function that removes the event listener.
@@ -221,8 +221,8 @@ export interface Location {
      * 
      * This event occurs when navigation is cancelled by a handler of the `beforeNavigate` event.
      * 
-     * **IMPORTANT:**  This is a feature only available when initializing the routing library with the 
-     * {@link InitOptions.full} option.
+     * **IMPORTANT:**  This is a feature only available when initializing the routing library with the
+     * {@link initFull} function.
      * @param event The event to listen for.
      * @param callback The callback to invoke when the event occurs.
      * @returns A function that removes the event listener.
@@ -343,3 +343,79 @@ export interface ILogger {
      */
     error: (...args: any[]) => void;
 };
+
+/**
+ * Library's routing options.
+ */
+export type RoutingOptions = {
+    /**
+     * Whether to use a single or multiple hash mode.  In single hash mode, the hash value is always one path; in multi 
+     * mode, the hash value can be multiple paths.
+     * 
+     * The multiple paths option shapes the hash value as:  `'#id1=/path/of/id1;id2=/path/of/id2;...'`.
+     * 
+     * @default 'single'
+     */
+    hashMode?: 'single' | 'multi';
+    /**
+     * Mode routers operate when their `hash` property is not set (left `undefined`).
+     * 
+     * In short:  It tells the library what type of routing is assumed when no `hash` property is specified in `Router`, 
+     * `Route`, `Fallback`, `Link`, or `RouterTrace` components.
+     * 
+     * When set to `'path'`, create components for hash routing by setting the `hash` property to `true` or a string 
+     * identifier; when set to `'hash'`, create components for path routing by setting the `hash` property to `false`.
+     * 
+     * @default 'path'
+     * 
+     * @example
+     * ```svelte
+     * // In main.ts:
+     * init({ implicitMode: 'hash' });
+     * 
+     * // In App.svelte:
+     * <Router>
+     *    <Route path="/path1">
+     *        <View1 />
+     *    </Route>
+     * </Router>
+     * ```
+     * 
+     * Even though the `hash` property is not set in the `Router` or `Route` components, the library will treat both 
+     * as hash-routing components because the `implicitMode` option was set to `'hash'`.
+     */
+    implicitMode?: 'hash' | 'path';
+}
+
+/**
+ * Library's tracing options.
+ */
+export type TraceOptions = {
+    /**
+     * Whether to trace the router hierarchy.
+     * 
+     * This consumes extra RAM and a bit more CPU cycles.  Disable it on production builds.
+     * @default false
+     */
+    routerHierarchy?: boolean;
+};
+
+
+/**
+ * Library's initialization options.
+ */
+export type InitOptions = RoutingOptions & {
+    /**
+     * Tracing options that generally should be off for production builds.
+     */
+    trace?: TraceOptions;
+    /**
+     * Controls logging.  If `true`, the default logger that logs to the console is used.  If `false`, logging is 
+     * turned off.  If an object is provided, it is used as the logger.
+     * 
+     * Logging is turned on by default.
+     * 
+     * **TIP**: You can provide your own logger implementation to integrate with your application's logging system.
+     */
+    logger?: boolean | ILogger;
+}
