@@ -10,9 +10,7 @@
 	import CodeSnippet from "../../CodeSnippet.svelte";
 	import xml from "svelte-highlight/languages/xml";
 	import liveHashCode from './code-samples/live-hash-display.svelte?raw';
-
-	// Modal state
-	let showCodeModal = $state(false);
+	import ShowCodeButton from "./ShowCodeButton.svelte";
 
 	// Parsed routes for display
 	const parsedRoutes = $derived.by(() => {
@@ -123,13 +121,7 @@
 				</div>
 			{/if}
 			<div class="mt-3">
-				<button
-					type="button"
-					class="btn btn-sm btn-outline-primary"
-					onclick={() => (showCodeModal = true)}
-				>
-					📋 Show Code
-				</button>
+				<ShowCodeButton />
 			</div>
 		</div>
 	{:else}
@@ -157,20 +149,14 @@
 				</div>
 			{/if}
 			<div class="mt-3">
-				<button
-					type="button"
-					class="btn btn-sm btn-outline-primary"
-					onclick={() => (showCodeModal = true)}
-				>
-					📋 Show Code
-				</button>
+				<ShowCodeButton />
 			</div>
 		</div>
 	{/if}
 </div>
 
 <!-- Code Modal -->
-{#if showCodeModal}
+{#if location.getState(false)?.showCodeDialog}
 	<div class="modal fade show" style="display: block;" tabindex="-1">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content">
@@ -179,7 +165,7 @@
 					<button 
 						type="button" 
 						class="btn-close" 
-						onclick={() => showCodeModal = false}
+						onclick={() => location.back()}
 						aria-label="Close this dialog box"
 					></button>
 				</div>
@@ -208,7 +194,7 @@
 					<button 
 						type="button" 
 						class="btn btn-primary" 
-						onclick={() => showCodeModal = false}
+						onclick={() => location.back()}
 					>
 						Got it! 👍
 					</button>
