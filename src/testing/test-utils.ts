@@ -6,15 +6,26 @@ import { resolveHashValue } from "$lib/core/resolveHashValue.js";
 import { vi } from "vitest";
 
 /**
- * Standard routing universe test configurations
+ * Defines the necessary needed to call the library's `init()` function for testing, plus additional metadata.
  */
-export const ROUTING_UNIVERSES: {
+export type RoutingUniverse = {
     hash: Hash | undefined;
     implicitMode: RoutingOptions['implicitMode'];
     hashMode: Exclude<RoutingOptions['hashMode'], undefined>;
+    /**
+     * Short universe identifier.  Used in test titles and descriptions.
+     */
     text: string;
+    /**
+     * Descriptive universe name.  More of a document-by-code property.  Not commonly used as it makes text very long.
+     */
     name: string;
-}[] = [
+};
+
+/**
+ * Standard routing universe test configurations
+ */
+export const ROUTING_UNIVERSES: RoutingUniverse[] = [
     { hash: undefined, implicitMode: 'path', hashMode: 'single', text: "IMP", name: "Implicit Path Routing" },
     { hash: undefined, implicitMode: 'hash', hashMode: 'single', text: "IMH", name: "Implicit Hash Routing" },
     { hash: false, implicitMode: 'path', hashMode: 'single', text: "PR", name: "Path Routing" },
@@ -279,9 +290,6 @@ export function setupBrowserMocks(initialUrl = "http://example.com/", libraryLoc
             if (libraryLocation) {
                 libraryLocation.url.href = url;
             }
-            // Trigger popstate to notify location service (simulates natural browser behavior)
-            const event = new PopStateEvent('popstate', { state: windowMock.history.state });
-            windowMock.dispatchEvent(event);
         },
         
         setState: (state: any) => {
@@ -292,7 +300,12 @@ export function setupBrowserMocks(initialUrl = "http://example.com/", libraryLoc
             const event = new PopStateEvent('popstate', { state: state ?? windowMock.history.state });
             windowMock.dispatchEvent(event);
         },
-        
+
+        triggerHashChange: () => {
+            const event = new HashChangeEvent('hashchange');
+            windowMock.dispatchEvent(event);
+        },
+
         // For tests that need to simulate external history changes
         simulateHistoryChange: (state: any, url?: string) => {
             if (url) {

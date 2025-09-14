@@ -201,6 +201,21 @@ export interface Location {
      */
     navigate(url: string, options?: NavigateOptions): void;
     /**
+     * Moves back one entry in the history stack.
+     * This is equivalent to calling `history.back()` but uses the configured HistoryApi implementation.
+     */
+    back(): void;
+    /**
+     * Moves forward one entry in the history stack.
+     * This is equivalent to calling `history.forward()` but uses the configured HistoryApi implementation.
+     */
+    forward(): void;
+    /**
+     * Moves to a specific entry in the history stack by its relative position.
+     * @param delta The number of entries to move. Negative values go back, positive values go forward.
+     */
+    go(delta: number): void;
+    /**
      * Disposes of the location object, cleaning up any resources.
      */
     dispose(): void;
@@ -418,4 +433,37 @@ export type InitOptions = RoutingOptions & {
      * **TIP**: You can provide your own logger implementation to integrate with your application's logging system.
      */
     logger?: boolean | ILogger;
+}
+
+/**
+ * Defines an abstraction over the browser's History API that provides consistent navigation
+ * and state management across different environments (browser, SvelteKit, memory-only, etc.).
+ * 
+ * This interface extends the standard History API with a reactive URL tracking capability
+ * needed for the routing library.
+ */
+export interface HistoryApi extends History {
+    /**
+     * Reactive URL object that reflects the current location.
+     * Implementations should ensure this stays synchronized with navigation changes.
+     */
+    readonly url: SvelteURL;
+    
+    /**
+     * Cleans up event listeners and resources used by the HistoryApi implementation.
+     * Should be called when the implementation is no longer needed to prevent memory leaks.
+     */
+    dispose(): void;
+}
+
+/**
+ * Extended HistoryApi interface for full-mode routing that supports navigation events.
+ * Used by LocationFull to provide beforeNavigate and navigationCancelled event capabilities.
+ */
+export interface FullModeHistoryApi extends HistoryApi {
+    /**
+     * Subscribe to navigation events.
+     */
+    on(event: 'beforeNavigate', callback: (event: BeforeNavigateEvent) => void): () => void;
+    on(event: 'navigationCancelled', callback: (event: NavigationCancelledEvent) => void): () => void;
 }

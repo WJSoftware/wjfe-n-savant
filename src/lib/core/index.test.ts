@@ -10,6 +10,11 @@ describe('index', () => {
             'isConformantState',
             'calculateHref',
             'calculateState',
+            'LocationState',
+            'StockHistoryApi',
+            'InterceptedHistoryApi',
+            'LocationLite',
+            'LocationFull',
         ];
 
         // Act.

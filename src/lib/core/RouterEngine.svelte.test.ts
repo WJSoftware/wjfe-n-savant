@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, afterAll, afterEach, vi, beforeEach } from "vitest";
 import { routePatternsKey, RouterEngine } from "./RouterEngine.svelte.js";
-import { init, type Hash, type RouteInfo } from "$lib/index.js";
+import { init, type RouteInfo } from "$lib/index.js";
 import { registerRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
 import type { State } from "$lib/types.js";
@@ -38,17 +38,17 @@ describe("RouterEngine", () => {
             cleanup();
         });
     });
-    
+
     describe('constructor hash validation', () => {
         let cleanupFn: (() => void) | null = null;
-        
+
         afterEach(() => {
             if (cleanupFn) {
                 cleanupFn();
                 cleanupFn = null;
             }
         });
-        
+
         test.each([
             { parentHash: ALL_HASHES.path, childHash: ALL_HASHES.single, mode: 'single' as const, description: "path parent vs hash child" },
             { parentHash: ALL_HASHES.single, childHash: ALL_HASHES.path, mode: 'single' as const, description: "hash parent vs path child" },
@@ -57,14 +57,14 @@ describe("RouterEngine", () => {
         ])("Should throw error when parent and child have different hash modes: $description", ({ parentHash, childHash, mode }) => {
             // Arrange
             cleanupFn = init({ hashMode: mode });
-            
+
             // Act & Assert
             expect(() => {
                 const parent = new RouterEngine({ hash: parentHash });
                 new RouterEngine({ parent, hash: childHash });
             }).toThrowError("The parent router's hash mode must match the child router's hash mode.");
         });
-        
+
         test.each([
             { parentHash: ALL_HASHES.path, mode: 'single' as const, description: "path parent" },
             { parentHash: ALL_HASHES.single, mode: 'single' as const, description: "hash parent" },
@@ -72,7 +72,7 @@ describe("RouterEngine", () => {
         ])("Should allow child router without explicit hash to inherit parent's hash: $description", ({ parentHash, mode }) => {
             // Arrange
             cleanupFn = init({ hashMode: mode });
-            
+
             // Act & Assert
             expect(() => {
                 const parent = new RouterEngine({ hash: parentHash });
@@ -80,31 +80,31 @@ describe("RouterEngine", () => {
                 expect(child).toBeDefined();
             }).not.toThrow();
         });
-        
+
         test("Should throw error when using hash path ID without multi hash mode", () => {
             // Arrange
             cleanupFn = init({ hashMode: 'single' });
-            
+
             // Act & Assert
             expect(() => {
                 new RouterEngine({ hash: ALL_HASHES.multi });
             }).toThrowError("A hash path ID was given, but is only allowed when the library's hash mode has been set to 'multi'.");
         });
-        
+
         test("Should throw error when using non-string hash in multi hash mode", () => {
             // Arrange
             cleanupFn = init({ hashMode: 'multi' });
-            
+
             // Act & Assert
             expect(() => {
                 new RouterEngine({ hash: ALL_HASHES.single }); // boolean not allowed in multi mode
             }).toThrowError("The specified hash value is not valid for the 'multi' hash mode.  Either don't specify a hash for path routing, or correct the hash value.");
         });
-        
+
         test("Should allow valid hash path ID in multi hash mode", () => {
             // Arrange
             cleanupFn = init({ hashMode: 'multi' });
-            
+
             // Act & Assert
             expect(() => {
                 const router = new RouterEngine({ hash: ALL_HASHES.multi });
@@ -122,35 +122,36 @@ ROUTING_UNIVERSES.forEach(universe => {
     describe(`RouterEngine (${universe.text})`, () => {
         let cleanup: () => void;
         let browserMocks: ReturnType<typeof setupBrowserMocks>;
-        
+
         beforeAll(() => {
             browserMocks = setupBrowserMocks("http://example.com/", location);
-            cleanup = init({ 
+            cleanup = init({
                 hashMode: universe.hashMode,
-                implicitMode: universe.implicitMode 
+                implicitMode: universe.implicitMode
             });
         });
-        
+
         beforeEach(() => {
-            browserMocks.setUrl("http://example.com");
+            location.url.href = "http://example.com/";
+            browserMocks.setUrl(location.url.href);
         });
-        
+
         afterAll(() => {
             cleanup();
             browserMocks.cleanup();
         });
-        
+
         describe('constructor', () => {
             test("Should create router with correct hash configuration", () => {
                 // Act.
                 const router = new RouterEngine({ hash: universe.hash });
-                
+
                 // Assert.
                 expect(router).toBeDefined();
                 // Additional assertions could check internal hash configuration
             });
         });
-        
+
         describe('basePath', () => {
             test("Should be '/' by default", () => {
                 // Act.
@@ -159,7 +160,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 // Assert.
                 expect(router.basePath).toBe('/');
             });
-            
+
             test("Should be the parent's basePath plus the router's basePath", () => {
                 // Arrange.
                 const parent = new RouterEngine({ hash: universe.hash });
@@ -173,7 +174,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 // Assert.
                 expect(basePath).toBe('/parent/child');
             });
-            
+
             test("Should remove the trailing slash.", () => {
                 // Arrange.
                 const router = new RouterEngine({ hash: universe.hash });
@@ -186,7 +187,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 expect(basePath).toBe('/abc');
             });
         });
-        
+
         describe('url', () => {
             test("Should return the current URL.", () => {
                 // Arrange.
@@ -200,7 +201,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 expect(url).toBe(location.url);
             });
         });
-        
+
         describe('state', () => {
             test("Should return the current state for the routing universe", () => {
                 // Arrange.
@@ -226,7 +227,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 expect(router.state).toBe(expectedState);
             });
         });
-        
+
         describe('routes', () => {
             test("Should recalculate the route patterns whenever a new route is added.", () => {
                 // Arrange.
@@ -243,7 +244,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 // Assert.
                 expect(router[routePatternsKey]().has('route')).toBe(true);
             });
-            
+
             test("Should recalculate the route patterns whenever a route is removed.", () => {
                 // Arrange.
                 const router = new RouterEngine({ hash: universe.hash });
@@ -260,7 +261,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 // Assert.
                 expect(router[routePatternsKey]().has('route')).toBe(false);
             });
-            
+
             test("Should recalculate the route patterns whenever a route is updated.", () => {
                 // Arrange.
                 const router = new RouterEngine({ hash: universe.hash });
@@ -278,7 +279,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 expect(router[routePatternsKey]().has('route')).toBe(true);
                 expect(router[routePatternsKey]().get('route')!.regex!.test('/other')).toBe(true);
             });
-            
+
             describe('Route Patterns', () => {
                 test.each(
                     [
@@ -413,7 +414,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                         }
                     }
                 });
-                
+
                 test.each([
                     {
                         pattern: '/path',
@@ -462,7 +463,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                     // Assert.
                     expect(matches).toBeNull();
                 });
-                
+
                 test.each([
                     {
                         pattern: '/:one?',
@@ -585,7 +586,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 });
             });
         });
-        
+
         describe('noMatches', () => {
             test("Should be true whenever there are no routes registered.", () => {
                 // Act.
@@ -594,10 +595,12 @@ ROUTING_UNIVERSES.forEach(universe => {
                 // Assert.
                 expect(router.noMatches).toBe(true);
             });
-            
+
             test("Should be true whenever there are no matching routes.", () => {
-                // Act.
+                // Arrange.
                 const router = new RouterEngine({ hash: universe.hash });
+
+                // Act.
                 router.routes['route'] = {
                     pattern: '/:one/:two?',
                     caseSensitive: false,
@@ -606,7 +609,7 @@ ROUTING_UNIVERSES.forEach(universe => {
                 // Assert.
                 expect(router.noMatches).toBe(true);
             });
-            
+
             test.each([
                 {
                     text: "is",
@@ -627,26 +630,26 @@ ROUTING_UNIVERSES.forEach(universe => {
                 // Arrange.
                 const router = new RouterEngine({ hash: universe.hash });
                 const nonMatchingCount = totalRoutes - routeCount;
-                
+
                 // Act.
                 addRoutes(router, { matching: routeCount, nonMatching: nonMatchingCount });
 
                 // Assert.
                 expect(router.noMatches).toBe(false);
             });
-            
+
             test.each([
                 1, 2, 5
             ])("Should be true whenever the %d matching route(s) are ignored for fallback.", (routeCount) => {
                 // Arrange.
                 const router = new RouterEngine({ hash: universe.hash });
-                
+
                 // Act.
-                addRoutes(router, { 
-                    matching: { 
-                        count: routeCount, 
-                        specs: { ignoreForFallback: true } 
-                    } 
+                addRoutes(router, {
+                    matching: {
+                        count: routeCount,
+                        specs: { ignoreForFallback: true }
+                    }
                 });
 
                 // Assert.

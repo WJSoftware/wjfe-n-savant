@@ -6,9 +6,10 @@
 
 > **📝 Small and Unique!**
 > 
-> + Less than **1,250** lines of code, including TypeScript typing.
+> + Less than **1,400** lines of code, including TypeScript typing.
 > + Always-on path and hash routing.  Simultaneous and independent routing modes.
 > + The router that invented multi hash routing.
+> + **NEW!** Supports extension packages (Sveltekit support coming soon)
 
 + **Electron support**:  Works with Electron (all routing modes)
 + **Reactivity-based**:  All data is reactive, reducing the need for events and imperative programming.
