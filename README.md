@@ -2,6 +2,8 @@
 
 > The client-side router for Svelte v5 SPA's that invented multi hash routing.
 
+[REPL Demo](https://svelte.dev/playground/d273d356947e48c0822a65402fd06fac)
+
 ## Features
 
 > **📝 Small and Unique!**
