@@ -45,6 +45,18 @@
 		"./core": {
 			"types": "./dist/core/index.d.ts",
 			"default": "./dist/core/index.js"
+		},
+		"./logo": {
+			"types": "./dist/logo/logo.d.ts",
+			"default": "./dist/logo/logo.svg"
+		},
+		"./logo64": {
+			"types": "./dist/logo/logo.d.ts",
+			"default": "./dist/logo/logo-64.svg"
+		},
+		"./logo48": {
+			"types": "./dist/logo/logo.d.ts",
+			"default": "./dist/logo/logo-48.svg"
 		}
 	},
 	"peerDependencies": {

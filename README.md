@@ -1,4 +1,4 @@
-# @wjfe/n-savant
+# <img src="src/lib/logo/logo-48.svg" alt="N-Savant Logo" width="48" height="48" align="left">&nbsp;&nbsp;&nbsp;@wjfe/n-savant
 
 > The client-side router for Svelte v5 SPA's that invented multi hash routing.
 

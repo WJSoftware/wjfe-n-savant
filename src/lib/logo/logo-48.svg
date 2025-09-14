@@ -1,0 +1,98 @@
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Simplified gradient for the outer ring -->
+    <radialGradient id="outerRingGradient48" cx="0.3" cy="0.3">
+      <stop offset="0%" stop-color="#2c3e50" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#2c3e50" />
+    </radialGradient>
+
+    <!-- Simplified gradient for the inner background -->
+    <radialGradient id="backgroundGradient48" cx="0.3" cy="0.3">
+      <stop offset="0%" stop-color="#ecf0f1" />
+      <stop offset="100%" stop-color="#34495e" stop-opacity="0.2" />
+    </radialGradient>
+
+    <!-- Simplified drop shadow -->
+    <filter id="dropShadow48" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="1" dy="1" stdDeviation="1" flood-color="black" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle
+    cx="24"
+    cy="24"
+    r="23"
+    fill="url(#outerRingGradient48)"
+    filter="url(#dropShadow48)"
+  />
+
+  <!-- Inner background -->
+  <circle cx="24" cy="24" r="20" fill="url(#backgroundGradient48)" />
+
+  <!-- Major tick marks only (every 90 degrees) -->
+  <g stroke="#7f8c8d" stroke-width="2" stroke-linecap="round">
+    <line x1="24" y1="4" x2="24" y2="8" />
+    <line x1="44" y1="24" x2="40" y2="24" />
+    <line x1="24" y1="44" x2="24" y2="40" />
+    <line x1="4" y1="24" x2="8" y2="24" />
+  </g>
+
+  <!-- Compass needle (rotated 15 degrees) -->
+  <g transform="rotate(15, 24, 24)">
+    <!-- North pointing part (red) -->
+    <polygon
+      points="24,5 26,22 24,23 22,22"
+      fill="#e74c3c"
+      stroke="white"
+      stroke-width="0.5"
+    />
+    <!-- South pointing part (silver) -->
+    <polygon
+      points="24,43 22,26 24,25 26,26"
+      fill="#95a5a6"
+      stroke="white"
+      stroke-width="0.5"
+    />
+    <!-- Center pivot -->
+    <circle cx="24" cy="24" r="2" fill="#2c3e50" stroke="white" stroke-width="0.5" />
+  </g>
+
+  <!-- Cardinal direction labels (simplified) -->
+  <text
+    x="24"
+    y="12"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="8"
+    font-weight="bold"
+    text-anchor="middle"
+    fill="#2c3e50"
+    dominant-baseline="middle">N</text>
+  <text
+    x="36"
+    y="26"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="8"
+    font-weight="bold"
+    text-anchor="middle"
+    fill="#2c3e50"
+    dominant-baseline="middle">E</text>
+  <text
+    x="24"
+    y="40"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="8"
+    font-weight="bold"
+    text-anchor="middle"
+    fill="#2c3e50"
+    dominant-baseline="middle">S</text>
+  <text
+    x="12"
+    y="26"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-size="8"
+    font-weight="bold"
+    text-anchor="middle"
+    fill="#2c3e50"
+    dominant-baseline="middle">W</text>
+</svg>

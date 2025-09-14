@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Link, Route } from '@wjfe/n-savant';
+	import logo from '@wjfe/n-savant/logo64';
 	import SubNav from './SubNav.svelte';
 	import { routingMode } from './hash-routing';
 	import type { HTMLAttributes } from 'svelte/elements';
@@ -22,28 +23,7 @@
 <nav class="navbar navbar-expand-lg bg-primary-subtle" {...restProps}>
 	<div class="container-fluid">
 		<Link class="navbar-brand fw-bold" href="/" id="logoLink">
-			<svg style:height="1.7em" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-				<!-- Outer circle -->
-				<circle cx="50" cy="50" r="48" stroke="black" stroke-width="2" fill="none" />
-				<!-- Compass needle -->
-				<polygon points="50,5 55,50 50,95 45,50" fill="red" transform="rotate(15, 50, 50)" />
-				<!-- North indicator -->
-				<text x="50" y="12" font-family="Arial" font-size="18" text-anchor="middle" fill="black"
-					>N</text
-				>
-				<!-- East indicator -->
-				<text x="88" y="55" font-family="Arial" font-size="18" text-anchor="middle" fill="black"
-					>E</text
-				>
-				<!-- South indicator -->
-				<text x="50" y="98" font-family="Arial" font-size="18" text-anchor="middle" fill="black"
-					>S</text
-				>
-				<!-- West indicator -->
-				<text x="12" y="55" font-family="Arial" font-size="18" text-anchor="middle" fill="black"
-					>W</text
-				>
-			</svg>
+			<img src={logo} alt="N-Savant Compass Logo" style:height="1.7em" />
 			@wjfe/n-savant
 		</Link>
 		<button
