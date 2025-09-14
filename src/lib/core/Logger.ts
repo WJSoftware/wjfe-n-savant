@@ -1,4 +1,4 @@
-import type { ILogger } from "$lib/types.js";
+import type { ILogger } from "../types.js";
 
 const stockLogger: ILogger = globalThis.console;
 

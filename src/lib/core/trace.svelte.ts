@@ -1,4 +1,4 @@
-import type { TraceOptions } from "$lib/types.js";
+import type { TraceOptions } from "../types.js";
 import type { RouterEngine } from "./RouterEngine.svelte.js";
 
 /**

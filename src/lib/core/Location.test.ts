@@ -1,4 +1,4 @@
-import { location, setLocation } from "$lib/core/Location.js";
+import { location, setLocation } from "./Location.js";
 import { describe, test, expect, afterEach } from "vitest";
 import { LocationLite } from "./LocationLite.svelte.js";
 

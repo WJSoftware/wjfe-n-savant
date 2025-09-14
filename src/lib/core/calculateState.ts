@@ -1,4 +1,4 @@
-import type { Hash, Location, State } from "$lib/types.js";
+import type { Hash, Location, State } from "../types.js";
 import { location } from "./Location.js";
 import { getCompleteStateKey } from "./Location.js";
 import { resolveHashValue } from "./resolveHashValue.js";

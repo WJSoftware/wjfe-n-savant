@@ -1,4 +1,4 @@
-import type { BeforeNavigateEvent, NavigationCancelledEvent, FullModeHistoryApi, Events } from "$lib/types.js";
+import type { BeforeNavigateEvent, NavigationCancelledEvent, FullModeHistoryApi, Events } from "../types.js";
 import { LocationLite } from "./LocationLite.svelte.js";
 import { InterceptedHistoryApi } from "./InterceptedHistoryApi.svelte.js";
 

@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from "vitest";
 import { getAllChildRouters, registerRouter, resetTraceOptions, setTraceOptions, traceOptions } from "./trace.svelte.js";
 import { RouterEngine } from "./RouterEngine.svelte.js";
-import { init } from "$lib/index.js";
+import { init } from "../init.js";
 
 vi.mock(import('./trace.svelte.js'), async (importActual) => {
     const actual = await importActual<typeof import("./trace.svelte.js")>();

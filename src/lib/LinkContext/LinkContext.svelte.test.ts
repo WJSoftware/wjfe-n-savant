@@ -1,12 +1,11 @@
 import { describe, test, expect, beforeEach, vi, beforeAll, afterAll } from "vitest";
 import { render } from "@testing-library/svelte";
 import LinkContext from "./LinkContext.svelte";
-import Link from "../Link/Link.svelte";
 import { createTestSnippet, createRouterTestSetup, ROUTING_UNIVERSES } from "../../testing/test-utils.js";
 import { flushSync } from "svelte";
 import TestLinkContextNested from "../../testing/TestLinkContextNested.svelte";
 import TestLinkContextWithLink from "../../testing/TestLinkContextWithLink.svelte";
-import { init } from "$lib/index.js";
+import { init } from "$lib/init.js";
 
 function defaultPropsTests() {
     const content = createTestSnippet("Link Context Content");

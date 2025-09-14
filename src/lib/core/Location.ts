@@ -1,4 +1,4 @@
-import type { Location, State } from "$lib/types.js";
+import type { Location } from "../types.js";
 
 /**
  * Internal symbol for accessing complete state from Location implementations.

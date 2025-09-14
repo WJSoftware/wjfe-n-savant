@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { calculateHref, type CalculateHrefOptions } from "./calculateHref.js";
-import { init, location } from "$lib/index.js";
+import { init } from "../init.js";
+import { location } from "./Location.js";
 import { ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
 
 describe("calculateHref", () => {

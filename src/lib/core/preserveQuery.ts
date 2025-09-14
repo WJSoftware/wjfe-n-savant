@@ -1,4 +1,4 @@
-import type { PreserveQuery } from "$lib/types.js";
+import type { PreserveQuery } from "../types.js";
 import { location } from "./Location.js";
 
 /**

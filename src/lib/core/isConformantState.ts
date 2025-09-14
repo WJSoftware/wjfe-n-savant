@@ -1,4 +1,4 @@
-import type { State } from "$lib/types.js";
+import type { State } from "../types.js";
 
 /**
  * Tests the given state data to see if it conforms to the expected `State` structure.

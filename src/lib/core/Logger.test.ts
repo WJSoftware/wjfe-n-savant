@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
 import { logger, resetLogger, setLogger } from "./Logger.js";
-import type { ILogger } from "$lib/types.js";
+import type { ILogger } from "../types.js";
 
 describe("logger", () => {
     test("Should default to offLogger when the library hasn't been initialized.", () => {

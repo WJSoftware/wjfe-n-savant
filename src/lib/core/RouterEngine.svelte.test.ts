@@ -1,9 +1,9 @@
 import { describe, test, expect, beforeAll, afterAll, afterEach, vi, beforeEach } from "vitest";
 import { routePatternsKey, RouterEngine } from "./RouterEngine.svelte.js";
-import { init, type RouteInfo } from "$lib/index.js";
+import { init } from "../init.js";
 import { registerRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
-import type { State } from "$lib/types.js";
+import type { State, RouteInfo } from "../types.js";
 import { setupBrowserMocks, addRoutes, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
 
 describe("RouterEngine", () => {

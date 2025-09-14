@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { preserveQueryInUrl, mergeQueryParams } from './preserveQuery.js';
-import { init, location } from '$lib/index.js';
+import { init } from '../init.js';
+import { location } from './Location.js';
 
 describe('preserveQuery utilities', () => {
     let cleanup: Function;

@@ -1,4 +1,4 @@
-import { init, location } from '$lib/index.js';
+import { init } from '../init.js';
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { calculateState } from './calculateState.js';
 import { ROUTING_UNIVERSES, ALL_HASHES, setupBrowserMocks } from '../../testing/test-utils.js';

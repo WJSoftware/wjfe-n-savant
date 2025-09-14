@@ -1,7 +1,7 @@
 import { SvelteURL } from "svelte/reactivity";
 import { isConformantState } from "./isConformantState.js";
 import { logger } from "./Logger.js";
-import type { State } from "$lib/types.js";
+import type { State } from "../types.js";
 
 /**
  * Helper class used to manage the reactive data of Location implementations.

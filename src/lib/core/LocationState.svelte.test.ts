@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { LocationState } from './LocationState.svelte.js';
-import type { State } from '$lib/types.js';
+import type { State } from '../types.js';
 import { logger } from './Logger.js';
 
 // Mock logger.warn to capture warnings

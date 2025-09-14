@@ -1,4 +1,4 @@
-import type { InitOptions, Location } from "$lib/types.js";
+import type { InitOptions, Location } from "../types.js";
 import { setLocation } from "./Location.js";
 import { resetLogger, setLogger } from "./Logger.js";
 import { resetRoutingOptions, setRoutingOptions } from "./options.js";
