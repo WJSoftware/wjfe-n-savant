@@ -2,15 +2,28 @@ import { setLocation } from "./core/Location.js";
 import { LocationFull } from "./core/LocationFull.js";
 import { LocationLite } from "./core/LocationLite.svelte.js";
 import { resetLogger, setLogger } from "./core/Logger.js";
-import { resetRoutingOptions, routingOptions } from "./core/options.js";
+import { resetRoutingOptions, routingOptions, setRoutingOptions } from "./core/options.js";
 import { resetTraceOptions, setTraceOptions } from "./core/trace.svelte.js";
 import type { InitOptions, Location } from "./types.js";
 
-function initInternal(options: InitOptions, location: Location) {
+/**
+ * Core initialization function used by both the main package and extension packages.
+ * This ensures consistent initialization logic across different environments.
+ * 
+ * Extension packages can use this function to provide their own Location implementations
+ * (e.g., SvelteKit-compatible implementations) while maintaining consistent setup.
+ * 
+ * @param options Initialization options for the routing library
+ * @param location The Location implementation to use
+ * @returns A cleanup function that reverts the initialization process
+ */
+export function initCore(options: InitOptions, location: Location) {
     setTraceOptions(options?.trace);
     setLogger(options?.logger ?? true);
-    routingOptions.hashMode = options?.hashMode ?? routingOptions.hashMode;
-    routingOptions.implicitMode = options?.implicitMode ?? routingOptions.implicitMode;
+    setRoutingOptions({
+        hashMode: options?.hashMode,
+        implicitMode: options?.implicitMode
+    });
     const newLocation = setLocation(location);
     return () => {
         newLocation?.dispose();
@@ -40,7 +53,7 @@ function initInternal(options: InitOptions, location: Location) {
  * @returns A cleanup function that reverts the initialization process.
  */
 export function init(options?: InitOptions) {
-    return initInternal(options ?? {}, new LocationLite());
+    return initCore(options ?? {}, new LocationLite());
 }
 
 /**
@@ -52,5 +65,5 @@ export function init(options?: InitOptions) {
  * @returns A cleanup function that reverts the initialization process.
  */
 export function initFull(options?: InitOptions) {
-    return initInternal(options ?? {}, new LocationFull());
+    return initCore(options ?? {}, new LocationFull());
 }

@@ -1,7 +1,6 @@
-import type { BeforeNavigateEvent, Hash, Location, GoToOptions, NavigateOptions, NavigationCancelledEvent, State } from "../types.js";
+import type { BeforeNavigateEvent, Hash, Location, GoToOptions, NavigateOptions, NavigationCancelledEvent, State, HistoryApi } from "../types.js";
 import { getCompleteStateKey } from "./Location.js";
-import { on } from "svelte/events";
-import { LocationState } from "./LocationState.svelte.js";
+import { StockHistoryApi } from "./StockHistoryApi.svelte.js";
 import { routingOptions } from "./options.js";
 import { resolveHashValue } from "./resolveHashValue.js";
 import { calculateHref } from "./calculateHref.js";
@@ -13,14 +12,14 @@ import { preserveQueryInUrl } from "./preserveQuery.js";
  * which are normally only needed when mixing router libraries.
  */
 export class LocationLite implements Location {
-    #innerState: LocationState;
-    #cleanup: (() => void) | undefined;
+    #historyApi: HistoryApi;
+    
     hashPaths = $derived.by(() => {
         if (routingOptions.hashMode === 'single') {
-            return { single: this.#innerState.url.hash.substring(1) };
+            return { single: this.#historyApi.url.hash.substring(1) };
         }
         const result = {} as Record<string, string>;
-        const paths = this.#innerState.url.hash.substring(1).split(';');
+        const paths = this.#historyApi.url.hash.substring(1).split(';');
         for (let rawPath of paths) {
             const [id, path] = rawPath.split('=');
             if (!id || !path) {
@@ -31,32 +30,8 @@ export class LocationLite implements Location {
         return result;
     });
 
-    constructor() {
-        const [innerState] = arguments;
-        if (innerState instanceof LocationState) {
-            this.#innerState = innerState;
-        }
-        else {
-            this.#innerState = new LocationState();
-        }
-        this.#cleanup = $effect.root(() => {
-            const cleanups = [] as (() => void)[];
-            ['popstate', 'hashchange'].forEach((event) => {
-                cleanups.push(on(globalThis.window, event, () => {
-                    this.#innerState.url.href = globalThis.window?.location?.href;
-                    if (!globalThis.window?.history?.state) {
-                        // Potential <a> hash navigation.  Preserve current state.
-                        this.#goTo(this.#innerState.url.href, true, $state.snapshot(this.#innerState.state));
-                    }
-                    this.#innerState.state = globalThis.window?.history?.state ?? this.#innerState.state;
-                }));
-            });
-            return () => {
-                for (let cleanup of cleanups) {
-                    cleanup();
-                }
-            };
-        });
+    constructor(historyApi?: HistoryApi) {
+        this.#historyApi = historyApi ?? new StockHistoryApi();
     }
 
     on(event: "beforeNavigate", callback: (event: BeforeNavigateEvent) => void): () => void;
@@ -66,17 +41,29 @@ export class LocationLite implements Location {
     }
 
     get url() {
-        return this.#innerState.url;
+        return this.#historyApi.url;
     }
 
     getState(hash: Hash) {
         if (typeof hash === 'string') {
-            return this.#innerState.state?.hash[hash];
+            return this.#historyApi.state?.hash[hash];
         }
         if (hash) {
-            return this.#innerState.state?.hash.single;
+            return this.#historyApi.state?.hash.single;
         }
-        return this.#innerState.state?.path;
+        return this.#historyApi.state?.path;
+    }
+
+    back(): void {
+        this.#historyApi.back();
+    }
+
+    forward(): void {
+        this.#historyApi.forward();
+    }
+
+    go(delta: number): void {
+        this.#historyApi.go(delta);
     }
 
     #goTo(url: string, replace: boolean, state: State | undefined) {
@@ -84,13 +71,7 @@ export class LocationLite implements Location {
             // Shallow routing.
             url = this.url.href;
         }
-        (
-            replace ?
-                globalThis.window?.history.replaceState :
-                globalThis.window?.history.pushState
-        ).bind(globalThis.window?.history)(state, '', url);
-        this.#innerState.url.href = globalThis.window?.location.href;
-        this.#innerState.state = state ?? { path: undefined, hash: {} };
+        this.#historyApi[replace ? 'replaceState' : 'pushState'](state, '', url);
     }
 
     goTo(url: string, options?: GoToOptions): void {
@@ -113,11 +94,10 @@ export class LocationLite implements Location {
     }
 
     [getCompleteStateKey](): State {
-        return $state.snapshot(this.#innerState.state);
+        return $state.snapshot(this.#historyApi.state);
     }
 
     dispose() {
-        this.#cleanup?.();
-        this.#cleanup = undefined;
+        this.#historyApi.dispose();
     }
 }

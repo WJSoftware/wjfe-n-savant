@@ -112,13 +112,13 @@ export class RouterEngine {
      * 
      * @default {}
      */
-    #routes = $state({}) as Record<string, RouteInfo>;
+    #routes = $state<Record<string, RouteInfo>>({});
     /**
      * Gets or sets the base path of the router.  This is the part of the URL that is ignored when matching routes.
      * 
      * @default '/'
      */
-    #basePath = $state('/') as string;
+    #basePath = $state<string>('/');
     /**
      * Calculates the route patterns to be used for matching the current URL.
      * 

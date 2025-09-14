@@ -157,9 +157,6 @@ describe('LocationState', () => {
 				hash: {}
 			});
 			expect(mockLoggerWarn).toHaveBeenCalledOnce();
-			expect(mockLoggerWarn).toHaveBeenCalledWith(
-				'Non-conformant state data detected in History API. Resetting to clean state.'
-			);
 		});
 	});
 

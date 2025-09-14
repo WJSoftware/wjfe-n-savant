@@ -1,4 +1,4 @@
-# N-Savant Routing Library - Testing Guide
+# N-Savant Routing Library
 
 ## Library Architecture Overview
 
@@ -46,7 +46,7 @@ routes: Record<string, RouteInfo>
 
 Where `RouteInfo` contains:
 - `pattern?: string` or `regex?: RegExp`: For URL matching
-- `and?: (routeParams) => boolean`: Additional predicate for guarded routes
+- `and?: (routeParams) => boolean`: Additional predicate for additional constraining, like guarded routes
 - `ignoreForFallback?: boolean`: Excludes route from fallback calculations
 
 #### Reactive Properties
@@ -54,6 +54,9 @@ Where `RouteInfo` contains:
 - `noMatches`: Boolean indicating NO routes matched (excluding `ignoreForFallback` routes)
 
 ### Component Architecture
+
+Except for the `LinkContext` components, all components possess the `hash: Hash` property to specify the routing 
+universe they belong to.
 
 #### Router Component
 - Creates `RouterEngine` instance
@@ -68,7 +71,6 @@ Where `RouteInfo` contains:
 #### Fallback Component
 - Shows content when no routes match
 - Props:
-  - `hash`: Routing universe selector
   - `when?: WhenPredicate`: Override default `noMatches` behavior
   - `children`: Content snippet
 
@@ -78,6 +80,65 @@ Render logic:
   {@render children?.(router.state, router.routeStatus)}
 {/if}
 ```
+
+## Library Initialization
+
+The `init()` function:
+- Passes library configuration to global singleton
+- Creates new Location implementation instance
+- Returns a cleanup function; mainly used in unit testing but valid anywhere as required.
+- Required when library configurations change
+- Multi hash routing needs cleanup between tests
+
+```typescript
+// Standard init
+const cleanup = init();
+
+// Multi hash mode
+const cleanup = init({ hashMode: 'multi' });
+
+// Always cleanup
+afterAll(() => {
+    cleanup();
+});
+```
+
+## Extensibility
+
+This library supports the creation of extension NPM packages by allowing custom implementations of the `Location`, `HistoryApi` and `FullModeHistoryApi` interfaces.
+
+`Location` implementations are in charge of obtaining the current environment URL and keeping it in sync across navigation.  They read the environment's URL and sets up reactive `$state` and `$derived` data for the rest of components and the application that consumes the package.
+
+`HistoryApi` implementations are helpers for the `Location` implementations.  They either tap into or completely replace the environment's history API to fulfill the sought objective.
+
+NPM extension packages may opt to provide custom implementations for any of these interfaces.  They may (and are encouraged to) expose their own initialization functions to provide customized or new options, and to remove stock initialization options that should not be touched by consumers.
+
+Custom initialization functions must ultimately call this package's `initCore()` function with the desired values; NPM extension packages can provide any number of initialization functions.
+
+### Location Implementations
+
+#### LocationLite
+
+- Default library option
+- By default, uses the `StockHistoryApi` class as its `HistoryApi` implementation
+- Base class for `LocationFull`
+
+#### LocationFull
+
+- By default, uses the `InterceptedHistoryApi` class as its `FullModeHistoryApi` implementation
+
+### HistoryApi and FullModeHistoryApi Implementations
+
+#### StockHistoryApi
+
+- Relays all functionality to the environment's history object
+- Synchronizes reactive values as needed while being used
+
+#### InterceptedHistoryApi
+
+- Extends the `StockHistoryApi` class
+- Replaces the environment's history object with itself on construction
+- Provides the logic for the `beforeNavigate` and `navigationCancelled` events
 
 ## Testing Patterns & Best Practices
 
@@ -90,7 +151,7 @@ function defaultPropsTests(setup: ReturnType<typeof createRouterTestSetup>) {
     beforeEach(() => setup.init());
     afterAll(() => setup.dispose());
     
-    test("Should behave correctly with default props", () => {
+    test("Should behave correctly with default props.", () => {
         // Test with hash: undefined and minimal props
         const { hash, context } = setup;
         render(Component, { props: { hash, children: content }, context });
@@ -106,7 +167,7 @@ function explicitPropsTests(setup: ReturnType<typeof createRouterTestSetup>) {
     test.each([
         { propValue: value1, scenario: "scenario1" },
         { propValue: value2, scenario: "scenario2" }
-    ])("Should handle $scenario", ({ propValue }) => {
+    ])("Should handle $scenario .", ({ propValue }) => {
         render(Component, { 
             props: { hash, specificProp: propValue, children: content }, 
             context 
@@ -121,7 +182,7 @@ Test two distinct types of reactivity:
 
 **A. Prop Value Changes** (Component prop reactivity):
 ```typescript
-test("Should re-render when prop value changes", async () => {
+test("Should re-render when prop value changes.", async () => {
     const { rerender } = render(Component, {
         props: { when: () => false, children: content }
     });
@@ -135,7 +196,7 @@ test("Should re-render when prop value changes", async () => {
 
 **B. Reactive State Changes** (Svelte rune reactivity):
 ```typescript
-test("Should re-render when reactive dependency changes", async () => {
+test("Should re-render when reactive dependency changes.", async () => {
     let reactiveState = $state(false);
     
     render(Component, {
@@ -144,7 +205,7 @@ test("Should re-render when reactive dependency changes", async () => {
     
     // Change the reactive state
     reactiveState = true;
-    flushSync(); // Ensure reactive updates are processed
+    flushSync(); // Only use if the assertion depends on Svelte $effect's having run to completion
     
     // Assert reactive behavior
 });
@@ -155,14 +216,14 @@ test("Should re-render when reactive dependency changes", async () => {
 #### **Focus on Observable Behavior, Not Implementation**
 ```typescript
 // ✅ Good - Test what the user sees
-test("Should hide content when routes match", () => {
+test("Should hide content when routes match.", () => {
     addMatchingRoute(router);
     const { queryByText } = render(Component, { props, context });
     expect(queryByText("content")).toBeNull();
 });
 
 // ❌ Bad - Test internal implementation
-test("Should call router.noMatches", () => {
+test("Should call router.noMatches.", () => {
     const spy = vi.spyOn(router, 'noMatches');
     render(Component, { props, context });
     expect(spy).toHaveBeenCalled(); // Testing implementation detail
@@ -172,13 +233,13 @@ test("Should call router.noMatches", () => {
 #### **Maintain Clear Testing Boundaries**
 ```typescript
 // ✅ Component tests focus on component behavior
-test("Component renders when condition is met", () => {
+test("Component renders when condition is met.", () => {
     // Setup: Create the condition (however that's achieved)
     // Test: Component responds correctly
 });
 
 // ✅ Router tests focus on router logic (separate file)
-test("Router calculates noMatches correctly", () => {
+test("Router calculates noMatches correctly.", () => {
     // Test router's internal logic
 });
 ```
@@ -233,40 +294,14 @@ See `src/testing/test-utils.ts` for the complete `ROUTING_UNIVERSES` array defin
 ### Context Setup
 
 ```typescript
-function createRouterTestSetup(hash: Hash | undefined) {
-    let router: RouterEngine | undefined;
-    let context: Map<any, any>;
-    
-    const init = () => {
-        // Dispose previous router if it exists
-        router?.dispose();
-        
-        // Create fresh router and context for each test
-        router = new RouterEngine({ hash });
-        context = new Map();
-        context.set(getRouterContextKey(hash), router);
-    };
-    
-    const dispose = () => {
-        router?.dispose();
-        router = undefined;
-        context = new Map();
-    };
-    
-    return {
-        get hash() { return hash; },
-        get router() { 
-            if (!router) throw new Error('Router not initialized. Call init() first.');
-            return router; 
-        },
-        get context() { 
-            if (!context) throw new Error('Context not initialized. Call init() first.');
-            return context; 
-        },
-        init,
-        dispose
-    };
-}
+// Full source in src/testing/test-utils.ts
+function createRouterTestSetup(hash: Hash | undefined): {
+    readonly hash: Hash | undefined;
+    readonly router: RouterEngine;
+    readonly context: Map<any, any>;
+    init: () => void;
+    dispose: () => void;
+};
 
 // Usage in tests
 beforeEach(() => {
@@ -324,7 +359,7 @@ expect(queryByText(content)).toBeNull();
 
 ### Testing Bindable Properties
 
-**Bindable properties** (declared with `export let` and used with `bind:` in Svelte) require special testing patterns since they involve two-way data binding between parent and child components.
+**Bindable properties** (declared with `$bindable()` and used with `bind:` in Svelte) require special testing patterns since they involve two-way data binding between parent and child components.
 
 #### **The Getter/Setter Pattern (Recommended)**
 
@@ -348,6 +383,7 @@ test("Should bind property correctly", async () => {
 
     // Trigger the binding (component-specific logic)
     // e.g., navigate to a route, trigger an event, etc.
+    // Might require the use of Svelte's flushSync() function if the update depends on effects running.
     await triggerBindingUpdate();
 
     // Assert: Verify binding occurred
@@ -362,7 +398,7 @@ For components that work across multiple routing universes, test bindable proper
 
 ```typescript
 function bindablePropertyTests(setup: ReturnType<typeof createRouterTestSetup>, ru: RoutingUniverse) {
-    test("Should bind property when condition is met", async () => {
+    test("Should bind property when condition is met.", async () => {
         const { hash, context } = setup;
         let capturedValue: any;
         const propertySetter = vi.fn((value) => { capturedValue = value; });
@@ -387,7 +423,7 @@ function bindablePropertyTests(setup: ReturnType<typeof createRouterTestSetup>, 
         expect(capturedValue).toEqual(expectedValue);
     });
 
-    test("Should update binding when conditions change", async () => {
+    test("Should update binding when conditions change.", async () => {
         // Test binding updates during navigation or state changes
         let capturedValue: any;
         const propertySetter = vi.fn((value) => { capturedValue = value; });
@@ -429,7 +465,7 @@ ROUTING_UNIVERSES.forEach((ru) => {
 Some routing modes may have different behavior or limitations. Handle these gracefully:
 
 ```typescript
-test("Should handle complex binding scenarios", async () => {
+test("Should handle complex binding scenarios.", async () => {
     let capturedValue: any;
     const propertySetter = vi.fn((value) => { capturedValue = value; });
 
@@ -461,7 +497,7 @@ test("Should handle complex binding scenarios", async () => {
 When testing components that perform automatic type conversion (like RouterEngine), account for expected type changes:
 
 ```typescript
-test("Should bind with correct type conversion", async () => {
+test("Should bind with correct type conversion.", async () => {
     let capturedParams: any;
     const paramsSetter = vi.fn((value) => { capturedParams = value; });
 
@@ -524,7 +560,7 @@ render(Component, {
 #### **Real-World Example: Route Parameter Binding**
 
 ```typescript
-test("Should bind route parameters correctly", async () => {
+test("Should bind route parameters correctly.", async () => {
     // Arrange
     const { hash, context } = setup;
     let capturedParams: any;
@@ -593,6 +629,37 @@ const content = createRawSnippet(() => {
 });
 ```
 
+### Test Description Conventions
+
+- Description should be a full English sentence
+- Must start capitalized
+- Must end with a period
+- In data-driven tests (`test.each()()`), ensure the sentence generated is unique among all test cases by interpolating test case data in the sentence
+- Feel free to create description-only test case properties in test cases to help build a good description sentence:
+    ```typescript
+    test.each([
+        {
+            text1: 'throw',
+            text2: 'no'
+            ...
+        },
+        {
+            text1: 'not throw',
+            text2: 'one or more'
+        }
+    ])("Should $text1 whenever the array has $text2 items.", ...);
+    ```
+
+### Gotcha's
+
+- When the test case is a POJO object and a property is used to build a good description sentence:
+    ```typescript
+    // Doesn't work:  The ending period cannot "touch" the placeholder identifier or vitest will be confused.
+    test.each([...])("Should ... $text.", ...);
+    // Workaround:  Add a space before the sentence's ending period.
+    test.each([...])("Should ... $text .", ...);
+    ```
+
 ## Test File Naming for Svelte 5
 
 **Important**: For tests that use Svelte 5 runes (`$state`, `$derived`, etc.), name your test files with `.svelte.test.ts`:
@@ -604,7 +671,7 @@ const content = createRawSnippet(() => {
 
 This allows you to use reactive state in tests:
 ```typescript
-test("Should react to state changes", () => {
+test("Should react to state changes.", () => {
     let reactiveValue = $state(false);
     
     render(Component, {
@@ -613,27 +680,6 @@ test("Should react to state changes", () => {
     
     reactiveValue = true;
     flushSync(); // Ensure reactive updates are processed
-});
-```
-
-## Library Initialization
-
-The `init()` function:
-- Passes library configuration to global singleton
-- Creates new Location implementation instance
-- Required when library configurations change
-- Multi hash routing needs cleanup between tests
-
-```typescript
-// Standard init
-const cleanup = init();
-
-// Multi hash mode
-const cleanup = init({ hashMode: 'multi' });
-
-// Always cleanup
-afterAll(() => {
-    cleanup();
 });
 ```
 
@@ -683,7 +729,7 @@ afterAll(() => {
 4. **Async Testing**: Use `queryByText` for immediate results vs `findByText` for async waiting
 5. **Hash Values**: Ensure hash values match between component props and context setup
 6. **File Naming**: Use `.svelte.test.ts` for files that need Svelte runes support
-7. **Reactivity**: Remember to call `flushSync()` after changing reactive state
+7. **Reactivity**: If a test depends on waiting for a Svelte effect to run, use `flushSync()` after changing reactive state
 8. **Prop vs State Reactivity**: Test both prop changes AND reactive dependency changes
 9. **Bindable Properties**: Use getter/setter pattern in `render()` props instead of wrapper components for testing two-way binding
 
@@ -702,7 +748,7 @@ describe("Component requiring browser APIs", () => {
         setupBrowserMocks("/initial/path");
     });
     
-    test("Should respond to location changes", () => {
+    test("Should respond to location changes.", () => {
         // Browser APIs are now mocked and integrated with library
         window.history.pushState({}, "", "/new/path");
         // Test component behavior
@@ -812,7 +858,7 @@ Use dictionary-based constants for better maintainability:
 import { ALL_HASHES } from "../testing/test-utils.js";
 
 // Usage in tests
-test("Should validate hash compatibility", () => {
+test("Should validate hash compatibility.", () => {
     expect(() => {
         new RouterEngine({ hash: ALL_HASHES.single });
     }).not.toThrow();
@@ -838,7 +884,7 @@ describe("Constructor hash validation", () => {
         { parent: ALL_HASHES.single, child: ALL_HASHES.path, desc: 'hash parent vs path child' },
         { parent: ALL_HASHES.multi, child: ALL_HASHES.path, desc: 'multi-hash parent vs path child' },
         { parent: ALL_HASHES.path, child: ALL_HASHES.multi, desc: 'path parent vs multi-hash child' }
-    ])("Should throw error when parent and child have different hash modes: '$desc'", ({ parent, child }) => {
+    ])("Should throw error when parent and child have different hash modes: $desc .", ({ parent, child }) => {
         expect(() => {
             const parentRouter = new RouterEngine({ hash: parent });
             new RouterEngine(parentRouter, { hash: child });
@@ -849,7 +895,7 @@ describe("Constructor hash validation", () => {
         { parent: ALL_HASHES.path, desc: 'path parent' },
         { parent: ALL_HASHES.single, desc: 'hash parent' },
         { parent: ALL_HASHES.multi, desc: 'multi-hash parent' }
-    ])("Should allow child router without explicit hash to inherit parent's hash: '$desc'", ({ parent }) => {
+    ])("Should allow child router without explicit hash to inherit parent's hash: $desc .", ({ parent }) => {
         expect(() => {
             const parentRouter = new RouterEngine({ hash: parent });
             new RouterEngine(parentRouter);

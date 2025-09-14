@@ -13,6 +13,7 @@ describe('index', () => {
             'Fallback',
             'location',
             'RouterTrace',
+            'initCore',
             'init',
             'initFull',
             'getRouterContext',

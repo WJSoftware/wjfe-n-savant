@@ -3,3 +3,8 @@ export { RouterEngine, joinPaths } from "./RouterEngine.svelte.js";
 export { isConformantState } from "./isConformantState.js";
 export { calculateHref } from "./calculateHref.js";
 export { calculateState } from "./calculateState.js";
+export { LocationState } from "./LocationState.svelte.js";
+export { StockHistoryApi } from "./StockHistoryApi.svelte.js";
+export { InterceptedHistoryApi } from "./InterceptedHistoryApi.svelte.js";
+export { LocationLite } from "./LocationLite.svelte.js";
+export { LocationFull } from "./LocationFull.js";
