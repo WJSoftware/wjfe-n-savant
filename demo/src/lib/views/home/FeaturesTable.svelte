@@ -106,6 +106,16 @@
 			fullMode: true
 		},
 		{
+			name: "Electron Support",
+			liteMode: true,
+			fullMode: true
+		},
+		{
+			name: "Extension packages",
+			liteMode: true,
+			fullMode: true
+		},
+		{
 			name: "Cancellable beforeNavigate event",
 			liteMode: false,
 			fullMode: true
