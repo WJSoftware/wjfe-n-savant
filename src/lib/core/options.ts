@@ -3,7 +3,7 @@ import type { RoutingOptions } from "$lib/types.js";
 /**
  * Default routing options used for rollback.
  */
-const defaultRoutingOptions: Required<RoutingOptions> = {
+export const defaultRoutingOptions: Required<RoutingOptions> = {
     hashMode: 'single',
     implicitMode: 'path',
 };
@@ -19,8 +19,9 @@ export const routingOptions: Required<RoutingOptions> = structuredClone(defaultR
  * 
  * @param options Partial routing options to set
  */
-export function setRoutingOptions(options: Partial<RoutingOptions>): void {
-    Object.assign(routingOptions, options);
+export function setRoutingOptions(options?: Partial<RoutingOptions>): void {
+    routingOptions.hashMode = options?.hashMode ?? routingOptions.hashMode;
+    routingOptions.implicitMode = options?.implicitMode ?? routingOptions.implicitMode;
 }
 
 /**

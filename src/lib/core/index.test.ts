@@ -10,6 +10,7 @@ describe('index', () => {
             'isConformantState',
             'calculateHref',
             'calculateState',
+            'initCore',
             'LocationState',
             'StockHistoryApi',
             'InterceptedHistoryApi',
