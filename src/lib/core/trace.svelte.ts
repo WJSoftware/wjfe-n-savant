@@ -64,16 +64,16 @@ export function getAllChildRouters(parent: RouterEngine) {
 /**
  * Default tracing options used for rollback.
  */
-const defaultTraceOptions: TraceOptions = {
+export const defaultTraceOptions: Required<TraceOptions> = {
     routerHierarchy: false,
 };
 
 /**
  * Tracing options that can be set during library initialization.
  */
-export const traceOptions: TraceOptions = structuredClone(defaultTraceOptions);
+export const traceOptions: Required<TraceOptions> = structuredClone(defaultTraceOptions);
 
-export function setTraceOptions(options?: typeof traceOptions) {
+export function setTraceOptions(options?: TraceOptions) {
     Object.assign(traceOptions, options);
 }
 
