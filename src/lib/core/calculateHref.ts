@@ -1,4 +1,4 @@
-import type { Hash, PreserveQuery } from "$lib/types.js";
+import type { Hash, PreserveQuery } from "../types.js";
 import { dissectHrefs } from "./dissectHrefs.js";
 import { location } from "./Location.js";
 import { mergeQueryParams } from "./preserveQuery.js";

@@ -1,5 +1,5 @@
 import { on } from "svelte/events";
-import type { HistoryApi, State } from "$lib/types.js";
+import type { HistoryApi, State } from "../types.js";
 import { LocationState } from "./LocationState.svelte.js";
 
 /**

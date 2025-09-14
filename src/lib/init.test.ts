@@ -1,6 +1,6 @@
 import { describe, test, expect, afterEach } from "vitest";
 import { init, initFull } from "./init.js";
-import { location } from "$lib/core/Location.js";
+import { location } from "./core/Location.js";
 import { LocationLite } from "./core/LocationLite.svelte.js";
 import { LocationFull } from "./core/LocationFull.js";
 

@@ -1,10 +1,9 @@
 import { describe, test, expect, beforeEach, vi, beforeAll, afterAll } from "vitest";
 import { render } from "@testing-library/svelte";
 import Route from "./Route.svelte";
-import Router, { getRouterContext } from "../Router/Router.svelte";
 import { createTestSnippet, createRouterTestSetup, ROUTING_UNIVERSES } from "../../testing/test-utils.js";
-import { flushSync } from "svelte";
-import { init, location } from "$lib/index.js";
+import { init } from "$lib/init.js";
+import { location } from "$lib/core/Location.js";
 import TestRouteWithRouter from "../../testing/TestRouteWithRouter.svelte";
 
 function basicRouteTests(setup: ReturnType<typeof createRouterTestSetup>) {

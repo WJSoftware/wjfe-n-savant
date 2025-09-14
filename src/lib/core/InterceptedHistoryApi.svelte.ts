@@ -1,4 +1,4 @@
-import type { BeforeNavigateEvent, NavigationCancelledEvent, NavigationEvent, State, FullModeHistoryApi, Events } from "$lib/types.js";
+import type { BeforeNavigateEvent, NavigationCancelledEvent, NavigationEvent, State, FullModeHistoryApi, Events } from "../types.js";
 import { isConformantState } from "./isConformantState.js";
 import { StockHistoryApi } from "./StockHistoryApi.svelte.js";
 import { logger } from "./Logger.js";

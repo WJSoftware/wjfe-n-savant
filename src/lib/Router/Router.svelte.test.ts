@@ -1,11 +1,10 @@
 import { describe, test, expect, beforeEach, vi, beforeAll, afterAll } from "vitest";
 import { render } from "@testing-library/svelte";
-import { getContext } from "svelte";
-import Router, { getRouterContext, getRouterContextKey } from "./Router.svelte";
+import Router, { getRouterContextKey } from "./Router.svelte";
 import { RouterEngine } from "$lib/core/RouterEngine.svelte.js";
 import { createTestSnippet, createRouterTestSetup, ROUTING_UNIVERSES } from "../../testing/test-utils.js";
 import { flushSync } from "svelte";
-import { init } from "$lib/index.js";
+import { init } from "$lib/init.js";
 
 function basicRouterTests(setup: ReturnType<typeof createRouterTestSetup>) {
     beforeEach(() => {

@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
 import { InterceptedHistoryApi } from "./InterceptedHistoryApi.svelte.js";
-import type { State, BeforeNavigateEvent, NavigationCancelledEvent } from "$lib/types.js";
+import type { State, BeforeNavigateEvent } from "../types.js";
 import { setupBrowserMocks } from "../../testing/test-utils.js";
 
 describe("InterceptedHistoryApi", () => {

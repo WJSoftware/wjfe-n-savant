@@ -1,5 +1,5 @@
-import type { BeforeNavigateEvent, GoToOptions, Hash, Location, NavigationCancelledEvent } from "$lib/types.js";
-import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import type { Location } from "../types.js";
+import { describe, test, expect, afterEach, vi } from 'vitest';
 import { initCore } from './initCore.js';
 import { SvelteURL } from "svelte/reactivity";
 import { location } from "./Location.js";

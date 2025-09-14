@@ -1,4 +1,4 @@
-import type { RoutingOptions } from "$lib/types.js";
+import type { RoutingOptions } from "../types.js";
 
 /**
  * Default routing options used for rollback.

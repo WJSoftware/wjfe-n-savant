@@ -1,4 +1,4 @@
-import type { AndUntyped, Hash, PatternRouteInfo, RegexRouteInfo, RouteInfo, RouteStatus } from "$lib/types.js";
+import type { AndUntyped, Hash, PatternRouteInfo, RegexRouteInfo, RouteInfo, RouteStatus } from "../types.js";
 import { traceOptions, registerRouter, unregisterRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
 import { routingOptions } from "./options.js";

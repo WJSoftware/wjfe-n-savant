@@ -1,4 +1,4 @@
-import { init } from "$lib/index.js";
+import { init } from "$lib/init.js";
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { render } from "@testing-library/svelte";
 import Fallback from "./Fallback.svelte";
