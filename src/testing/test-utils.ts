@@ -6,7 +6,7 @@ import { resolveHashValue } from "$lib/core/resolveHashValue.js";
 import { vi } from "vitest";
 
 /**
- * Defines the necessary needed to call the library's `init()` function for testing, plus additional metadata.
+ * Defines the necessary information to call the library's `init()` function for testing, plus additional metadata.
  */
 export type RoutingUniverse = {
     hash: Hash | undefined;
