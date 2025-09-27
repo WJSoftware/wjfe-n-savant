@@ -16,6 +16,7 @@ describe('index', () => {
             'InterceptedHistoryApi',
             'LocationLite',
             'LocationFull',
+            'preserveQueryInUrl',
         ];
 
         // Act.
