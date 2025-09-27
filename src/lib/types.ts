@@ -1,5 +1,4 @@
 import type { ClassValue, HTMLAnchorAttributes } from "svelte/elements";
-import type { SvelteURL } from "svelte/reactivity";
 
 /**
  * Defines the data type of all `hash` properties found in almost all of the library's components.
@@ -157,7 +156,7 @@ export interface Location {
     /**
      * Gets a reactive URL object with the current window's URL.
      */
-    readonly url: SvelteURL;
+    readonly url: URL;
     /**
      * Gets the current hash path or paths, depending on how the library was initialized.
      * 
@@ -445,9 +444,10 @@ export type InitOptions = RoutingOptions & {
 export interface HistoryApi extends History {
     /**
      * Reactive URL object that reflects the current location.
+     * 
      * Implementations should ensure this stays synchronized with navigation changes.
      */
-    readonly url: SvelteURL;
+    readonly url: URL;
     
     /**
      * Cleans up event listeners and resources used by the HistoryApi implementation.
