@@ -1,17 +1,20 @@
-import type { RoutingOptions } from "../types.js";
+import type { ExtendedRoutingOptions } from "../types.js";
 
 /**
  * Default routing options used for rollback.
  */
-export const defaultRoutingOptions: Required<RoutingOptions> = {
+export const defaultRoutingOptions: Required<ExtendedRoutingOptions> = {
     hashMode: 'single',
     implicitMode: 'path',
+    disallowPathRouting: false,
+    disallowHashRouting: false,
+    disallowMultiHashRouting: false,
 };
 
 /**
  * Global routing options.
  */
-export const routingOptions: Required<RoutingOptions> = structuredClone(defaultRoutingOptions);
+export const routingOptions: Required<ExtendedRoutingOptions> = structuredClone(defaultRoutingOptions);
 
 /**
  * Sets routing options, merging with current values.
@@ -19,9 +22,12 @@ export const routingOptions: Required<RoutingOptions> = structuredClone(defaultR
  * 
  * @param options Partial routing options to set
  */
-export function setRoutingOptions(options?: Partial<RoutingOptions>): void {
+export function setRoutingOptions(options?: Partial<ExtendedRoutingOptions>): void {
     routingOptions.hashMode = options?.hashMode ?? routingOptions.hashMode;
     routingOptions.implicitMode = options?.implicitMode ?? routingOptions.implicitMode;
+    routingOptions.disallowPathRouting = options?.disallowPathRouting ?? routingOptions.disallowPathRouting;
+    routingOptions.disallowHashRouting = options?.disallowHashRouting ?? routingOptions.disallowHashRouting;
+    routingOptions.disallowMultiHashRouting = options?.disallowMultiHashRouting ?? routingOptions.disallowMultiHashRouting;
 }
 
 /**

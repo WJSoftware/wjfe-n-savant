@@ -1,4 +1,4 @@
-import type { InitOptions, Location } from "../types.js";
+import type { ExtendedInitOptions, Location } from "../types.js";
 import { setLocation } from "./Location.js";
 import { resetLogger, setLogger } from "./Logger.js";
 import { resetRoutingOptions, setRoutingOptions } from "./options.js";
@@ -15,7 +15,7 @@ import { resetTraceOptions, setTraceOptions } from "./trace.svelte.js";
  * @param location The Location implementation to use
  * @returns A cleanup function that reverts the initialization process
  */
-export function initCore(location: Location, options?: InitOptions) {
+export function initCore(location: Location, options?: ExtendedInitOptions) {
     if (!location) {
         throw new Error("A valid location object must be provided to initialize the routing library.");
     }

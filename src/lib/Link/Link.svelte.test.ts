@@ -1,10 +1,12 @@
 import { init } from "$lib/init.js";
 import { location } from "$lib/core/Location.js";
-import { describe, test, expect, beforeAll, afterAll, beforeEach, vi } from "vitest";
+import { describe, test, expect, beforeAll, afterAll, beforeEach, vi, afterEach } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
 import Link from "./Link.svelte";
-import { createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES } from "../../testing/test-utils.js";
+import { createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
 import { flushSync } from "svelte";
+import { resetRoutingOptions, setRoutingOptions } from "$lib/core/options.js";
+import type { ExtendedRoutingOptions } from "$lib/types.js";
 
 function basicLinkTests(setup: ReturnType<typeof createRouterTestSetup>) {
     const linkText = "Test Link";
@@ -636,6 +638,61 @@ function reactivityTests(setup: ReturnType<typeof createRouterTestSetup>) {
     });
 }
 
+describe("Routing Mode Assertions", () => {
+    const linkText = "Test Link";
+    const content = createTestSnippet(linkText);
+    let cleanup: () => void;
+
+    beforeAll(() => {
+        cleanup = init();
+    });
+
+    afterEach(() => {
+        resetRoutingOptions();
+    });
+
+    afterAll(() => {
+        cleanup();
+    });
+
+    test.each<{
+        options: Partial<ExtendedRoutingOptions>;
+        hash: typeof ALL_HASHES[keyof typeof ALL_HASHES];
+        description: string;
+    }>([
+        {
+            options: { disallowHashRouting: true },
+            hash: ALL_HASHES.single,
+            description: 'hash routing is disallowed'
+        },
+        {
+            options: { disallowMultiHashRouting: true },
+            hash: ALL_HASHES.multi,
+            description: 'multi-hash routing is disallowed'
+        },
+        {
+            options: { disallowPathRouting: true },
+            hash: ALL_HASHES.path,
+            description: 'path routing is disallowed'
+        }
+    ])("Should throw error when $description and hash=$hash .", ({ options, hash }) => {
+        // Arrange
+        setRoutingOptions(options);
+ 
+        // Act & Assert
+        expect(() => {
+            render(Link, { 
+                props: { 
+                    href: "/test", 
+                    hash, 
+                    children: content 
+                }, 
+            });
+        }).toThrow();
+    });
+});
+
+
 ROUTING_UNIVERSES.forEach(ru => {
     describe(`Link - ${ru.text}`, () => {
         const setup = createRouterTestSetup(ru.hash);
@@ -649,7 +706,7 @@ ROUTING_UNIVERSES.forEach(ru => {
         });
 
         afterAll(() => {
-            cleanup();
+            cleanup?.();
         });
 
         describe("Basic Link Functionality", () => {

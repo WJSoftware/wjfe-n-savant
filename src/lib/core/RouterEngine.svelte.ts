@@ -3,6 +3,7 @@ import { traceOptions, registerRouter, unregisterRouter } from "./trace.svelte.j
 import { location } from "./Location.js";
 import { routingOptions } from "./options.js";
 import { resolveHashValue } from "./resolveHashValue.js";
+import { assertAllowedRoutingMode } from "$lib/utils.js";
 
 /**
  * RouterEngine's options.
@@ -232,6 +233,7 @@ export class RouterEngine {
                 this.#resolvedHash :
                 (this.#resolvedHash ? 'single' : undefined);
         }
+        assertAllowedRoutingMode(this.#resolvedHash);
         if (traceOptions.routerHierarchy) {
             registerRouter(this);
             this.#cleanup = true;

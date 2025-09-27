@@ -2,6 +2,7 @@
 	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { RouteStatus, WhenPredicate } from '$lib/types.js';
+	import { assertAllowedRoutingMode } from '$lib/utils.js';
 	import type { Snippet } from 'svelte';
 
 	type Props = {
@@ -63,7 +64,10 @@
 
 	let { hash, when, children }: Props = $props();
 
-	const router = getRouterContext(resolveHashValue(hash));
+	const resolvedHash = resolveHashValue(hash);
+	assertAllowedRoutingMode(resolvedHash);
+
+	const router = getRouterContext(resolvedHash);
 </script>
 
 {#if (router && when?.(router.routeStatus, router.noMatches)) || (!when && router?.noMatches)}
