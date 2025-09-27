@@ -6,6 +6,7 @@ import { resolveHashValue } from "./resolveHashValue.js";
 import { calculateHref } from "./calculateHref.js";
 import { calculateState } from "./calculateState.js";
 import { preserveQueryInUrl } from "./preserveQuery.js";
+import { assertAllowedRoutingMode } from "$lib/utils.js";
 
 /**
  * A lite version of the location object.  It does not support event listeners or state-setting call interceptions, 
@@ -83,6 +84,7 @@ export class LocationLite implements Location {
 
     navigate(url: string, options?: NavigateOptions): void {
         const resolvedHash = resolveHashValue(options?.hash);
+        assertAllowedRoutingMode(resolvedHash);
         if (url !== '') {
             url = calculateHref({
                 ...options,

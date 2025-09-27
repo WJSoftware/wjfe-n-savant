@@ -1,8 +1,10 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
 import { LocationLite } from "./LocationLite.svelte.js";
-import type { Hash, HistoryApi } from "../types.js";
+import type { ExtendedRoutingOptions, Hash, HistoryApi, PreserveQuery } from "../types.js";
 import { setupBrowserMocks, ALL_HASHES } from "../../testing/test-utils.js";
 import { SvelteURL } from "svelte/reactivity";
+import { setLocation } from "./Location.js";
+import { resetRoutingOptions, setRoutingOptions } from "./options.js";
 
 describe("LocationLite", () => {
     const initialUrl = "http://example.com/";
@@ -12,10 +14,12 @@ describe("LocationLite", () => {
     beforeEach(() => {
         browserMocks = setupBrowserMocks(initialUrl);
         location = new LocationLite();
+        setLocation(location);
     });
 
     afterEach(() => {
         location.dispose();
+        setLocation(null);
         browserMocks.cleanup();
     });
 
@@ -123,6 +127,130 @@ describe("LocationLite", () => {
             expect(location.getState(ALL_HASHES.path)).toBe(pathState);
             expect(location.getState(ALL_HASHES.single)).toBe(singleHashState);
             expect(location.getState('abc')).toBe(abcHashState);
+        });
+    });
+    describe('goTo', () => {
+        test.each<{
+            qs: string;
+            preserveQuery: PreserveQuery;
+            text: string;
+            expectedQs: string;
+        }>([
+            {
+                qs: 'some=value',
+                preserveQuery: false,
+                text: 'not preserve',
+                expectedQs: '',
+            },
+            {
+                qs: 'some=value',
+                preserveQuery: true,
+                text: 'preserve',
+                expectedQs: '?some=value',
+            },
+            {
+                qs: 'some=value&plus=another',
+                preserveQuery: 'plus',
+                text: 'preserve',
+                expectedQs: '?plus=another',
+            },
+            {
+                qs: 'some=value&plus=another&extra=thing',
+                preserveQuery: ['plus', 'extra'],
+                text: 'preserve',
+                expectedQs: '?plus=another&extra=thing',
+            },
+        ])
+            ("Should $text the query string when instructed by the value $preserveQuery in the preserveQuery option.", ({ qs, preserveQuery, expectedQs }) => {
+                // Arrange.
+                location.url.search = window.location.search = qs;
+                const newPath = '/new/path';
+
+                // Act.
+                location.goTo(newPath, { preserveQuery });
+
+                // Assert.
+                expect(window.location.pathname).to.equal(newPath);
+                expect(window.location.search).to.equal(`${expectedQs}`);
+            });
+    });
+    describe('navigate', () => {
+        afterEach(() => {
+            resetRoutingOptions();
+        });
+        
+        test.each<{
+            qs: string;
+            preserveQuery: PreserveQuery;
+            text: string;
+            expectedQs: string;
+        }>([
+            {
+                qs: 'some=value',
+                preserveQuery: false,
+                text: 'not preserve',
+                expectedQs: '',
+            },
+            {
+                qs: 'some=value',
+                preserveQuery: true,
+                text: 'preserve',
+                expectedQs: '?some=value',
+            },
+            {
+                qs: 'some=value&plus=another',
+                preserveQuery: 'plus',
+                text: 'preserve',
+                expectedQs: '?plus=another',
+            },
+            {
+                qs: 'some=value&plus=another&extra=thing',
+                preserveQuery: ['plus', 'extra'],
+                text: 'preserve',
+                expectedQs: '?plus=another&extra=thing',
+            },
+        ])("Should $text the query string when instructed by the value $preserveQuery in the preserveQuery option.", ({ qs, preserveQuery, expectedQs }) => {
+            // Arrange.
+            location.url.search = window.location.search = qs;
+            const newPath = '/new/path';
+
+            // Act.
+            location.navigate(newPath, { preserveQuery });
+
+            // Assert.
+            expect(window.location.pathname).to.equal(newPath);
+            expect(window.location.search).to.equal(`${expectedQs}`);
+        });
+        test.each<{
+            hash: Hash;
+            desc: string;
+            options: ExtendedRoutingOptions;
+        }>([
+            {
+                hash: ALL_HASHES.path,
+                desc: 'path',
+                options: { disallowPathRouting: true}
+            },
+            {
+                hash: ALL_HASHES.single,
+                desc: 'hash',
+                options: { disallowHashRouting: true}
+            },
+            {
+                hash: ALL_HASHES.multi,
+                desc: 'multi hash',
+                options: { disallowMultiHashRouting: true}
+            },
+        ])("Should throw an error when the hash option is $hash and $desc routing is disallowed.", ({ hash, options }) => {
+            // Arrange.
+            const newPath = '/new/path';
+            setRoutingOptions(options);
+
+            // Act.
+            const act = () => location.navigate(newPath, { hash });
+
+            // Assert.
+            expect(act).toThrow();
         });
     });
 });

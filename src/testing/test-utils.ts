@@ -170,6 +170,7 @@ export function createLocationMock(initialUrl = "http://example.com/") {
         // Add other location properties as needed
         get pathname() { return _url.pathname; },
         get search() { return _url.search; },
+        set search(value: string) { _url.search = value; },
         get hash() { return _url.hash; },
         get origin() { return _url.origin; },
         get protocol() { return _url.protocol; },
