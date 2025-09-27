@@ -692,56 +692,6 @@ describe("Routing Mode Assertions", () => {
     });
 });
 
-describe("Routing Mode Assertions", () => {
-    const linkText = "Test Link";
-    const content = createTestSnippet(linkText);
-
-    afterEach(() => {
-        resetRoutingOptions();
-    });
-
-    test.each<{
-        options: Partial<ExtendedRoutingOptions>;
-        hash: typeof ALL_HASHES[keyof typeof ALL_HASHES];
-        description: string;
-    }>([
-        {
-            options: {
-                disallowHashRouting: true,
-            },
-            hash: ALL_HASHES.single,
-            description: "hash routing is disallowed",
-        },
-        {
-            options: {
-                disallowMultiHashRouting: true,
-            },
-            hash: ALL_HASHES.multi,
-            description: "multi-hash routing is disallowed",
-        },
-        {
-            options: {
-                disallowPathRouting: true,
-            },
-            hash: ALL_HASHES.path,
-            description: "path routing is disallowed",
-        },
-    ])("Should throw when rendering Link component and $description (hash=$hash).", ({ options, hash }) => {
-        // Arrange.
-        setRoutingOptions(options);
-
-        // Act & Assert.
-        expect(() => {
-            render(Link, {
-                props: {
-                    hash,
-                    href: "/test",
-                    children: content
-                },
-            });
-        }).toThrow();
-    });
-});
 
 ROUTING_UNIVERSES.forEach(ru => {
     describe(`Link - ${ru.text}`, () => {

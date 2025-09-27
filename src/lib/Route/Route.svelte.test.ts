@@ -658,7 +658,7 @@ describe("Routing Mode Assertions", () => {
     afterEach(() => {
         resetRoutingOptions();
     });
-    
+
     afterAll(() => {
         cleanup();
     });
@@ -716,79 +716,6 @@ describe("Routing Mode Assertions", () => {
         }).not.toThrow();
 
         // Cleanup  
-        setup.dispose();
-    });
-});
-
-describe("Routing Mode Assertions", () => {
-    const contentText = "Route content.";
-    const content = createTestSnippet(contentText);
-    let cleanup: () => void;
-
-    beforeAll(() => {
-        cleanup = init();
-    });
-
-    afterEach(() => {
-        resetRoutingOptions();
-    });
-
-    afterAll(() => {
-        cleanup();
-    });
-
-    test.each<{
-        options: Partial<ExtendedRoutingOptions>;
-        hash: typeof ALL_HASHES[keyof typeof ALL_HASHES];
-        hashMode: InitOptions['hashMode'];
-        description: string;
-    }>([
-        {
-            options: {
-                disallowHashRouting: true,
-            },
-            hash: ALL_HASHES.single,
-            hashMode: 'single',
-            description: "hash routing is disallowed",
-        },
-        {
-            options: {
-                disallowMultiHashRouting: true,
-            },
-            hash: ALL_HASHES.multi,
-            hashMode: 'multi',
-            description: "multi-hash routing is disallowed",
-        },
-        {
-            options: {
-                disallowPathRouting: true,
-            },
-            hash: ALL_HASHES.path,
-            hashMode: undefined,
-            description: "path routing is disallowed",
-        },
-    ])("Should throw when rendering Route component and $description (hash=$hash).", ({ options, hash, hashMode }) => {
-        // Arrange.
-        const setup = createRouterTestSetup(hash);
-        cleanup?.();
-        init({ hashMode });
-        setup.init();
-        const { context } = setup;
-        setRoutingOptions(options);
-
-        // Act & Assert.
-        expect(() => {
-            render(Route, {
-                props: {
-                    key: "test-route",
-                    hash,
-                    path: "/test",
-                    children: content
-                },
-                context
-            });
-        }).toThrow();
-        
         setup.dispose();
     });
 });
