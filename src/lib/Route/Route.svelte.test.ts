@@ -1,10 +1,12 @@
-import { describe, test, expect, beforeEach, vi, beforeAll, afterAll } from "vitest";
+import { describe, test, expect, beforeEach, vi, beforeAll, afterAll, afterEach } from "vitest";
 import { render } from "@testing-library/svelte";
 import Route from "./Route.svelte";
-import { createTestSnippet, createRouterTestSetup, ROUTING_UNIVERSES } from "../../testing/test-utils.js";
+import { createTestSnippet, createRouterTestSetup, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
 import { init } from "$lib/init.js";
 import { location } from "$lib/core/Location.js";
 import TestRouteWithRouter from "../../testing/TestRouteWithRouter.svelte";
+import { resetRoutingOptions, setRoutingOptions } from "$lib/core/options.js";
+import type { ExtendedRoutingOptions, InitOptions } from "$lib/types.js";
 
 function basicRouteTests(setup: ReturnType<typeof createRouterTestSetup>) {
     beforeEach(() => {
@@ -645,6 +647,151 @@ function routeBindingTestsForUniverse(setup: ReturnType<typeof createRouterTestS
         expect(capturedParams).toEqual({ rest: "/documents/readme.txt" });
     });
 }
+
+describe("Routing Mode Assertions", () => {
+    let cleanup: () => void;
+
+    beforeAll(() => {
+        cleanup = init();
+    });
+
+    afterEach(() => {
+        resetRoutingOptions();
+    });
+    
+    afterAll(() => {
+        cleanup();
+    });
+
+    test.each<{
+        options: Partial<ExtendedRoutingOptions>;
+        hash: typeof ALL_HASHES[keyof typeof ALL_HASHES];
+        description: string;
+    }>([
+        {
+            options: { disallowHashRouting: true },
+            hash: ALL_HASHES.single,
+            description: 'hash routing is disallowed'
+        },
+        {
+            options: { disallowMultiHashRouting: true },
+            hash: ALL_HASHES.multi,
+            description: 'multi-hash routing is disallowed'
+        },
+        {
+            options: { disallowPathRouting: true },
+            hash: ALL_HASHES.path,
+            description: 'path routing is disallowed'
+        }
+    ])("Should throw error when $description and hash=$hash .", ({ options, hash }) => {
+        // Arrange
+        setRoutingOptions(options);
+
+        // Act & Assert
+        expect(() => {
+            render(Route, {
+                props: {
+                    key: 'r1',
+                    hash,
+                }, 
+            });
+        }).toThrow();
+    });
+
+    test("Should not throw error when all routing modes are allowed.", () => {
+        // Arrange
+        const hash = ALL_HASHES.single;
+        const setup = createRouterTestSetup(hash);
+        setup.init();
+
+        // Act & Assert
+        expect(() => {
+            render(Route, { 
+                props: { 
+                    hash,
+                    key: "test-route", 
+                }, 
+                context: setup.context 
+            });
+        }).not.toThrow();
+
+        // Cleanup  
+        setup.dispose();
+    });
+});
+
+describe("Routing Mode Assertions", () => {
+    const contentText = "Route content.";
+    const content = createTestSnippet(contentText);
+    let cleanup: () => void;
+
+    beforeAll(() => {
+        cleanup = init();
+    });
+
+    afterEach(() => {
+        resetRoutingOptions();
+    });
+
+    afterAll(() => {
+        cleanup();
+    });
+
+    test.each<{
+        options: Partial<ExtendedRoutingOptions>;
+        hash: typeof ALL_HASHES[keyof typeof ALL_HASHES];
+        hashMode: InitOptions['hashMode'];
+        description: string;
+    }>([
+        {
+            options: {
+                disallowHashRouting: true,
+            },
+            hash: ALL_HASHES.single,
+            hashMode: 'single',
+            description: "hash routing is disallowed",
+        },
+        {
+            options: {
+                disallowMultiHashRouting: true,
+            },
+            hash: ALL_HASHES.multi,
+            hashMode: 'multi',
+            description: "multi-hash routing is disallowed",
+        },
+        {
+            options: {
+                disallowPathRouting: true,
+            },
+            hash: ALL_HASHES.path,
+            hashMode: undefined,
+            description: "path routing is disallowed",
+        },
+    ])("Should throw when rendering Route component and $description (hash=$hash).", ({ options, hash, hashMode }) => {
+        // Arrange.
+        const setup = createRouterTestSetup(hash);
+        cleanup?.();
+        init({ hashMode });
+        setup.init();
+        const { context } = setup;
+        setRoutingOptions(options);
+
+        // Act & Assert.
+        expect(() => {
+            render(Route, {
+                props: {
+                    key: "test-route",
+                    hash,
+                    path: "/test",
+                    children: content
+                },
+                context
+            });
+        }).toThrow();
+        
+        setup.dispose();
+    });
+});
 
 // Run tests for each routing universe
 for (const ru of ROUTING_UNIVERSES) {

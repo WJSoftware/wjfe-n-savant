@@ -6,6 +6,7 @@
 	import { getLinkContext, type ILinkContext } from '$lib/LinkContext/LinkContext.svelte';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { ActiveState, Hash, RouteStatus } from '$lib/types.js';
+	import { assertAllowedRoutingMode } from '$lib/utils.js';
 	import { type Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
@@ -85,6 +86,7 @@
 	}: Props = $props();
 
 	const resolvedHash = resolveHashValue(hash);
+	assertAllowedRoutingMode(resolvedHash);
 	const router = getRouterContext(resolvedHash);
 	const linkContext = getLinkContext();
 	const calcReplace = $derived(replace ?? linkContext?.replace ?? false);

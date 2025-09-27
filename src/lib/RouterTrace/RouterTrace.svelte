@@ -8,6 +8,7 @@
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { PatternRouteInfo } from '$lib/types.js';
 	import type { HTMLTableAttributes } from 'svelte/elements';
+	import { assertAllowedRoutingMode } from '$lib/utils.js';
 
 	type Props = Omit<HTMLTableAttributes, 'children'> & {
 		/**
@@ -56,7 +57,9 @@
 	}: Props = $props();
 
 	if (!router) {
-		router = getRouterContext(resolveHashValue(hash));
+		const resolvedHash = resolveHashValue(hash);
+		assertAllowedRoutingMode(resolvedHash);
+		router = getRouterContext(resolvedHash);
 		if (!router) {
 			throw new Error(
 				'There is no router to trace.  Make sure a Router component is an ancestor of this RouterTrace component instance, or provide a router using the "router" property.'

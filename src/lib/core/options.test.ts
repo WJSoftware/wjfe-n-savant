@@ -2,17 +2,24 @@ import { describe, expect, test } from "vitest";
 import { resetRoutingOptions, routingOptions } from "./options.js";
 
 describe("options", () => {
-    test("The routing options' initial values are the expected ones.", () => {
-        // Assert.
-        expect(routingOptions).toEqual({ hashMode: 'single', implicitMode: 'path' });
-    });
-
     test("Should have correct default value for hashMode option.", () => {
         expect(routingOptions.hashMode).toBe('single');
     });
 
     test("Should have correct default value for implicitMode option.", () => {
         expect(routingOptions.implicitMode).toBe('path');
+    });
+
+    test("Should have correct default value for disallowPathRouting option.", () => {
+        expect(routingOptions.disallowPathRouting).toBe(false);
+    });
+
+    test("Should have correct default value for disallowHashRouting option.", () => {
+        expect(routingOptions.disallowHashRouting).toBe(false);
+    });
+
+    test("Should have correct default value for disallowMultiHashRouting option.", () => {
+        expect(routingOptions.disallowMultiHashRouting).toBe(false);
     });
 
     test("Should allow modification of hashMode option.", () => {
@@ -46,6 +53,9 @@ describe("options", () => {
             const original = structuredClone(routingOptions);
             routingOptions.hashMode = 'multi';
             routingOptions.implicitMode = 'hash';
+            routingOptions.disallowPathRouting = true;
+            routingOptions.disallowHashRouting = true;
+            routingOptions.disallowMultiHashRouting = true;
 
             // Act.
             resetRoutingOptions();

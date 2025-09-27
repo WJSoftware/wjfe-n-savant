@@ -21,6 +21,7 @@
 	import { getRouterContext } from '../Router/Router.svelte';
 	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import type { ParameterValue, RouteStatus } from '$lib/types.js';
+	import { assertAllowedRoutingMode } from '$lib/utils.js';
 
 	type Props = {
 		/**
@@ -132,7 +133,10 @@
 		children
 	}: Props = $props();
 
-	const router = getRouterContext(resolveHashValue(hash));
+	const resolvedHash = resolveHashValue(hash);
+	assertAllowedRoutingMode(resolvedHash);
+
+	const router = getRouterContext(resolvedHash);
 	if (!router) {
 		throw new Error(
 			'Route components must be used inside a Router component that matches the hash setting.'

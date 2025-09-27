@@ -402,6 +402,17 @@ export type RoutingOptions = {
 }
 
 /**
+ * Internal representation of routing options, including additional flags used internally by the library.
+ *
+ * _Meaningful only for library extension packages that need additional control over routing options._
+ */
+export type ExtendedRoutingOptions = RoutingOptions & {
+    disallowPathRouting?: boolean;
+    disallowHashRouting?: boolean;
+    disallowMultiHashRouting?: boolean;
+};
+
+/**
  * Library's tracing options.
  */
 export type TraceOptions = {
@@ -433,6 +444,13 @@ export type InitOptions = RoutingOptions & {
      */
     logger?: boolean | ILogger;
 }
+
+/**
+ * Extended initialization options that include all routing options.
+ * 
+ * _Meaningful only for library extension packages that need additional control over routing options._
+ */
+export type ExtendedInitOptions = ExtendedRoutingOptions & Pick<InitOptions, 'trace' | 'logger'>;
 
 /**
  * Defines an abstraction over the browser's History API that provides consistent navigation

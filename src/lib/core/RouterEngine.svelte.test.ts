@@ -3,8 +3,9 @@ import { routePatternsKey, RouterEngine } from "./RouterEngine.svelte.js";
 import { init } from "../init.js";
 import { registerRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
-import type { State, RouteInfo } from "../types.js";
+import type { State, RouteInfo, ExtendedRoutingOptions } from "../types.js";
 import { setupBrowserMocks, addRoutes, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
+import { resetRoutingOptions, setRoutingOptions } from "./options.js";
 
 describe("RouterEngine", () => {
     describe('constructor', () => {
@@ -110,6 +111,78 @@ describe("RouterEngine", () => {
                 const router = new RouterEngine({ hash: ALL_HASHES.multi });
                 expect(router).toBeDefined();
             }).not.toThrow();
+        });
+    });
+
+    describe('Routing Mode Assertions', () => {
+        let cleanupFn: (() => void) | null = null;
+
+        afterEach(() => {
+            resetRoutingOptions();
+            cleanupFn?.();
+            cleanupFn = null;
+        });
+
+        test.each<{
+            options: Partial<ExtendedRoutingOptions>;
+            hash: typeof ALL_HASHES[keyof typeof ALL_HASHES];
+            description: string;
+        }>([
+            {
+                options: { disallowHashRouting: true },
+                hash: ALL_HASHES.single,
+                description: 'hash routing is disallowed'
+            },
+            {
+                options: { disallowMultiHashRouting: true },
+                hash: ALL_HASHES.multi,
+                description: 'multi-hash routing is disallowed'
+            },
+            {
+                options: { disallowPathRouting: true },
+                hash: ALL_HASHES.path,
+                description: 'path routing is disallowed'
+            }
+        ])("Should throw error when $description and hash=$hash in constructor.", ({ options, hash }) => {
+            // Arrange
+            setRoutingOptions(options);
+            cleanupFn = init();
+
+            // Act & Assert
+            expect(() => {
+                new RouterEngine({ hash });
+            }).toThrow();
+        });
+
+        test("Should not throw error when all routing modes are allowed in constructor.", () => {
+            // Arrange
+            cleanupFn = init();
+
+            // Act & Assert
+            expect(() => {
+                new RouterEngine({ hash: ALL_HASHES.path });
+            }).not.toThrow();
+            expect(() => {
+                new RouterEngine({ hash: ALL_HASHES.single });
+            }).not.toThrow();
+
+            cleanupFn();
+            cleanupFn = init({ hashMode: 'multi' });
+            expect(() => {
+                new RouterEngine({ hash: ALL_HASHES.multi });
+            }).not.toThrow();
+        });
+
+        test("Should throw error when parent router violates restrictions.", () => {
+            // Arrange
+            setRoutingOptions({ disallowHashRouting: true });
+            cleanupFn = init();
+
+            // Act & Assert - Parent router creation should fail
+            expect(() => {
+                const parent = new RouterEngine({ hash: ALL_HASHES.single });
+                new RouterEngine(parent); // Child inherits from parent
+            }).toThrow();
         });
     });
 });

@@ -2,8 +2,10 @@ import { init } from "$lib/init.js";
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { render } from "@testing-library/svelte";
 import Fallback from "./Fallback.svelte";
-import { addMatchingRoute, addRoutes, createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES } from "../../testing/test-utils.js";
+import { addMatchingRoute, addRoutes, createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
 import { flushSync } from "svelte";
+import { resetRoutingOptions, setRoutingOptions } from "$lib/core/options.js";
+import type { ExtendedRoutingOptions } from "$lib/types.js";
 
 function defaultPropsTests(setup: ReturnType<typeof createRouterTestSetup>) {
     const contentText = "Fallback content.";
@@ -160,6 +162,57 @@ function reactivityTests(setup: ReturnType<typeof createRouterTestSetup>) {
         await expect(findByText(contentText)).resolves.toBeDefined();
     });
 }
+
+describe("Routing Mode Assertions", () => {
+    const contentText = "Fallback content.";
+    const content = createTestSnippet(contentText);
+    let cleanup: () => void;
+
+    beforeAll(() => {
+        cleanup = init();
+    });
+
+    beforeEach(() => {
+        resetRoutingOptions();
+    });
+
+    afterAll(() => {
+        resetRoutingOptions();
+        cleanup();
+    });
+
+    test.each<{
+        options: Partial<ExtendedRoutingOptions>;
+        hash: typeof ALL_HASHES[keyof typeof ALL_HASHES];
+        description: string;
+    }>([
+        {
+            options: { disallowHashRouting: true },
+            hash: ALL_HASHES.single,
+            description: 'hash routing is disallowed'
+        },
+        {
+            options: { disallowMultiHashRouting: true },
+            hash: ALL_HASHES.multi,
+            description: 'multi-hash routing is disallowed'
+        },
+        {
+            options: { disallowPathRouting: true },
+            hash: ALL_HASHES.path,
+            description: 'path routing is disallowed'
+        }
+    ])("Should throw error when $description and hash=$hash .", ({ options, hash }) => {
+        // Arrange
+        setRoutingOptions(options);
+
+        // Act & Assert
+        expect(() => {
+            render(Fallback, { 
+                props: { hash, children: content }, 
+            });
+        }).toThrow();
+    });
+});
 
 ROUTING_UNIVERSES.forEach(ru => {
     describe(`Fallback - ${ru.text}`, () => {
