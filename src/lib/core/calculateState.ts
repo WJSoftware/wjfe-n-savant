@@ -18,7 +18,7 @@ export function calculateState(state: any): State;
  * @param state The desired state for the given hash.
  * @returns The state object that should be set, accounting for all routing universes.
  */
-export function calculateState(hash: Hash, state: any): State;
+export function calculateState(hash: Hash | undefined, state: any): State;
 export function calculateState(hashOrState: any, state?: any): State {
     let hash: Hash;
     if (arguments.length === 1) {
@@ -26,7 +26,7 @@ export function calculateState(hashOrState: any, state?: any): State {
         hash = resolveHashValue(undefined);
     }
     else {
-        hash = hashOrState;
+        hash = resolveHashValue(hashOrState);
     }
     // Get a deep clone of the complete current state using the internal symbol method
     const newState = (location as LocationInternal)[getCompleteStateKey]();
