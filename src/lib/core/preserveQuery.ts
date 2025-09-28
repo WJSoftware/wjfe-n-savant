@@ -8,35 +8,8 @@ import { location } from "./Location.js";
  * @returns The URL with preserved query parameters added.
  */
 export function preserveQueryInUrl(url: string, preserveQuery: PreserveQuery): string {
-    if (!preserveQuery || !location.url.searchParams.size) {
-        return url;
-    }
-
     const urlObj = new URL(url, location.url.origin);
-    const existingParams = urlObj.searchParams;
-    
-    const transferValue = (key: string) => {
-        const values = location.url.searchParams.getAll(key);
-        if (values.length) {
-            values.forEach((v) => existingParams.append(key, v));
-        }
-    };
-
-    if (preserveQuery === true) {
-        // Preserve all current query parameters
-        for (let key of location.url.searchParams.keys()) {
-            transferValue(key);
-        }
-    } else if (typeof preserveQuery === 'string') {
-        // Preserve a specific query parameter
-        transferValue(preserveQuery);
-    } else if (Array.isArray(preserveQuery)) {
-        // Preserve specific query parameters
-        for (let key of preserveQuery) {
-            transferValue(key);
-        }
-    }
-
+    mergeQueryParams(urlObj.searchParams, preserveQuery);
     return urlObj.toString();
 }
 
