@@ -76,7 +76,7 @@ export class LocationLite implements Location {
     }
 
     goTo(url: string, options?: GoToOptions): void {
-        if (options?.preserveQuery) {
+        if (options?.preserveQuery && url !== '') {
             url = preserveQueryInUrl(url, options.preserveQuery);
         }
         this.#goTo(url, options?.replace ?? false, options?.state);

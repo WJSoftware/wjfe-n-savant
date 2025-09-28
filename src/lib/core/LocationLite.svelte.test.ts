@@ -160,25 +160,36 @@ describe("LocationLite", () => {
                 text: 'preserve',
                 expectedQs: '?plus=another&extra=thing',
             },
-        ])
-            ("Should $text the query string when instructed by the value $preserveQuery in the preserveQuery option.", ({ qs, preserveQuery, expectedQs }) => {
-                // Arrange.
-                location.url.search = window.location.search = qs;
-                const newPath = '/new/path';
+        ])("Should $text the query string when instructed by the value $preserveQuery in the preserveQuery option.", ({ qs, preserveQuery, expectedQs }) => {
+            // Arrange.
+            location.url.search = window.location.search = qs;
+            const newPath = '/new/path';
 
-                // Act.
-                location.goTo(newPath, { preserveQuery });
+            // Act.
+            location.goTo(newPath, { preserveQuery });
 
-                // Assert.
-                expect(window.location.pathname).to.equal(newPath);
-                expect(window.location.search).to.equal(`${expectedQs}`);
-            });
+            // Assert.
+            expect(window.location.pathname).to.equal(newPath);
+            expect(window.location.search).to.equal(`${expectedQs}`);
+        });
+        test("Should ignore the preserveQuery option when doing shallow routing.", () => {
+            // Arrange.
+            const currentPath = "/current/path";
+            window.location.href = `${currentPath}?some=value&plus=another`;
+            location.url.href = window.location.href;
+            console.debug('Path: ', window.location.pathname);
+
+            // Act.
+            location.goTo('', { preserveQuery: true });
+            // Assert.
+            expect(window.location.pathname).to.equal(currentPath);
+        });
     });
     describe('navigate', () => {
         afterEach(() => {
             resetRoutingOptions();
         });
-        
+
         test.each<{
             qs: string;
             preserveQuery: PreserveQuery;
@@ -229,17 +240,17 @@ describe("LocationLite", () => {
             {
                 hash: ALL_HASHES.path,
                 desc: 'path',
-                options: { disallowPathRouting: true}
+                options: { disallowPathRouting: true }
             },
             {
                 hash: ALL_HASHES.single,
                 desc: 'hash',
-                options: { disallowHashRouting: true}
+                options: { disallowHashRouting: true }
             },
             {
                 hash: ALL_HASHES.multi,
                 desc: 'multi hash',
-                options: { disallowMultiHashRouting: true}
+                options: { disallowMultiHashRouting: true }
             },
         ])("Should throw an error when the hash option is $hash and $desc routing is disallowed.", ({ hash, options }) => {
             // Arrange.
