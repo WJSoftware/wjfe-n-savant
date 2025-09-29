@@ -169,6 +169,6 @@
 	});
 </script>
 
-{#if (router.routeStatus[key]?.match ?? true)}
+{#if (router.routeStatus[key]?.match ?? (!and && !path))}
 	{@render children?.(params, router.state, router.routeStatus)}
 {/if}
