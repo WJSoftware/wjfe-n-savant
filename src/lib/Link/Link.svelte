@@ -133,7 +133,7 @@
 <a
 	href={calcHref}
 	class={[cssClass, (isActive && activeState?.class) || undefined]}
-	style={isActive ? styleString() : undefined}
+	style={isActive ? styleString() : style}
 	aria-current={isActive ? (activeState?.ariaCurrent ?? 'page') : undefined}
 	onclick={handleClick}
 	{...restProps}
