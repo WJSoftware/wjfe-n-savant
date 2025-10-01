@@ -18,6 +18,7 @@ describe('index', () => {
             'getRouterContext',
             'setRouterContext',
             'isRouteActive',
+            'activeBehavior',
         ];
 
         // Act.
