@@ -4,9 +4,10 @@
 	import { location } from '$lib/core/Location.js';
 	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import { getLinkContext, type ILinkContext } from '$lib/LinkContext/LinkContext.svelte';
+	import { isRouteActive } from '$lib/public-utils.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { ActiveState, Hash, RouteStatus } from '$lib/types.js';
-	import { assertAllowedRoutingMode } from '$lib/utils.js';
+	import { assertAllowedRoutingMode, joinStyles } from '$lib/utils.js';
 	import { type Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
@@ -92,7 +93,7 @@
 	const calcReplace = $derived(replace ?? linkContext?.replace ?? false);
 	const calcPreserveQuery = $derived(preserveQuery ?? linkContext?.preserveQuery ?? false);
 	const calcPrependBasePath = $derived(prependBasePath ?? linkContext?.prependBasePath ?? false);
-	const isActive = $derived(!!router?.routeStatus[activeState?.key ?? '']?.match);
+	const isActive = $derived(isRouteActive(router, activeState?.key));
 	const calcHref = $derived(
 		calculateHref(
 			{
@@ -111,29 +112,12 @@
 		const newState = calculateState(resolvedHash, typeof state === 'function' ? state() : state);
 		location.goTo(calcHref, { state: newState, replace: calcReplace });
 	}
-
-	function styleString() {
-		let baseStyle = style ? style.trim() : '';
-		if (baseStyle && !baseStyle.endsWith(';')) {
-			baseStyle += ';';
-		}
-		if (!activeState?.style) {
-			return baseStyle || undefined;
-		}
-		if (typeof activeState.style === 'string') {
-			return baseStyle ? `${baseStyle} ${activeState.style}` : activeState.style;
-		}
-		const calculatedStyle = Object.entries(activeState.style)
-			.map(([key, value]) => `${key}: ${value}`)
-			.join('; ');
-		return baseStyle ? `${baseStyle} ${calculatedStyle}` : calculatedStyle;
-	}
 </script>
 
 <a
 	href={calcHref}
 	class={[cssClass, (isActive && activeState?.class) || undefined]}
-	style={isActive ? styleString() : style}
+	style={isActive ? joinStyles(style, activeState?.style) : style}
 	aria-current={isActive ? (activeState?.ariaCurrent ?? 'page') : undefined}
 	onclick={handleClick}
 	{...restProps}
