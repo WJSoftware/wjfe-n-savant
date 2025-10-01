@@ -101,7 +101,7 @@
 		result.aria = {
 			...linkContext?.activeState?.aria,
 			...activeState.aria
-		}
+		};
 		return result;
 	});
 	const isActive = $derived(isRouteActive(router, activeFor));
