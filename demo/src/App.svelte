@@ -2,7 +2,7 @@
 	import './app.scss';
 	import NavBar from './lib/NavBar.svelte';
 	import Tooltip from './lib/Tooltip.svelte';
-	import { Router, Route, Fallback, RouterTrace } from '@wjfe/n-savant';
+	import { Router, Route, Fallback, RouterTrace, activeBehavior } from '@wjfe/n-savant';
 	import NotFound from './lib/NotFound.svelte';
 	import HomeView from './lib/views/home/HomeView.svelte';
 	import PathRoutingView from './lib/views/path-routing/PathRoutingView.svelte';
@@ -32,12 +32,29 @@
 	<div class="d-flex flex-column h-100">
 		<Router id="root">
 			{#snippet children(_, rs)}
-				<Tooltip shown={showNavTooltip} placement="bottom">
-					{#snippet reference(ref)}
-						<NavBar {@attach ref} />
-					{/snippet}
-					Use these navigation links to test-drive the routing capabilities of @wjfe/n-savant.
-				</Tooltip>
+				<header>
+					<Tooltip shown={showNavTooltip} placement="bottom">
+						{#snippet reference(ref)}
+							<NavBar {@attach ref} />
+						{/snippet}
+						Use these navigation links to test-drive the routing capabilities of @wjfe/n-savant.
+					</Tooltip>
+					<div class="breadcrumb">
+						<span>
+							<span {@attach activeBehavior(rs, { key: 'home', class: 'bc-active' })}>Home</span>
+						</span>
+						<span>
+							<span {@attach activeBehavior(rs, { key: 'pathRouting', class: 'bc-active' })}
+								>Path Routing</span
+							>
+						</span>
+						<span>
+							<span {@attach activeBehavior(rs, { key: 'hashRouting', class: 'bc-active' })}
+								>Hash Routing</span
+							>
+						</span>
+					</div>
+				</header>
 				<main class="d-flex flex-column flex-fill overflow-auto mt-3">
 					<div class="container-fluid flex-fill d-flex flex-column">
 						<div class="grid flex-fill">
@@ -89,5 +106,28 @@
 				background-color: var(--bg-color);
 			}
 		}
+	}
+	.breadcrumb {
+		padding: 0.5em 1em;
+		background-color: #f8f9fa;
+		border-bottom: 1px solid #dee2e6;
+		font-size: 0.9em;
+		display: flex;
+		flex-direction: row;
+		gap: 0.5em;
+		& > *:after {
+			content: '>';
+			flex-grow: 1;
+			margin-left: 0.5em;
+		}
+		& > *:last-child:after {
+			content: '';
+			flex-grow: 0;
+			margin-left: 0;
+		}
+	}
+	:global .bc-active {
+		font-weight: bold;
+		text-decoration: underline;
 	}
 </style>

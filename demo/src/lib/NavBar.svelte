@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Link, Route } from '@wjfe/n-savant';
+	import { Link, LinkContext, Route } from '@wjfe/n-savant';
 	import logo from '@wjfe/n-savant/logo64';
 	import SubNav from './SubNav.svelte';
 	import { routingMode } from './hash-routing';
@@ -15,7 +15,7 @@
 		{ text: 'Home', href: '/hash-routing' },
 		{
 			text: 'Start Demo',
-			href: `#${(routingMode === 'multi' ? 'd1=/demo;d2=/demo' : '/demo')}`
+			href: `#${routingMode === 'multi' ? 'd1=/demo;d2=/demo' : '/demo'}`
 		}
 	];
 </script>
@@ -38,62 +38,49 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<div class="collapse navbar-collapse" id="navbarNav">
-			<ul class="navbar-nav">
-				<li class="nav-item">
-					<Link
-						class="nav-link"
-						activeState={{ class: 'active', key: 'home' }}
-						href="/"
-						id="homeLink">Home</Link
-					>
-				</li>
-				<Route key="homeMenuPr">
-					{#snippet children(rp, _, rs)}
-						{#if !rs.pathRouting?.match}
-							<li class="nav-item">
-								<Link
-									class="nav-link"
-									activeState={{ class: 'active', key: 'pathRouting' }}
-									href="/path-routing"
-								>
-									Path Routing
-								</Link>
-							</li>
-						{/if}
-					{/snippet}
-				</Route>
-				<Route key="pathRouting">
-					<SubNav title="Path Routing" links={pathRoutingLinks} />
-				</Route>
-				<Route key="homeMenuHr">
-					{#snippet children(rp, _, rs)}
-						{#if !rs.hashRouting?.match}
-							<li class="nav-item">
-								<Link
-									class="nav-link"
-									activeState={{ class: 'active', key: 'hashRouting' }}
-									href="/hash-routing"
-								>
-									Hash Routing
-								</Link>
-							</li>
-						{/if}
-					{/snippet}
-				</Route>
-				<Route key="hashRouting">
-					<SubNav title="Hash Routing" links={hashRoutingLinks} />
-				</Route>
-				<li class="nav-item">
-					<Link class="nav-link" activeState={{ class: 'active', key: 'px' }} href="/pricing">
-						404
-					</Link>
-				</li>
-				<li class="nav-item">
-					<Link class="nav-link disabled" href="/disabled" tabindex={-1} aria-disabled="true">
-						Disabled
-					</Link>
-				</li>
-			</ul>
+			<LinkContext activeState={{ class: 'active', aria: { 'aria-current': 'page' } }}>
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<Link class="nav-link" activeFor="home" href="/" id="homeLink">Home</Link>
+					</li>
+					<Route key="homeMenuPr">
+						{#snippet children(rp, _, rs)}
+							{#if !rs.pathRouting?.match}
+								<li class="nav-item">
+									<Link class="nav-link" activeFor="pathRouting" href="/path-routing">
+										Path Routing
+									</Link>
+								</li>
+							{/if}
+						{/snippet}
+					</Route>
+					<Route key="pathRouting">
+						<SubNav title="Path Routing" links={pathRoutingLinks} />
+					</Route>
+					<Route key="homeMenuHr">
+						{#snippet children(rp, _, rs)}
+							{#if !rs.hashRouting?.match}
+								<li class="nav-item">
+									<Link class="nav-link" activeFor="hashRouting" href="/hash-routing">
+										Hash Routing
+									</Link>
+								</li>
+							{/if}
+						{/snippet}
+					</Route>
+					<Route key="hashRouting">
+						<SubNav title="Hash Routing" links={hashRoutingLinks} />
+					</Route>
+					<li class="nav-item">
+						<Link class="nav-link" activeFor="pricing" href="/pricing">404</Link>
+					</li>
+					<li class="nav-item">
+						<Link class="nav-link disabled" href="/disabled" tabindex={-1} aria-disabled="true">
+							Disabled
+						</Link>
+					</li>
+				</ul>
+			</LinkContext>
 		</div>
 	</div>
 </nav>
