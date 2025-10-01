@@ -42,6 +42,6 @@ export function joinStyles(
         return baseStyle ? `${baseStyle} ${addedStyle}` : addedStyle;
     }
     const calculatedStyle = Object.entries(addedStyle)
-        .reduce((acc, [key, value]) => acc += `${key}: ${value}; `, '');
+        .reduce((acc, [key, value]) => acc + `${key}: ${value}; `, '');
     return baseStyle ? `${baseStyle} ${calculatedStyle}` : calculatedStyle;
 }
