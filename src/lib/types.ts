@@ -1,4 +1,4 @@
-import type { ClassValue, HTMLAnchorAttributes } from "svelte/elements";
+import type { AriaAttributes, ClassValue, HTMLAnchorAttributes } from "svelte/elements";
 
 /**
  * Defines the data type of all `hash` properties found in almost all of the library's components.
@@ -318,13 +318,22 @@ export type ActiveState = {
      */
     style?: HTMLAnchorAttributes['style'] | Record<string, string>;
     /**
-     * Sets the value of the `aria-current` attribute when the link is active.
+     * Sets additional ARIA attributes when the link is active.
      * 
-     * The possible values are defined by the HTML specification.
+     * ### aria-selected
+     * Use it for `gridcell`, `option`, `row`, `tab`, and `treeitem` roles to indicate the current item in a
+     * selection.
      * 
-     * [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-current#values)
+     * [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-selected)
+     * 
+     * ### aria-current
+     * Use it for `article`, `cell`, `columnheader`, `document`, `feed`, `listitem`, `math`, `rowheader`,
+     * `section`, `table`, and `treeitem` roles to indicate the current item within a container or set of related
+     * items.
+     * 
+     * [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-current)
      */
-    ariaCurrent?: HTMLAnchorAttributes['aria-current'];
+    aria?: AriaAttributes;
 }
 
 /**

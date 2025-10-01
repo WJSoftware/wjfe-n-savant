@@ -118,8 +118,8 @@
 	href={calcHref}
 	class={[cssClass, (isActive && activeState?.class) || undefined]}
 	style={isActive ? joinStyles(style, activeState?.style) : style}
-	aria-current={isActive ? (activeState?.ariaCurrent ?? 'page') : undefined}
 	onclick={handleClick}
+	{...(isActive ? activeState?.aria : undefined)}
 	{...restProps}
 >
 	{@render children?.(location.getState(resolvedHash), router?.routeStatus)}

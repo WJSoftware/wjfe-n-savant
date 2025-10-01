@@ -233,7 +233,44 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
         expect(anchor?.getAttribute('style')).toContain('color: red');
     });
 
-    test("Should set aria-current when route is active.", async () => {
+    test("Should set any aria- attributes from activeState when route is active.", () => {
+        // Arrange.
+        const { hash, router, context } = setup;
+        const href = "/test/path";
+        const activeKey = "test-route";
+
+        // Mock active route status
+        if (router) {
+            Object.defineProperty(router, 'routeStatus', {
+                value: { [activeKey]: { match: false } },
+                configurable: true
+            });
+        }
+
+        // Act.
+        const { container } = render(Link, {
+            props: {
+                hash,
+                href,
+                activeState: {
+                    key: activeKey,
+                    aria: {
+                        'aria-selected': 'true',
+                        'aria-current': 'page'
+                    }
+                },
+                children: content
+            },
+            context
+        });
+        const anchor = container.querySelector('a');
+
+        // Assert.
+        expect(anchor?.getAttribute('aria-selected')).toBeNull();
+        expect(anchor?.getAttribute('aria-current')).toBeNull();
+    });
+
+    test("Should not set any aria- attributes when route is not active.", async () => {
         // Arrange.
         const { hash, router, context } = setup;
         const href = "/test/path";
@@ -252,7 +289,13 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
             props: {
                 hash,
                 href,
-                activeState: { key: activeKey, ariaCurrent: "page" },
+                activeState: {
+                    key: activeKey,
+                    aria: {
+                        'aria-selected': 'true',
+                        'aria-current': 'page'
+                    }
+                },
                 children: content
             },
             context
@@ -260,6 +303,7 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
         const anchor = container.querySelector('a');
 
         // Assert.
+        expect(anchor?.getAttribute('aria-selected')).toBe('true');
         expect(anchor?.getAttribute('aria-current')).toBe('page');
     });
 
@@ -678,15 +722,15 @@ describe("Routing Mode Assertions", () => {
     ])("Should throw error when $description and hash=$hash .", ({ options, hash }) => {
         // Arrange
         setRoutingOptions(options);
- 
+
         // Act & Assert
         expect(() => {
-            render(Link, { 
-                props: { 
-                    href: "/test", 
-                    hash, 
-                    children: content 
-                }, 
+            render(Link, {
+                props: {
+                    href: "/test",
+                    hash,
+                    children: content
+                },
             });
         }).toThrow();
     });
