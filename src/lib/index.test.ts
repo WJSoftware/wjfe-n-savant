@@ -17,6 +17,7 @@ describe('index', () => {
             'initFull',
             'getRouterContext',
             'setRouterContext',
+            'isRouteActive',
         ];
 
         // Act.
