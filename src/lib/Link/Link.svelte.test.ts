@@ -3,10 +3,12 @@ import { location } from "$lib/core/Location.js";
 import { describe, test, expect, beforeAll, afterAll, beforeEach, vi, afterEach } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
 import Link from "./Link.svelte";
-import { createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
+import { createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES, createWindowMock, setupBrowserMocks, type RoutingUniverse, addMatchingRoute } from "../../testing/test-utils.js";
 import { flushSync } from "svelte";
 import { resetRoutingOptions, setRoutingOptions } from "$lib/core/options.js";
 import type { ExtendedRoutingOptions } from "$lib/types.js";
+import { linkCtxKey, type ILinkContext } from "$lib/LinkContext/LinkContext.svelte";
+import { calculateHref } from "$lib/core/calculateHref.js";
 
 function basicLinkTests(setup: ReturnType<typeof createRouterTestSetup>) {
     const linkText = "Test Link";
@@ -192,7 +194,8 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
             props: {
                 hash,
                 href,
-                activeState: { key: activeKey, class: "active-link" },
+                activeFor: activeKey,
+                activeState: { class: "active-link" },
                 children: content
             },
             context
@@ -222,7 +225,8 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
             props: {
                 hash,
                 href,
-                activeState: { key: activeKey, style: "color: red;" },
+                activeFor: activeKey,
+                activeState: { style: "color: red;" },
                 children: content
             },
             context
@@ -252,8 +256,8 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
             props: {
                 hash,
                 href,
+                activeFor: activeKey,
                 activeState: {
-                    key: activeKey,
                     aria: {
                         'aria-selected': 'true',
                         'aria-current': 'page'
@@ -289,8 +293,8 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
             props: {
                 hash,
                 href,
+                activeFor: activeKey,
                 activeState: {
-                    key: activeKey,
                     aria: {
                         'aria-selected': 'true',
                         'aria-current': 'page'
@@ -326,7 +330,8 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
             props: {
                 hash,
                 href,
-                activeState: { key: activeKey, class: "active-link" },
+                activeFor: activeKey,
+                activeState: { class: "active-link" },
                 children: content
             },
             context
@@ -508,11 +513,17 @@ function reactivityTests(setup: ReturnType<typeof createRouterTestSetup>) {
             });
         }
 
-        const initialActiveState = { key: activeKey, class: "initial-active" };
-        const updatedActiveState = { key: activeKey, class: "updated-active" };
+        const initialActiveState = { class: "initial-active" };
+        const updatedActiveState = { class: "updated-active" };
 
         const { container, rerender } = render(Link, {
-            props: { hash, href, activeState: initialActiveState, children: content },
+            props: {
+                hash,
+                href,
+                activeFor: activeKey,
+                activeState: initialActiveState,
+                children: content
+            },
             context
         });
         const anchor = container.querySelector('a');
@@ -546,7 +557,8 @@ function reactivityTests(setup: ReturnType<typeof createRouterTestSetup>) {
             props: {
                 hash,
                 href,
-                get activeState() { return { key: activeKey, class: activeClass }; },
+                activeFor: activeKey,
+                get activeState() { return { class: activeClass }; },
                 children: content
             },
             context
@@ -682,6 +694,125 @@ function reactivityTests(setup: ReturnType<typeof createRouterTestSetup>) {
     });
 }
 
+function linkContextTests(ru: RoutingUniverse) {
+    let browserMocks: ReturnType<typeof setupBrowserMocks>;
+    let setup: ReturnType<typeof createRouterTestSetup>;
+
+    beforeEach(() => {
+        browserMocks = setupBrowserMocks('http://example.com/', location);
+        setup = createRouterTestSetup(ru.hash);
+        setup.init();
+    });
+
+    afterAll(() => {
+        setup.dispose();
+    });
+
+    test("Should prepend the parent router's base path when link context demands it.", () => {
+        // Arrange.
+        const { router, context } = setup;
+        router.basePath = '/base';
+        const linkCtx: ILinkContext = {
+            prependBasePath: true,
+        };
+        context.set(linkCtxKey, linkCtx);
+
+        // Act.
+        const { container } = render(Link, {
+            props: {
+                hash: ru.hash,
+                href: "/test",
+            },
+            context,
+        });
+
+        // Assert.
+        const anchor = container.querySelector('a');
+        expect(anchor?.getAttribute('href')).toEqual(calculateHref({ hash: ru.hash }, '/base/test'));
+    });
+
+    test("Should preserve the query string when link context demands it.", () => {
+        // Arrange.
+        const { router, context } = setup;
+        const queryString = '?a=1&b=2';
+        browserMocks.setUrl(`http://example.com/${queryString}`);
+        const linkCtx: ILinkContext = {
+            preserveQuery: true,
+        };
+        context.set(linkCtxKey, linkCtx);
+
+        // Act.
+        const { container } = render(Link, {
+            props: {
+                hash: ru.hash,
+                href: "/test",
+            },
+            context,
+        });
+
+        // Assert.
+        const anchor = container.querySelector('a');
+        expect(anchor?.getAttribute('href')).toContain(queryString);
+    });
+
+    test("Should apply activeState from link context when link context demands it.", () => {
+        // Arrange.
+        const { router, context } = setup;
+        const linkCtx: ILinkContext = {
+            activeState: {
+                class: 'context-active',
+                aria: { 'aria-current': 'page' }
+            }
+        };
+        const activeFor = 'test-route';
+        addMatchingRoute(router, { name: activeFor });
+        context.set(linkCtxKey, linkCtx);
+
+        // Act.
+        const { container } = render(Link, {
+            props: {
+                hash: ru.hash,
+                href: "/test",
+                activeFor,
+            },
+            context,
+        });
+
+        // Assert.
+        const anchor = container.querySelector('a');
+        expect(anchor?.className).toContain('context-active');
+        expect(anchor?.getAttribute('aria-current')).toBe('page');
+    });
+
+    test.each<{
+        replace: boolean;
+        fnName: 'pushState' | 'replaceState';
+    }>([
+        { replace: false, fnName: 'pushState' },
+        { replace: true, fnName: 'replaceState' }
+    ])("Should call $fnName when link context demands it.", async ({ replace, fnName }) => {
+        // Arrange.
+        const { router, context } = setup;
+        const linkCtx: ILinkContext = {
+            replace,
+        };
+        context.set(linkCtxKey, linkCtx);
+        const { container } = render(Link, {
+            props: {
+                hash: ru.hash,
+                href: "/test",
+            },
+            context,
+        });
+        const anchor = container.querySelector('a');
+
+        // Act.
+        await fireEvent.click(anchor!);
+
+        expect(browserMocks.history[fnName]).toHaveBeenCalledOnce();
+    });
+}
+
 describe("Routing Mode Assertions", () => {
     const linkText = "Test Link";
     const content = createTestSnippet(linkText);
@@ -736,7 +867,6 @@ describe("Routing Mode Assertions", () => {
     });
 });
 
-
 ROUTING_UNIVERSES.forEach(ru => {
     describe(`Link - ${ru.text}`, () => {
         const setup = createRouterTestSetup(ru.hash);
@@ -772,5 +902,21 @@ ROUTING_UNIVERSES.forEach(ru => {
         describe("Reactivity", () => {
             reactivityTests(setup);
         });
+    });
+});
+
+ROUTING_UNIVERSES.forEach(ru => {
+    describe(`Link Context - ${ru.text}`, () => {
+        let cleanup: () => void;
+        beforeAll(() => {
+            cleanup = init({
+                implicitMode: ru.implicitMode,
+                hashMode: ru.hashMode,
+            });
+        });
+        afterAll(() => {
+            cleanup?.();
+        });
+        linkContextTests(ru);
     });
 });

@@ -1,5 +1,5 @@
 <script lang="ts" module>
-	import type { PreserveQuery } from '$lib/types.js';
+	import type { ActiveState, PreserveQuery } from '$lib/types.js';
 	import { getContext, setContext, type Snippet } from 'svelte';
 
 	export type ILinkContext = {
@@ -33,25 +33,30 @@
 		 * Set to a string or an array of strings to preserve only the specified query string values.
 		 */
 		preserveQuery?: PreserveQuery;
+		/**
+		 * Sets the various options that are used to automatically style the anchor tag whenever a particular route
+		 * becomes active.
+		 *
+		 * **IMPORTANT**:  This only works if the component is within a `Router` component.
+		 */
+		activeState?: ActiveState;
 	};
 
 	class _LinkContext implements ILinkContext {
 		replace;
 		prependBasePath;
 		preserveQuery;
+		activeState;
 
-		constructor(
-			replace: boolean,
-			prependBasePath: boolean,
-			preserveQuery: PreserveQuery
-		) {
+		constructor(replace: boolean | undefined, prependBasePath: boolean | undefined, preserveQuery: PreserveQuery | undefined, activeState: ActiveState | undefined) {
 			this.replace = $state(replace);
 			this.prependBasePath = $state(prependBasePath);
 			this.preserveQuery = $state(preserveQuery);
+			this.activeState = $state(activeState);
 		}
 	}
 
-	const linkCtxKey = Symbol();
+	export const linkCtxKey = Symbol();
 
 	export function getLinkContext() {
 		return getContext<ILinkContext | undefined>(linkCtxKey);
@@ -67,25 +72,28 @@
 	};
 
 	let {
-		replace = false,
-		prependBasePath = false,
-		preserveQuery = false,
-		children,
+		replace,
+		prependBasePath,
+		preserveQuery,
+		activeState,
+		children
 	}: Props = $props();
 
 	const parentContext = getLinkContext();
 	const context = new _LinkContext(
-		parentContext?.replace ?? replace,
-		parentContext?.prependBasePath ?? prependBasePath,
-		parentContext?.preserveQuery ?? preserveQuery
+		replace ?? parentContext?.replace,
+		prependBasePath ?? parentContext?.prependBasePath,
+		preserveQuery ?? parentContext?.preserveQuery,
+		activeState ?? parentContext?.activeState
 	);
 
 	setContext(linkCtxKey, context);
 
 	$effect.pre(() => {
-		context.prependBasePath = prependBasePath;
-		context.replace = replace;
-		context.preserveQuery = preserveQuery;
+		context.prependBasePath = prependBasePath ?? parentContext?.prependBasePath;
+		context.replace = replace ?? parentContext?.replace;
+		context.preserveQuery = preserveQuery ?? parentContext?.preserveQuery;
+		context.activeState = activeState ?? parentContext?.activeState;
 	});
 </script>
 

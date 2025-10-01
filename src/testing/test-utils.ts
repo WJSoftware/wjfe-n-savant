@@ -270,6 +270,9 @@ export function createWindowMock(initialUrl = "http://example.com/") {
 export function setupBrowserMocks(initialUrl = "http://example.com/", libraryLocation?: { url: { href: string } }) {
     const originalWindow = globalThis.window;
     const windowMock = createWindowMock(initialUrl);
+    if (libraryLocation) {
+        libraryLocation.url.href = initialUrl;
+    }
     
     // @ts-expect-error - Mocking window for testing
     globalThis.window = windowMock;
