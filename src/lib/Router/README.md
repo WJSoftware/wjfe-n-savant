@@ -23,19 +23,19 @@ Simplest form of use.
 
 ```svelte
 <script lang="ts">
-    import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@wjfe/n-savant';
 </script>
 
 <Router>
-    <Route path="/home">
-        <h1>Welcome to the home page!</h1>
-    </Route>
-    <Route path="/about">
-        <h1>About Us</h1>
-    </Route>
-    <Route path="/contact">
-        <h1>Contact Us</h1>
-    </Route>
+  <Route path="/home">
+    <h1>Welcome to the home page!</h1>
+  </Route>
+  <Route path="/about">
+    <h1>About Us</h1>
+  </Route>
+  <Route path="/contact">
+    <h1>Contact Us</h1>
+  </Route>
 </Router>
 ```
 
@@ -46,11 +46,11 @@ the MFE is meant to respond to sub-path routes only.
 
 ```svelte
 <script lang="ts">
-    import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@wjfe/n-savant';
 </script>
 
 <Router basePath="/subpath">
-    ...
+  ...
 </Router>
 ```
 
@@ -61,29 +61,29 @@ as needed.
 
 ```svelte
 <script lang="ts">
-    import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@wjfe/n-savant';
 </script>
 
 <Router basePath="/root">
-    <Route path="/home">
-        <h1>Welcome to the home page!</h1>
-        <p>The Route component matched /root/home.</p>
+  <Route path="/home">
+    <h1>Welcome to the home page!</h1>
+    <p>The Route component matched /root/home.</p>
+  </Route>
+  <Route path="/about">
+    <h1>About Us</h1>
+  </Route>
+  <Route path="/contact">
+    <h1>Contact Us</h1>
+  </Route>
+  <Router basePath="/admin">
+    <Route path="/dashboard">
+      <h1>Admin Dashboard</h1>
+      <p>The Route component matched /root/admin/dashboard.</p>
     </Route>
-    <Route path="/about">
-        <h1>About Us</h1>
+    <Route path="/users">
+      <h1>Admin Users</h1>
     </Route>
-    <Route path="/contact">
-        <h1>Contact Us</h1>
-    </Route>
-    <Router basePath="/admin">
-        <Route path="/dashboard">
-            <h1>Admin Dashboard</h1>
-            <p>The Route component matched /root/admin/dashboard.</p>
-        </Route>
-        <Route path="/users">
-            <h1>Admin Users</h1>
-        </Route>
-    </Router>
+  </Router>
 </Router>
 ```
 
@@ -93,22 +93,22 @@ Use the `fallback()` snippet of the router to present content when no routes mat
 
 ```svelte
 <script lang="ts">
-    import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@wjfe/n-savant';
 </script>
 
 <Router>
-    <Route path="/home">
-        <h1>Welcome to the home page!</h1>
-    </Route>
-    <Route path="/about">
-        <h1>About Us</h1>
-    </Route>
-    <Route path="/contact">
-        <h1>Contact Us</h1>
-    </Route>
-    {#snippet fallback()}
-        <h1>404 Not Found</h1>
-    {/snippet}
+  <Route path="/home">
+    <h1>Welcome to the home page!</h1>
+  </Route>
+  <Route path="/about">
+    <h1>About Us</h1>
+  </Route>
+  <Route path="/contact">
+    <h1>Contact Us</h1>
+  </Route>
+  {#snippet fallback()}
+    <h1>404 Not Found</h1>
+  {/snippet}
 </Router>
 ```
 
@@ -118,20 +118,20 @@ Parameters are expressed in the form `:<name>[?]`.  The optional `"?"` makes the
 
 ```svelte
 <script lang="ts">
-    import { Router, Route } from '@wjfe/n-savant';
-    import UserProfile from '$lib/components/user-profile.svelte';
-    import UserDetails from '$lib/components/user-details.svelte';
+  import { Router, Route } from '@wjfe/n-savant';
+  import UserProfile from '$lib/components/user-profile.svelte';
+  import UserDetails from '$lib/components/user-details.svelte';
 </script>
 
 <Router>
-    <Route path="/user/:id/:detailed?">
-        {#snippet children(params)}
-            <UserProfile id={params.id} />
-            {#if params.detailed}
-                <UserDetails id={params.id} />
-            {/if}
-        {/snippet}
-    </Route>
+  <Route path="/user/:id/:detailed?">
+    {#snippet children(params)}
+      <UserProfile id={params.id} />
+      {#if params.detailed}
+        <UserDetails id={params.id} />
+      {/if}
+    {/snippet}
+  </Route>
 </Router>
 ```
 
@@ -142,12 +142,12 @@ never use this name as a name for one of your parameters.
 
 ```svelte
 <script lang="ts">
-    import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@wjfe/n-savant';
 </script>
 
 <Router>
-    <Route path="/dashboard/*">
-        ...
-    </Route>
+  <Route path="/dashboard/*">
+    ...
+  </Route>
 </Router>
 ```
