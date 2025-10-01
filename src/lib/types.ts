@@ -300,10 +300,6 @@ export type NavigationCancelledEvent = NavigationEvent & {
  */
 export type ActiveState = {
     /**
-     * Sets the route key that the link will use to determine if it should render as active.
-     */
-    key: string;
-    /**
      * Sets the class or classes that the link will use when rendering as active.
      * 
      * For example, set it to `"active"` for Bootstrap setups.
@@ -475,7 +471,7 @@ export interface HistoryApi extends History {
      * Implementations should ensure this stays synchronized with navigation changes.
      */
     readonly url: URL;
-    
+
     /**
      * Cleans up event listeners and resources used by the HistoryApi implementation.
      * Should be called when the implementation is no longer needed to prevent memory leaks.

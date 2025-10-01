@@ -55,12 +55,9 @@
 			 */
 			state?: any;
 			/**
-			 * Sets the various options that are used to automatically style the anchor tag whenever a particular route
-			 * becomes active.
-			 *
-			 * **IMPORTANT**:  This only works if the component is within a `Router` component.
+			 * Sets the route key that the link will use to determine if it should render as active.
 			 */
-			activeState?: ActiveState;
+			activeFor?: string;
 			/**
 			 * Renders the children of the component.
 			 * @param state The state object stored in in the window's History API for the universe the link is
@@ -76,6 +73,7 @@
 		href,
 		replace,
 		state,
+		activeFor,
 		activeState,
 		class: cssClass,
 		style,
@@ -93,7 +91,20 @@
 	const calcReplace = $derived(replace ?? linkContext?.replace ?? false);
 	const calcPreserveQuery = $derived(preserveQuery ?? linkContext?.preserveQuery ?? false);
 	const calcPrependBasePath = $derived(prependBasePath ?? linkContext?.prependBasePath ?? false);
-	const isActive = $derived(isRouteActive(router, activeState?.key));
+	const calcActiveState = $derived.by(() => {
+		if (!activeState) {
+			return linkContext?.activeState;
+		}
+		const result = { ...activeState };
+		result.class ??= linkContext?.activeState?.class;
+		result.style ??= linkContext?.activeState?.style;
+		result.aria = {
+			...linkContext?.activeState?.aria,
+			...activeState.aria
+		};
+		return result;
+	});
+	const isActive = $derived(isRouteActive(router, activeFor));
 	const calcHref = $derived(
 		calculateHref(
 			{
@@ -116,10 +127,10 @@
 
 <a
 	href={calcHref}
-	class={[cssClass, (isActive && activeState?.class) || undefined]}
-	style={isActive ? joinStyles(style, activeState?.style) : style}
+	class={[cssClass, (isActive && calcActiveState?.class) || undefined]}
+	style={isActive ? joinStyles(style, calcActiveState?.style) : style}
 	onclick={handleClick}
-	{...(isActive ? activeState?.aria : undefined)}
+	{...(isActive ? calcActiveState?.aria : undefined)}
 	{...restProps}
 >
 	{@render children?.(location.getState(resolvedHash), router?.routeStatus)}
