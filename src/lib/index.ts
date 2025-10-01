@@ -13,3 +13,4 @@ export { location } from "./core/Location.js";
 export * from './RouterTrace/RouterTrace.svelte';
 export { default as RouterTrace } from './RouterTrace/RouterTrace.svelte';
 export * from "./public-utils.js";
+export * from "./behaviors/active.svelte.js";
