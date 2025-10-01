@@ -302,7 +302,7 @@ export type ActiveState = {
     /**
      * Sets the route key that the link will use to determine if it should render as active.
      */
-    key?: string;
+    key: string;
     /**
      * Sets the class or classes that the link will use when rendering as active.
      * 
