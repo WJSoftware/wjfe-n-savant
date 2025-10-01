@@ -8,10 +8,10 @@
 
 > **📝 Small and Unique!**
 > 
-> + Less than **1,400** lines of code, including TypeScript typing.
+> + Less than **1,450** lines of code, including TypeScript typing.
 > + Always-on path and hash routing.  Simultaneous and independent routing modes.
 > + The router that invented multi hash routing.
-> + **NEW!** Supports extension packages (Sveltekit support coming soon)
+> + **NEW!** Supports Sveltekit (via [@wjfe/n-savant-sk](https://github.com/WJSoftware/wjfe-n-savant-sk))
 
 + **Electron support**:  Works with Electron (all routing modes)
 + **Reactivity-based**:  All data is reactive, reducing the need for events and imperative programming.
@@ -133,27 +133,27 @@ For applications that also run in the browser, condition the navigation to Elect
 
 ```svelte
 <script lang="ts">
-    import { Router, Route } from "@wjfe/n-savant";
-    import NavBar from "./lib/NavBar.svelte";
-    import UserView from "./lib/UserView.svelte";
+  import { Router, Route } from "@wjfe/n-savant";
+  import NavBar from "./lib/NavBar.svelte";
+  import UserView from "./lib/UserView.svelte";
 </script>
 
 <Router>
-    <NavBar />
-    <div class="container">
-        <!-- content outside routes is always rendered -->
-        <h1>Routing Demo</h1>
-        <Route key="users" path="/users">
-            <!-- content here -->
-        </Route>
-        <Route key="user" path="/users/:userId">
-            <!-- access parameters via the snippet parameter -->
-            {#snippet children(params)}
-                <UserView id={params.userId} /> <!-- Intellisense will work here!! -->
-            {/snippet}
-        </Route>
-        ...
-    </div>
+  <NavBar />
+  <div class="container">
+    <!-- content outside routes is always rendered -->
+    <h1>Routing Demo</h1>
+    <Route key="users" path="/users">
+      <!-- content here -->
+    </Route>
+    <Route key="user" path="/users/:userId">
+      <!-- access parameters via the snippet parameter -->
+      {#snippet children(params)}
+        <UserView id={params.userId} /> <!-- Intellisense will work here!! -->
+      {/snippet}
+    </Route>
+    ...
+  </div>
 </Router>
 ```
 
@@ -165,18 +165,20 @@ functionality.  Still, this is not mandatory.
 ```svelte
 <!-- NavBar.svelte -->
 <script lang="ts">
-    import { Link } from "@wjfe/n-savant";
+  import { Link } from "@wjfe/n-savant";
 </script>
 
 <nav>
-    <div class="nav-links">
-        <ul>
-            <li class="nav-link">
-                <Link href="/users" activeState={{ key: 'users', class: 'active' }}>All Users</Link>
-            </li>
-            ...
-        </ul>
-    </div>
+  <div class="nav-links">
+    <ul>
+      <li class="nav-link">
+        <Link href="/users" activeFor="users" activeState={{ class: 'active' }}>
+          All Users
+        </Link>
+      </li>
+      ...
+    </ul>
+  </div>
 </nav>
 ```
 
@@ -189,7 +191,7 @@ strategies that are possible with this router.
 
 Routers always evaluate all defined routes, so it is possible for more than one route to match.  This facilitates the 
 layout of micro-frontends.  For example, a navigation micro-frontend could be inside a route that either always matches 
-or matches most of the time, so navigation links are available the mayority/all of the time.
+or matches most of the time, so navigation links are available the majority/all of the time.
 
 ### Simultaneous, Always-On Path and Hash Routing
 
@@ -201,13 +203,13 @@ name, while specialty MFE's could route using the path in the hash part of the U
 
 ### Multi-Hash Routing
 
-As of Februrary 2025, no other router in the world can do this.
+As of February 2025, no other router in the world can do this.
 
 Imagine a scenario where your MFE application would like to show side-by-side two micro-frontends that are 
 router-enabled (meaning they use or need to work with a path).  With traditional routing, you could not have this setup 
 because one MFE would take over the path, leaving the other MFE without one.
 
-Mutli-hash routing creates named paths in the hash value, giving routers the ability to share the hash value with other 
+Multi-hash routing creates named paths in the hash value, giving routers the ability to share the hash value with other 
 routers.  A hash value of the form `#path1=/path/1;path2=/path/2;...` could power side-by-side MFE's on, say, 4K 
 layouts.
 
@@ -218,7 +220,7 @@ abandon the use of `registerApplication()` and `start()` and just mount parcels 
 
 [single-spa](https://single-spa.js.org)
 
-## Unintrusive Philosophy
+## Unobtrusive Philosophy
 
 This mini router library imposes minimal restrictions.  Here are some features provided by other much larger codebases 
 that are not provided here because Svelte already has the capability.
@@ -229,11 +231,11 @@ Nothing prevents you to add transitions to anything.
 
 ```svelte
 <Route key="users" path="/users/:userId">
-    {#snippet children(params)}
-        <div transition:fade>
-            ...
-        </div>
-    {/snippet}
+  {#snippet children(params)}
+    <div transition:fade>
+      ...
+    </div>
+  {/snippet}
 </Route>
 ```
 
@@ -252,7 +254,7 @@ the `rest` parameter specifier (`/*`):
 
 ```svelte
 <Route key="admin" path="/admin/*">
-    ...
+  ...
 </Route>
 ```
 
@@ -265,19 +267,19 @@ Lazy-loading components is very simple:
 
 ```svelte
 <script lang="ts">
-    function loadUsersComponent() {
-        return import('./lib/Users.svelte').then(m => m.default);
-    }
+  function loadUsersComponent() {
+    return import('./lib/Users.svelte').then(m => m.default);
+  }
 </script>
 
 <Route key="users" path="/users">
-    {#await loadUsersComponent()}
-        <span>Loading...</span>
-    {:then Users}
-        <Users />
-    {:catch}
-        <p>Ooops!</p>
-    {/await}
+  {#await loadUsersComponent()}
+    <span>Loading...</span>
+  {:then Users}
+    <Users />
+  {:catch}
+    <p>Oops!</p>
+  {/await}
 </Route>
 ```
 
@@ -291,13 +293,13 @@ import { location } from "@wjfe/n-savant";
 
 // Or $derived, whichever you need.
 $effect(() => {
-    // Read location.url to re-run on URL changes (navigation).
-    location.url;
-    // Read location.state to re-run on state changes.
-    location.state;
-    // Read location.hashPaths to re-run on hash changes (hash navigation).
-    // The route named "single" is the one you want if doing hash routing.
-    location.hashPaths.single;
+  // Read location.url to re-run on URL changes (navigation).
+  location.url;
+  // Read location.state to re-run on state changes.
+  location.state;
+  // Read location.hashPaths to re-run on hash changes (hash navigation).
+  // The route named "single" is the one you want if doing hash routing.
+  location.hashPaths.single;
 });
 ```
 
@@ -317,12 +319,12 @@ numeric parameter value uses the `and` property to type-check the value:
 
 ```svelte
 <Route path="/users/:userId" and={(rp) => typeof rp.userId === 'number'}>
-    {#snippet children(rp)}
-        <UserDetails userId={rp.userId} />
-    {/snippet}
+  {#snippet children(rp)}
+    <UserDetails userId={rp.userId} />
+  {/snippet}
 </Route>
 <Route path="/users/summary">
-    <UsersSummary />
+  <UsersSummary />
 </Route>
 ```
 
@@ -330,12 +332,12 @@ This is the version using a regular expression for the `path` property:
 
 ```svelte
 <Route path={/\/users\/(?<userId>\d+)/i}>
-    {#snippet children(rp)}
-        <UserDetails userId={rp.userId} />
-    {/snippet}
+  {#snippet children(rp)}
+    <UserDetails userId={rp.userId} />
+  {/snippet}
 </Route>
 <Route path="/users/summary">
-    <UsersSummary />
+  <UsersSummary />
 </Route>
 ```
 
@@ -346,23 +348,23 @@ property of router engines (which is reactive) by binding to a router's `router`
 
 ```svelte
 <script lang="ts">
-    import { RouterEngine } from "@wjfe/n-savant/core";
+  import { RouterEngine } from "@wjfe/n-savant/core";
 
-    let router: $state<RouterEngine>();
+  let router: $state<RouterEngine>();
 
-    $effect(() => {
-        for (let [key, rs] of Object.entries(router.routeStatus)) {
-            // key: Route's key
-            // rs:  RouteStatus for the route.
-            if (rs.match) {
-                // Do stuff with rs.routeParams, for example.
-            }
-        }
-    });
+  $effect(() => {
+    for (let [key, rs] of Object.entries(router.routeStatus)) {
+      // key: Route's key
+      // rs:  RouteStatus for the route.
+      if (rs.match) {
+        // Do stuff with rs.routeParams, for example.
+      }
+    }
+  });
 </script>
 
 <Router bind:router>
-    ...
+  ...
 </Router>
 ```
 
@@ -384,29 +386,29 @@ import { location } from "@wjfe/n-savant";
 
 // Path routing navigation:
 location.navigate('/new/path', { 
-    replace: true, 
-    state: { custom: 'Hi' },
-    hash: false 
+  replace: true, 
+  state: { custom: 'Hi' },
+  hash: false 
 });
 
 // Hash routing navigation:
 location.navigate('/new/path', { 
-    replace: true, 
-    state: { custom: 'Hi' },
-    hash: true 
+  replace: true, 
+  state: { custom: 'Hi' },
+  hash: true 
 });
 
 // Multi-hash routing navigation:
 location.navigate('/new/path', { 
-    replace: true, 
-    state: { custom: 'Hi' },
-    hash: 'path1' 
+  replace: true, 
+  state: { custom: 'Hi' },
+  hash: 'path1' 
 });
 
 // Preserve existing query parameters:
 location.navigate('/new/path', { 
-    preserveQuery: true,
-    hash: false
+  preserveQuery: true,
+  hash: false
 });
 ```
 
@@ -424,8 +426,8 @@ import { location } from "@wjfe/n-savant";
 
 // Direct URL navigation:
 location.goTo('https://example.com/new/path', { 
-    replace: true,
-    state: { path: undefined, hash: {} }  // Must provide complete State object
+  replace: true,
+  state: { path: undefined, hash: {} }  // Must provide complete State object
 });
 
 // Shallow routing (navigate to current URL):
@@ -433,7 +435,7 @@ location.goTo('', { replace: true });
 
 // Preserve query parameters:
 location.goTo('/new/path', { 
-    preserveQuery: ['param1', 'param2'] 
+  preserveQuery: ['param1', 'param2'] 
 });
 ```
 
