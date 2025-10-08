@@ -19,6 +19,7 @@ describe('index', () => {
             'setRouterContext',
             'isRouteActive',
             'activeBehavior',
+            'autoFocusBehavior',
         ];
 
         // Act.

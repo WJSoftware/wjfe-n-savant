@@ -490,3 +490,13 @@ export interface FullModeHistoryApi extends HistoryApi {
     on(event: 'beforeNavigate', callback: (event: BeforeNavigateEvent) => void): () => void;
     on(event: 'navigationCancelled', callback: (event: NavigationCancelledEvent) => void): () => void;
 }
+
+/**
+ * Defines the options that can be specified with the `autoFocusBehavior` attachment factory.
+ */
+export type AutoFocusOptions = {
+    /**
+     * A custom query selector string to find focusable elements.
+     */
+    selector?: string | undefined;
+}
