@@ -105,16 +105,14 @@
 		return result;
 	});
 	const isActive = $derived(isRouteActive(router, activeFor));
-	const calcHref = $derived(
-		calculateHref(
+	const calcHref = $derived(href === '' ? location.url.href : calculateHref(
 			{
 				hash: resolvedHash,
 				preserveQuery: calcPreserveQuery
 			},
 			calcPrependBasePath ? router?.basePath : undefined,
 			href
-		)
-	);
+		));
 
 	function handleClick(event: MouseEvent & { currentTarget: EventTarget & HTMLAnchorElement }) {
 		incomingOnclick?.(event);
