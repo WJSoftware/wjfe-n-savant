@@ -46,9 +46,9 @@ export function activeBehavior(
     return function (el: HTMLElement) {
         if (isRouteActive(rsOrRouter, activeState.key)) {
             el.setAttribute('style', joinStyles(baseStyle, activeState.style) ?? '');
-            const activeClass = clsx(activeState.class);
-            if (activeClass) {
-                el.classList.add(activeClass);
+            const activeClass = clsx(activeState.class).split(' ').filter(c => c.trim().length > 0);
+            if (activeClass.length) {
+                el.classList.add(...activeClass);
             }
             if (activeState.aria) {
                 for (let [attr, value] of Object.entries(activeState.aria)) {
@@ -57,8 +57,8 @@ export function activeBehavior(
             }
             return () => {
                 el.setAttribute('style', baseStyle ?? '');
-                if (activeClass) {
-                    el.classList.remove(activeClass);
+                if (activeClass.length) {
+                    el.classList.remove(...activeClass);
                 }
                 if (activeState.aria) {
                     for (let attr of Object.keys(activeState.aria)) {

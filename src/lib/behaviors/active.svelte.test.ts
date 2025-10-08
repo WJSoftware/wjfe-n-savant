@@ -5,6 +5,8 @@ import type { ActiveState, RouteStatus } from "$lib/types.js";
 import { render } from "@testing-library/svelte";
 import TestActiveBehavior from "../../testing/TestActiveBehavior.svelte";
 import { flushSync } from "svelte";
+import type { ClassValue } from "svelte/elements";
+import { clsx } from "clsx";
 
 describe("activeBehavior", () => {
     let mockElement: HTMLElement;
@@ -45,6 +47,44 @@ describe("activeBehavior", () => {
             // Assert
             expect(mockElement.setAttribute).toHaveBeenCalledWith('style', 'background: white; color: red;');
             expect(mockElement.classList.add).toHaveBeenCalledWith('active-class');
+        });
+        test.each<{
+            text: string;
+            classValue: ClassValue
+        }>([
+            {
+                text: "string",
+                classValue: "single-class",
+            },
+            {
+                text: "object",
+                classValue: { active: true, },
+            },
+            {
+                text: "array",
+                classValue: ["class1", "class2"],
+            },
+        ])("Should apply classes provided in $text form when route is active.", ({ classValue }) => {
+            // Arrange.
+            const routeKey = "test-route";
+            const routeStatus: Record<string, RouteStatus> = {
+                [routeKey]: {
+                    match: true,
+                    routeParams: undefined
+                }
+            };
+            const activeState: ActiveState & { key: string } = {
+                key: routeKey,
+                class: classValue,
+            };
+
+            // Act.
+            const attachment = activeBehavior(routeStatus, activeState);
+            attachment(mockElement);
+
+            // Assert.
+            const expectedClass = clsx(classValue).split(' ');
+            expect(mockElement.classList.add).toHaveBeenCalledWith(...expectedClass);
         });
         test("Should return a cleanup function when route is active.", () => {
             // Arrange
@@ -287,8 +327,8 @@ describe("activeBehavior", () => {
             attachment(mockElement);
 
             // Assert - clsx should process the class value and add it to classList if non-empty
-            const processedClass = expect.any(String);
-            expect(mockElement.classList.add).toHaveBeenCalledWith(processedClass);
+            const processedClass = clsx(classValue).split(' ').filter(c => c.trim().length > 0);
+            expect(mockElement.classList.add).toHaveBeenCalledWith(...processedClass);
         });
     });
 
