@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { traceOptions, getAllChildRouters } from '$lib/core/trace.svelte.js';
-	import {
-		routePatternsKey,
-		RouterEngine
-	} from '$lib/core/RouterEngine.svelte.js';
+	import { routePatternsKey, RouterEngine } from '$lib/core/RouterEngine.svelte.js';
 	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { PatternRouteInfo } from '$lib/types.js';
@@ -98,20 +95,23 @@
 	</div>
 {/snippet}
 
-<table class={['minimal', cssClass]} {...restProps}>
+<table class={[cssClass ?? 'minimal']} {...restProps}>
 	<caption>
 		<div>
-			<span>
+			<div>
 				Router ID: <span class="router-property">{router.id ?? '(no ID)'}</span>
-			</span>
-			<span>
+			</div>
+			<div>
 				Base Path: <span class="router-property">{router.basePath}</span>
-			</span>
-			{#if traceOptions.routerHierarchy && childRouterRefs.length > 0}
-				<span>
+			</div>
+			<div>
+				Test Path: <span class="router-property">{router.testPath}</span>
+			</div>
+			<div>
+				{#if traceOptions.routerHierarchy && childRouterRefs.length > 0}
 					{@render childRoutersPicker()}
-				</span>
-			{/if}
+				{/if}
+			</div>
 		</div>
 	</caption>
 	<thead>
@@ -188,74 +188,68 @@
 		& td:has(> span.minimal-icon) {
 			text-align: center;
 		}
+	}
 
-		& .error {
-			color: #dc3545;
+	caption > div {
+		display: flex;
+		flex-direction: row;
+		gap: 2em;
+		justify-content: start;
+		& > div:last-of-type {
+			margin-left: auto;
 		}
+		& .children-picker {
+			position: relative;
 
-		& caption {
-			font-size: 0.9em;
-
-			& > div {
-				display: flex;
-				flex-direction: row;
-				gap: 1em;
-				flex-wrap: nowrap;
-				justify-content: start;
-				align-items: baseline;
+			& button {
+				border: none;
+				border-radius: 4px;
 			}
 
-			& span.router-property {
-				font-weight: bold;
-				margin-left: 0.5em;
+			& .children-menu {
+				position: absolute;
+				left: 0;
+				width: max-content;
 				background-color: #f8f9fa;
-			}
+				border: 1px solid #ddd;
+				border-radius: 4px;
+				padding: 0.5em 0;
+				z-index: 1;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5em;
+				box-shadow: 0.5em 0.5em 1em rgba(0, 0, 0, 0.1);
 
-			& .children-picker {
-				position: relative;
-
-				& button {
-					border: none;
-					border-radius: 4px;
+				& li {
+					list-style: none;
+					& button {
+						border: none;
+						background-color: transparent;
+						padding: 0.25em;
+					}
 				}
 
-				& .children-menu {
-					position: absolute;
-					left: 0;
-					width: max-content;
-					background-color: #f8f9fa;
-					border: 1px solid #ddd;
-					border-radius: 4px;
-					padding: 0.5em 0;
-					z-index: 1;
-					display: flex;
-					flex-direction: column;
-					gap: 0.5em;
-					box-shadow: 0.5em 0.5em 1em rgba(0, 0, 0, 0.1);
+				& li:hover,
+				& li button:hover {
+					background-color: #e9ecef;
+				}
 
-					& li {
-						list-style: none;
-						& button {
-							border: none;
-							background-color: transparent;
-							padding: 0.25em;
-						}
-					}
+				&.children-menu-top {
+					bottom: 0;
+				}
 
-					& li:hover,
-					& li button:hover {
-						background-color: #e9ecef;
-					}
-
-					&.children-menu-top {
-						bottom: 0;
-					}
-
-					&.children-menu-bottom {
-						top: 100%;
-					}
+				&.children-menu-bottom {
+					top: 100%;
 				}
 			}
 		}
+	}
+
+	.router-property {
+		font-weight: bold;
+	}
+
+	.error {
+		color: #dc3545;
 	}
 </style>
