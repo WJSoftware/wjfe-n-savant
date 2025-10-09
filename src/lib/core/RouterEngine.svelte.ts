@@ -138,14 +138,14 @@ export class RouterEngine {
         return this.#routePatterns;
     }
 
-    #testPath = $derived.by(() => noTrailingSlash(this.#hashId ? (location.hashPaths[this.#hashId] || '/') : this.path));
+    testPath = $derived.by(() => noTrailingSlash(this.#hashId ? (location.hashPaths[this.#hashId] || '/') : this.path));
 
     #routeStatusData = $derived.by(() => {
         const routeStatus = {} as Record<string, RouteStatus>;
         let noMatches = true;
         for (let routeKey of Object.keys(this.routes)) {
             const pattern = this.#routePatterns.get(routeKey)!;
-            const matches = pattern.regex ? pattern.regex.exec(this.#testPath) : null;
+            const matches = pattern.regex ? pattern.regex.exec(this.testPath) : null;
             const routeParams = matches?.groups ? { ...matches.groups } as RouteStatus['routeParams'] : undefined;
             if (routeParams) {
                 for (let key in routeParams) {
