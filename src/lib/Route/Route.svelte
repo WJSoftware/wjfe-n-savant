@@ -170,5 +170,11 @@
 </script>
 
 {#if (router.routeStatus[key]?.match ?? (!and && !path))}
-	{@render children?.(params, router.state, router.routeStatus)}
+	<!--
+		Changed use of params for router.routeStatus[key]?.routeParams to work around issues around
+		$effect.pre() introduced with async Svelte.
+
+		See:  https://github.com/sveltejs/svelte/pull/16930#issuecomment-3427913259
+	-->
+	{@render children?.(router.routeStatus[key]?.routeParams, router.state, router.routeStatus)}
 {/if}
