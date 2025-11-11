@@ -56,7 +56,7 @@ export function expandAriaAttributes(aria: ActiveStateAriaAttributes | undefined
         return undefined;
     }
     const result = {} as AriaAttributes;
-    for (let [k, v] of Object.entries(aria)) {
+    for (const [k, v] of Object.entries(aria)) {
         if (v !== undefined) {
             // @ts-expect-error TS7053 - We know this construction is correct.
             result[`aria-${k}`] = v;
