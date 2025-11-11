@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { location } from '@wjfe/n-savant';
+  import { location } from '@svelte-router/core';
   
   // For this example, assume we have routing mode state
   let routingMode = $state('single'); // or 'multi'

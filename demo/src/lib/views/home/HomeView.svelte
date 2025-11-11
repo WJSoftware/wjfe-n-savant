@@ -7,7 +7,7 @@
 	import Card from '../../Card.svelte';
 	import CardHeader from '../../CardHeader.svelte';
 	import CardBody from '../../CardBody.svelte';
-	import { RouterTrace, Link } from '@wjfe/n-savant';
+	import { RouterTrace, Link } from '@svelte-router/core';
 	import xml from 'svelte-highlight/languages/xml';
 	import typescript from 'svelte-highlight/languages/typescript';
 
@@ -111,7 +111,7 @@
 			<div transition:fly={{ delay: 400, y: 50, duration: 600 }}>
 				<Card border="info">
 				<CardHeader background="info" textColor="white" class="text-center" tag="h3">
-					🎯 Why Choose @wjfe/n-savant?
+					🎯 Why Choose @svelte-router/core?
 				</CardHeader>
 				<CardBody>
 					<div class="row">
@@ -176,7 +176,7 @@
 			<div class="alert alert-primary text-center" transition:fly={{ delay: 700, y: 50, duration: 600 }}>
 				<h4 class="alert-heading">🎮 Ready to Get Started?</h4>
 				<p class="mb-3">
-					Explore the different routing modes and see the power of @wjfe/n-savant in action!
+					Explore the different routing modes and see the power of @svelte-router/core in action!
 				</p>
 				<div class="d-flex flex-wrap justify-content-center gap-3">
 					<Link href="/path-routing" class="btn btn-primary btn-lg">

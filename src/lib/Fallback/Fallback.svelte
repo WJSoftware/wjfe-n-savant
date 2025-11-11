@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
+	import { resolveHashValue } from '$lib/kernel/resolveHashValue.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { RouteStatus, WhenPredicate } from '$lib/types.js';
 	import { assertAllowedRoutingMode } from '$lib/utils.js';

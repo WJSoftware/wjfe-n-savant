@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { location } from "@wjfe/n-savant";
+    import { location } from "@svelte-router/core";
 
     function handleClick() {
         location.navigate('', { state: { showCodeDialog: true } });

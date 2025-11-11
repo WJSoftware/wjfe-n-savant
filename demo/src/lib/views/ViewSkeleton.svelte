@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { RouterTrace } from '@wjfe/n-savant';
+	import { RouterTrace } from '@svelte-router/core';
 	import type { Snippet } from 'svelte';
 
     type Props = {

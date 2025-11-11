@@ -4,7 +4,7 @@ import { render } from "@testing-library/svelte";
 import Fallback from "./Fallback.svelte";
 import { addMatchingRoute, addRoutes, createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
 import { flushSync } from "svelte";
-import { resetRoutingOptions, setRoutingOptions } from "$lib/core/options.js";
+import { resetRoutingOptions, setRoutingOptions } from "$lib/kernel/options.js";
 import type { ExtendedRoutingOptions } from "$lib/types.js";
 
 function defaultPropsTests(setup: ReturnType<typeof createRouterTestSetup>) {

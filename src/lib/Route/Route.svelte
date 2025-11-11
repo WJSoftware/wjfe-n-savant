@@ -19,7 +19,7 @@
 <script lang="ts" generics="T extends string | RegExp">
 	import { untrack, type Snippet } from 'svelte';
 	import { getRouterContext } from '../Router/Router.svelte';
-	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
+	import { resolveHashValue } from '$lib/kernel/resolveHashValue.js';
 	import type { ParameterValue, RouteStatus } from '$lib/types.js';
 	import { assertAllowedRoutingMode } from '$lib/utils.js';
 

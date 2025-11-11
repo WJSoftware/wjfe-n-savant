@@ -1,5 +1,5 @@
 <script>
-    const title = "@wjfe/n-savant Router";
+    const title = "@svelte-router/core Router";
     const subtitle = "The ultimate routing solution for Svelte PWA's and micro-frontends";
 </script>
 

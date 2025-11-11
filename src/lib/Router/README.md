@@ -23,7 +23,7 @@ Simplest form of use.
 
 ```svelte
 <script lang="ts">
-  import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@svelte-router/core';
 </script>
 
 <Router>
@@ -46,7 +46,7 @@ the MFE is meant to respond to sub-path routes only.
 
 ```svelte
 <script lang="ts">
-  import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@svelte-router/core';
 </script>
 
 <Router basePath="/subpath">
@@ -61,7 +61,7 @@ as needed.
 
 ```svelte
 <script lang="ts">
-  import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@svelte-router/core';
 </script>
 
 <Router basePath="/root">
@@ -93,7 +93,7 @@ Use the `fallback()` snippet of the router to present content when no routes mat
 
 ```svelte
 <script lang="ts">
-  import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@svelte-router/core';
 </script>
 
 <Router>
@@ -118,7 +118,7 @@ Parameters are expressed in the form `:<name>[?]`.  The optional `"?"` makes the
 
 ```svelte
 <script lang="ts">
-  import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@svelte-router/core';
   import UserProfile from '$lib/components/user-profile.svelte';
   import UserDetails from '$lib/components/user-details.svelte';
 </script>
@@ -142,7 +142,7 @@ never use this name as a name for one of your parameters.
 
 ```svelte
 <script lang="ts">
-  import { Router, Route } from '@wjfe/n-savant';
+  import { Router, Route } from '@svelte-router/core';
 </script>
 
 <Router>

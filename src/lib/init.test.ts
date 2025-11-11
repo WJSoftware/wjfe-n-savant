@@ -1,8 +1,8 @@
 import { describe, test, expect, afterEach } from "vitest";
 import { init, initFull } from "./init.js";
-import { location } from "./core/Location.js";
-import { LocationLite } from "./core/LocationLite.svelte.js";
-import { LocationFull } from "./core/LocationFull.js";
+import { location } from "./kernel/Location.js";
+import { LocationLite } from "./kernel/LocationLite.svelte.js";
+import { LocationFull } from "./kernel/LocationFull.js";
 
 let cleanup: (() => void) | undefined;
 

@@ -1,5 +1,5 @@
 import type { ActiveState, Hash } from "./types.js";
-import { routingOptions } from "./core/options.js";
+import { routingOptions } from "./kernel/options.js";
 import type { HTMLAnchorAttributes } from "svelte/elements";
 
 /**

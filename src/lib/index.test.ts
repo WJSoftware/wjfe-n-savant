@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { routingOptions } from "./core/options.js";
-import { location } from "./core/Location.js";
+import { routingOptions } from "./kernel/options.js";
+import { location } from "./kernel/Location.js";
 
 describe('index', () => {
     test("Should export exactly the expected objects.", async () => {

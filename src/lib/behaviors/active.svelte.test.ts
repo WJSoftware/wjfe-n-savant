@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, vi } from "vitest";
 import { activeBehavior } from "./active.svelte.js";
-import { RouterEngine } from "$lib/core/RouterEngine.svelte.js";
+import { RouterEngine } from "$lib/kernel/RouterEngine.svelte.js";
 import type { ActiveState, RouteStatus } from "$lib/types.js";
 import { render } from "@testing-library/svelte";
 import TestActiveBehavior from "../../testing/TestActiveBehavior.svelte";

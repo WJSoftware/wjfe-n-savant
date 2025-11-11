@@ -1,7 +1,7 @@
-import { LocationFull } from "./core/LocationFull.js";
-import { LocationLite } from "./core/LocationLite.svelte.js";
+import { LocationFull } from "./kernel/LocationFull.js";
+import { LocationLite } from "./kernel/LocationLite.svelte.js";
 import type { InitOptions } from "./types.js";
-import { initCore } from "./core/initCore.js";
+import { initCore } from "./kernel/initCore.js";
 
 /**
  * Initializes the routing library in normal mode.  The following features are available:
