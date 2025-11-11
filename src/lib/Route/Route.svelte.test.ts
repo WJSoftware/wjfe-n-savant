@@ -458,7 +458,7 @@ function routeBindingTestsForUniverse(setup: ReturnType<typeof createRouterTestS
         });
 
         // Navigate to a matching path - determine URL format based on routing mode
-        const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+        const shouldUseHash = (ru.defaultHash === true) || (hash === true) || (typeof hash === 'string');
         location.url.href = shouldUseHash ? "http://example.com/#/user/123" : "http://example.com/user/123";
         await vi.waitFor(() => {});
 
@@ -494,7 +494,7 @@ function routeBindingTestsForUniverse(setup: ReturnType<typeof createRouterTestS
         });
 
         // Navigate to a matching path - determine URL format based on routing mode
-        const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+        const shouldUseHash = (ru.defaultHash === true) || (hash === true) || (typeof hash === 'string');
         location.url.href = shouldUseHash ? "http://example.com/#/about" : "http://example.com/about";
         await vi.waitFor(() => {});
 
@@ -524,7 +524,7 @@ function routeBindingTestsForUniverse(setup: ReturnType<typeof createRouterTestS
         });
 
         // Navigate to a non-matching path - determine URL format based on routing mode
-        const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+        const shouldUseHash = (ru.defaultHash === true) || (hash === true) || (typeof hash === 'string');
         location.url.href = shouldUseHash ? "http://example.com/#/other" : "http://example.com/other";
         await vi.waitFor(() => {});
 
@@ -552,7 +552,7 @@ function routeBindingTestsForUniverse(setup: ReturnType<typeof createRouterTestS
         });
 
         // Navigate to first matching path - determine URL format based on routing mode
-        const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+        const shouldUseHash = (ru.defaultHash === true) || (hash === true) || (typeof hash === 'string');
         location.url.href = shouldUseHash ? "http://example.com/#/user/123" : "http://example.com/user/123";
         await vi.waitFor(() => {});
         
@@ -595,7 +595,7 @@ function routeBindingTestsForUniverse(setup: ReturnType<typeof createRouterTestS
         });
 
         // Navigate to a matching path - determine URL format based on routing mode
-        const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+        const shouldUseHash = (ru.defaultHash === true) || (hash === true) || (typeof hash === 'string');
         location.url.href = shouldUseHash ? "http://example.com/#/user/123/post/456" : "http://example.com/user/123/post/456";
         await vi.waitFor(() => {});
 
@@ -631,7 +631,7 @@ function routeBindingTestsForUniverse(setup: ReturnType<typeof createRouterTestS
         });
 
         // Navigate to a matching path - determine URL format based on routing mode
-        const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+        const shouldUseHash = (ru.defaultHash === true) || (hash === true) || (typeof hash === 'string');
         location.url.href = shouldUseHash ? "http://example.com/#/files/documents/readme.txt" : "http://example.com/files/documents/readme.txt";
         await vi.waitFor(() => {});
 
@@ -728,7 +728,7 @@ for (const ru of ROUTING_UNIVERSES) {
         
         beforeAll(() => {
             cleanup = init({
-                implicitMode: ru.implicitMode,
+                defaultHash: ru.defaultHash,
                 hashMode: ru.hashMode,
             });
         });

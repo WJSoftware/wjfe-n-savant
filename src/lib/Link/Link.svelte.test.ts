@@ -874,7 +874,7 @@ ROUTING_UNIVERSES.forEach(ru => {
 
         beforeAll(() => {
             cleanup = init({
-                implicitMode: ru.implicitMode,
+                defaultHash: ru.defaultHash,
                 hashMode: ru.hashMode,
             });
         });
@@ -910,7 +910,7 @@ ROUTING_UNIVERSES.forEach(ru => {
         let cleanup: () => void;
         beforeAll(() => {
             cleanup = init({
-                implicitMode: ru.implicitMode,
+                defaultHash: ru.defaultHash,
                 hashMode: ru.hashMode,
             });
         });

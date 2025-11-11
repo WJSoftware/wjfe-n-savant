@@ -1,5 +1,5 @@
 // Initialize with hash as default mode
-init({ implicitMode: 'hash' });
+init({ defaultHash: true });
 
 // Now you can omit the hash property!
 <Router id="modals">

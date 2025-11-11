@@ -51,7 +51,7 @@ describe('calculateState', () => {
             
             beforeAll(() => {
                 cleanup = init({ 
-                    implicitMode: universe.implicitMode,
+                    defaultHash: universe.defaultHash,
                     hashMode: universe.hashMode
                 });
             });
@@ -97,10 +97,10 @@ describe('calculateState', () => {
                     }
                     
                     // Assert - calculateState preserves existing state, so we need to account for that
-                    if (universe.hash === ALL_HASHES.path || (universe.hash === ALL_HASHES.implicit && universe.implicitMode === 'path')) {
+                    if (universe.hash === ALL_HASHES.path || (universe.hash === ALL_HASHES.implicit && universe.defaultHash === false)) {
                         expect(newState.path).toEqual(testState);
                         expect(newState.hash).toBeDefined();
-                    } else if (universe.hash === ALL_HASHES.single || (universe.hash === ALL_HASHES.implicit && universe.implicitMode === 'hash')) {
+                    } else if (universe.hash === ALL_HASHES.single || (universe.hash === ALL_HASHES.implicit && universe.defaultHash === true)) {
                         expect(newState.hash.single).toEqual(testState);
                         expect(newState.path).toBeDefined(); // Path is preserved
                     } else if (typeof universe.hash === 'string') {
@@ -228,7 +228,7 @@ describe('calculateState', () => {
 
             if (universe.hash === ALL_HASHES.implicit) {
                 describe("Implicit hash resolution", () => {
-                    test("Should resolve implicit hash according to implicitMode", () => {
+                    test("Should resolve implicit hash according to defaultHash", () => {
                         // Arrange
                         const testState = { implicit: 'test' };
                         
@@ -236,7 +236,7 @@ describe('calculateState', () => {
                         const newState = calculateState(testState);
                         
                         // Assert - calculateState preserves existing state
-                        if (universe.implicitMode === 'path') {
+                        if (universe.defaultHash === false) {
                             expect(newState.path).toEqual(testState);
                             expect(newState.hash).toBeDefined(); // Hash state preserved
                         } else {

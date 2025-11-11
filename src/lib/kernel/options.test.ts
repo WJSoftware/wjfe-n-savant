@@ -6,8 +6,8 @@ describe("options", () => {
         expect(routingOptions.hashMode).toBe('single');
     });
 
-    test("Should have correct default value for implicitMode option.", () => {
-        expect(routingOptions.implicitMode).toBe('path');
+    test("Should have correct default value for defaultHash option.", () => {
+        expect(routingOptions.defaultHash).toBe(false);
     });
 
     test("Should have correct default value for disallowPathRouting option.", () => {
@@ -31,20 +31,20 @@ describe("options", () => {
         routingOptions.hashMode = originalValue;
     });
 
-    test("Should allow modification of implicitMode option.", () => {
-        const originalValue = routingOptions.implicitMode;
-        routingOptions.implicitMode = 'hash';
-        expect(routingOptions.implicitMode).toBe('hash');
+    test("Should allow modification of defaultHash option.", () => {
+        const originalValue = routingOptions.defaultHash;
+        routingOptions.defaultHash = true;
+        expect(routingOptions.defaultHash).toBe(true);
 
         // Restore original value
-        routingOptions.implicitMode = originalValue;
+        routingOptions.defaultHash = originalValue;
     });
 
     test("Should contain all required properties as non-nullable.", () => {
         expect(routingOptions.hashMode).toBeDefined();
-        expect(routingOptions.implicitMode).toBeDefined();
+        expect(routingOptions.defaultHash).toBeDefined();
         expect(typeof routingOptions.hashMode).toBe('string');
-        expect(typeof routingOptions.implicitMode).toBe('string');
+        expect(typeof routingOptions.defaultHash).toBe('boolean');
     });
 
     describe('resetRoutingOptions', () => {
@@ -52,7 +52,7 @@ describe("options", () => {
             // Arrange.
             const original = structuredClone(routingOptions);
             routingOptions.hashMode = 'multi';
-            routingOptions.implicitMode = 'hash';
+            routingOptions.defaultHash = true;
             routingOptions.disallowPathRouting = true;
             routingOptions.disallowHashRouting = true;
             routingOptions.disallowMultiHashRouting = true;

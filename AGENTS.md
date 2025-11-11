@@ -9,8 +9,9 @@ The @svelte-router/core routing library supports simultaneous path and hash rout
 - **Path Routing** (`hash: false`): Uses URL pathname
 - **Single Hash Routing** (`hash: true`): Uses URL hash as a single path (e.g., `#/path/to/route`)
 - **Multi Hash Routing** (`hash: 'p1'`): Uses semicolon-separated hash segments (e.g., `#p1=/path;p2=/other`)
-- **Implicit Path Routing** (`hash: undefined`, `implicitMode: 'path'`): Resolves to path routing
-- **Implicit Hash Routing** (`hash: undefined`, `implicitMode: 'hash'`): Resolves to hash routing
+- **Implicit Path Routing** (`hash: undefined`, `defaultHash: false`): Resolves to path routing
+- **Implicit Hash Routing** (`hash: undefined`, `defaultHash: true`): Resolves to hash routing
+- **Implicit Named Hash Routing** (`hash: undefined`, `defaultHash: <a string>`):  Resolves to named (multi) hash routing
 
 #### Example Multi-Universe Setup
 ```svelte
@@ -268,7 +269,7 @@ ROUTING_UNIVERSES.forEach((ru) => {
         let cleanup: () => void;
         beforeAll(() => {
             cleanup = init({ 
-                implicitMode: ru.implicitMode,
+                defaultHash: ru.defaultHash,
                 hashMode: ru.hashMode
             });
         });
@@ -414,7 +415,7 @@ function bindablePropertyTests(setup: ReturnType<typeof createRouterTestSetup>, 
         });
 
         // Trigger binding based on routing mode
-        const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+        const shouldUseHash = (ru.defaultHash === true) || (hash === true) || (typeof hash === 'string');
         const url = shouldUseHash ? "http://example.com/#/test" : "http://example.com/test";
         location.url.href = url;
         await vi.waitFor(() => {});
@@ -579,7 +580,7 @@ test("Should bind route parameters correctly.", async () => {
     });
 
     // Navigate to matching route
-    const shouldUseHash = (ru.implicitMode === 'hash') || (hash === true) || (typeof hash === 'string');
+    const shouldUseHash = (ru.defaultHash === true) || (hash === true) || (typeof hash === 'string');
     location.url.href = shouldUseHash ? "http://example.com/#/user/42" : "http://example.com/user/42";
     await vi.waitFor(() => {});
 
@@ -816,7 +817,7 @@ ROUTING_UNIVERSES.forEach((universe) => {
         
         beforeAll(() => {
             cleanup = init({ 
-                implicitMode: universe.implicitMode,
+                defaultHash: universe.defaultHash,
                 hashMode: universe.hashMode
             });
             setup = createRouterTestSetup(universe.hash);

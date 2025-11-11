@@ -475,7 +475,7 @@ for (const ru of ROUTING_UNIVERSES) {
         
         beforeAll(() => {
             cleanup = init({
-                implicitMode: ru.implicitMode,
+                defaultHash: ru.defaultHash,
                 hashMode: ru.hashMode,
             });
         });

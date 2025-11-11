@@ -10,7 +10,7 @@ import { vi } from "vitest";
  */
 export type RoutingUniverse = {
     hash: Hash | undefined;
-    implicitMode: RoutingOptions['implicitMode'];
+    defaultHash: Hash;
     hashMode: Exclude<RoutingOptions['hashMode'], undefined>;
     /**
      * Short universe identifier.  Used in test titles and descriptions.
@@ -26,11 +26,11 @@ export type RoutingUniverse = {
  * Standard routing universe test configurations
  */
 export const ROUTING_UNIVERSES: RoutingUniverse[] = [
-    { hash: undefined, implicitMode: 'path', hashMode: 'single', text: "IMP", name: "Implicit Path Routing" },
-    { hash: undefined, implicitMode: 'hash', hashMode: 'single', text: "IMH", name: "Implicit Hash Routing" },
-    { hash: false, implicitMode: 'path', hashMode: 'single', text: "PR", name: "Path Routing" },
-    { hash: true, implicitMode: 'path', hashMode: 'single', text: "HR", name: "Hash Routing" },
-    { hash: 'p1', implicitMode: 'path', hashMode: 'multi', text: "MHR", name: "Multi Hash Routing" },
+    { hash: undefined, defaultHash: false, hashMode: 'single', text: "IMP", name: "Implicit Path Routing" },
+    { hash: undefined, defaultHash: true, hashMode: 'single', text: "IMH", name: "Implicit Hash Routing" },
+    { hash: false, defaultHash: false, hashMode: 'single', text: "PR", name: "Path Routing" },
+    { hash: true, defaultHash: false, hashMode: 'single', text: "HR", name: "Hash Routing" },
+    { hash: 'p1', defaultHash: false, hashMode: 'multi', text: "MHR", name: "Multi Hash Routing" },
 ] as const;
 
 /**
@@ -40,7 +40,7 @@ export const ALL_HASHES = {
     path: false,        // Path routing
     single: true,       // Hash routing (single)
     multi: 'p1',        // Multi-hash routing
-    implicit: undefined // Implicit routing (depends on implicitMode)
+    implicit: undefined // Implicit routing (depends on defaultHash)
 } as const;
 
 /**

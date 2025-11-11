@@ -200,7 +200,7 @@ ROUTING_UNIVERSES.forEach(universe => {
             browserMocks = setupBrowserMocks("http://example.com/", location);
             cleanup = init({
                 hashMode: universe.hashMode,
-                implicitMode: universe.implicitMode
+                defaultHash: universe.defaultHash
             });
         });
 
@@ -294,8 +294,8 @@ ROUTING_UNIVERSES.forEach(universe => {
                 } else if (typeof universe.hash === 'string') {
                     expectedState = state.hash[universe.hash];
                 } else {
-                    // For implicit modes (hash === undefined), the behavior depends on implicitMode
-                    expectedState = universe.implicitMode === 'path' ? state.path : state.hash.single;
+                    // For implicit modes (hash === undefined), the behavior depends on defaultHash
+                    expectedState = universe.defaultHash === false ? state.path : state.hash.single;
                 }
                 expect(router.state).toBe(expectedState);
             });

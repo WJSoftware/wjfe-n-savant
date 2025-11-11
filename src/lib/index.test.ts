@@ -36,7 +36,7 @@ describe('index', () => {
     test("Should have default routing options in uninitialized state.", () => {
         // Assert.
         expect(routingOptions.hashMode).toBe('single');
-        expect(routingOptions.implicitMode).toBe('path');
+        expect(routingOptions.defaultHash).toBe(false);
     });
 
     test("Should have no location in uninitialized state.", () => {
