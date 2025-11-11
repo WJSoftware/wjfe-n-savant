@@ -1,14 +1,36 @@
-# <img src="src/lib/logo/logo-48.svg" alt="N-Savant Logo" width="48" height="48" align="left">&nbsp;&nbsp;&nbsp;@wjfe/n-savant
+# <img src="src/lib/logo/logo-48.svg" alt="N-Savant Logo" width="48" height="48" align="left">&nbsp;&nbsp;@wjfe/n-savant
 
-> The client-side router for Svelte v5 SPA's that invented multi hash routing.
+> ⚠️ DEPRECATED
+> 
+> This package has been deprecated because it has been renamed and re-branded.  Use `@svelte-router/core` instead.
+
+## 📦 Package Renaming & Deprecation Notice
+
+The `@wjfe/n-savant` and `@wjfe/n-savant-sk` packages are now deprecated and will no longer receive updates. Please 
+migrate to the new `@svelte-router/*` packages to ensure compatibility with future versions of Svelte.
+
+### Migration Instructions
+
+As of v1.0, the router has been renamed to better reflect its role in the Svelte ecosystem.  Install the new package 
+and update your imports:
+
+| Old Package Path          | New Package Path              |
+|---------------------------|-------------------------------|
+| `@wjfe/n-savant`          | `@svelte-router/core`         |
+| `@wjfe/n-savant-sk`       | `@svelte-router/kit`          |
+| `@wjfe/n-savant/core`     | `@svelte-router/core/kernel`  |
+
+---
 
 [REPL Demo](https://svelte.dev/playground/d273d356947e48c0822a65402fd06fac)
+
+[Full Documentation @ Hashnode Space](https://wjfe-n-savant.hashnode.space)
 
 ## Features
 
 > **📝 Small and Unique!**
 > 
-> + Less than **1,450** lines of code, including TypeScript typing.
+> + About **1,450** lines of code, including TypeScript typing.
 > + Always-on path and hash routing.  Simultaneous and independent routing modes.
 > + The router that invented multi hash routing.
 > + **NEW!** Supports Sveltekit (via [@wjfe/n-savant-sk](https://github.com/WJSoftware/wjfe-n-savant-sk))
