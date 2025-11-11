@@ -601,7 +601,7 @@ This pattern provides:
 import { init, type Hash } from "$lib/index.js";
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { render } from "@testing-library/svelte";
-import { RouterEngine } from "$lib/core/RouterEngine.svelte.js";
+import { RouterEngine } from "$lib/kernel/RouterEngine.svelte.js";
 import { getRouterContextKey } from "../Router/Router.svelte";
 import { createRawSnippet } from "svelte";
 import { flushSync } from "svelte"; // For Svelte 5 reactivity testing
