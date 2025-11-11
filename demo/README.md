@@ -1,4 +1,4 @@
-# @wjfe/n-savant Demo
+# @svelte-router/core Demo
 
 This folder contains the demo and tester the author uses while developing the library.  It is a **Vite + Svelte + TS** project created with `npm create vite@latest`.
 
@@ -12,7 +12,7 @@ npm ci
 
 Then, you can do one of 2 options:
 
-1. Install the routing library:  `npm i @wjfe/n-savant`
+1. Install the routing library:  `npm i @svelte-router/core`
 2. Build the package and link it with NPM.
 
 The first option simply pulls the latest version from `npmjs.org`.  Not good for development of the library.
@@ -26,7 +26,7 @@ npm run prepack && npm link
 Now move to the `/demo` folder and complete the link:
 
 ```bash
-npm link @wjfe/n-savant
+npm link @svelte-router/core
 ```
 
 You are ready to run the development server:

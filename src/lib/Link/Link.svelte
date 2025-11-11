@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { calculateHref } from '$lib/core/calculateHref.js';
-	import { calculateState } from '$lib/core/calculateState.js';
-	import { location } from '$lib/core/Location.js';
-	import { resolveHashValue } from '$lib/core/resolveHashValue.js';
+	import { calculateHref } from '$lib/kernel/calculateHref.js';
+	import { calculateState } from '$lib/kernel/calculateState.js';
+	import { location } from '$lib/kernel/Location.js';
+	import { resolveHashValue } from '$lib/kernel/resolveHashValue.js';
 	import { getLinkContext, type ILinkContext } from '$lib/LinkContext/LinkContext.svelte';
 	import { isRouteActive } from '$lib/public-utils.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
-	import type { ActiveState, Hash, RouteStatus } from '$lib/types.js';
+	import type { Hash, RouteStatus } from '$lib/types.js';
 	import { assertAllowedRoutingMode, joinStyles } from '$lib/utils.js';
 	import { type Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';

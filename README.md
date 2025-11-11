@@ -1,89 +1,62 @@
-# <img src="src/lib/logo/logo-48.svg" alt="N-Savant Logo" width="48" height="48" align="left">&nbsp;&nbsp;&nbsp;@wjfe/n-savant
+# <img src="src/lib/logo/logo-48.svg" alt="Svelte Router Logo" width="48" height="48" align="left">&nbsp;&nbsp;@svelte-router/core
 
-> The client-side router for Svelte v5 SPA's that invented multi hash routing.
+> Next-level routing for Svelte and Sveltekit.
 
 [REPL Demo](https://svelte.dev/playground/d273d356947e48c0822a65402fd06fac)
 
+[Full Documentation @ Hashnode Space](https://wjfe-n-savant.hashnode.space)
+
+> **🚧 IMPORTANT NOTICE**
+> 
+> We're in the process of re-branding the package as `@svelte-router/core`.  This document has been updated to reflect 
+> this (future) new package name.  In the meantime, continue using the soon-to-be-deprecated package name,
+> `@wjfe/n-savant` when installing or importing.
+> 
+> If you need to import stuff from `@svelte-router/core/kernel`, in the old package the path is `@wjfe/n-savant/core`.
+> 
+> The full online documentation has already been updated, but the URL's cannot be changed.  Alas, we'll have to deploy 
+> our own docs and stop using Hashnode Space.
+
 ## Features
 
-> **📝 Small and Unique!**
-> 
-> + Less than **1,450** lines of code, including TypeScript typing.
-> + Always-on path and hash routing.  Simultaneous and independent routing modes.
-> + The router that invented multi hash routing.
-> + **NEW!** Supports Sveltekit (via [@wjfe/n-savant-sk](https://github.com/WJSoftware/wjfe-n-savant-sk))
-
++ **Always-on path and hash routing**:  Simultaneous, independent and always-on routing modes.
++ **Multi hash routing**:  Doing micro-frontends?  Routing tabs or dialogs using the URL?  Have as many paths as needed.
++ **Sveltekit support**: Add hash routing on top of Sveltekit's path routing Via 
+[@svelte-router/kit](https://github.com/WJSoftware/svelte-router-kit)
 + **Electron support**:  Works with Electron (all routing modes)
 + **Reactivity-based**:  All data is reactive, reducing the need for events and imperative programming.
-+ **Always-on path and hash routing**:  Add routers that use the URL's path name or the URL's hash value in the same 
-application.  Both routing modes are possible simultaneously.
-+ **Multi-hash routing**:  This is the first router in the world to do this:  You can create named paths in the hash 
-value of the URL and create router hierarchies that use a specific named path.
 
-### `<Router>` Component
+**Components**:
 
-+ **Multi-matching routes**:  All routes are evaluated, which is useful to mount micro-frontends.
-+ **Base paths**:  Specify base paths that are inherited by routes and nesting routers.
-+ **Nesting routers**:  Add child routers inside routers for fine-grained control.
-+ **Liberty**:  Place anything anywhere inside.  No child restrictions.
++ `<Router>`
++ `<Route>`
++ `<Fallback>`
++ `<Link>`
++ `<LinkContext>`
++ `<RouterTrace>`
 
-### `<Route>` Component
+**Reactive Data**:
 
-+ **Exact path matching**:  Exact match by default; specify the rest parameter to relax the condition.
-+ **Path as string or regular expression**:  Define paths however's best for you.
-+ **Route parameters**:  Define route parameters inside string paths or regular expression paths.
-+ **Rest parameter**:  Collect "the rest" of the path.
-+ **Optional parameters**:  Parameters may be specified as optional.
-+ **Additional matching logic**:  Add a predicate function to further restrict a route's matching ability.
-+ **Path is optional**:  Forgo path specification entirely and handle route matching entirely with code.
-+ **Superb Intellisense**:  The route parameters are strongly typed when defining them inside a string path.
-+ **Disconnected UI pieces**:  Repeat route keys in `Route` components to show disconnected pieces of UI for a given 
-route's key.
++ `location.url`
++ `location.hashPaths`
++ `location.getState()`
++ `RouterEngine.routes`
++ `RouterEngine.routeStatus`
 
-### `<Fallback>` Component
+All data is a Svelte signal.  Add routes dynamically or reactively, change route conditions on the fly, and more pieces 
+of user interface on-demand, etc.  All works reactively.
 
-+ **Non-matching content**:  Show users something when there are no matching routes.
-+ **Disconnected content**:  Add as many `Fallback` components as needed in various places.
+### Two Library Modes
 
-### `<Link>` Component
-
-+ **Drop-in replacement**:  Exchange `<a>` tags with `<Link>` tags and you're done.[^1]
-+ **Specify state**:  Set history state upon hyperlink click.
-+ **Active state based on route key**:  Automatically set active state and `aria-current` by specifying the route's key.
-+ **Replace or push**:  Select the method for pushing state.
-+ **Preserve query string**:  Opt in to preserve existing query string values.
-+ **Shallow routing**:  [This Sveltekit](https://svelte.dev/docs/kit/shallow-routing) document explains the concept.
-
-[^1]:  For hyperlink components that only specify a hash and are converted to hash-routing `<Link>` components, remove 
-the pound sign (`#`) from the href.
-
-### `<LinkContext>` Component
-
-+ **Centralize `<Link>` configuration**:  Configures a special context that all `<Link>` components follow.
-
-### `<RouterTrace>` Component
-
-+ **Tracing Information**:  Drop it inside a router to display its route status data, including the internal regular 
-expressions that are generated from string path patterns.
-+ **Specify a specific router**:  Ability to give it a specific router engine object, allowing tracing of router engine 
-objects created in code.
-+ **Track child routers**:  See and traverse the router hierarchy.
-
-### `location` Global Object
-
-+ **Reactive URL**:  URL object that's always in sync with the browser's URL.
-+ **Reactive state**:  Reactive state property that's always in sync with the history state.
-+ **Reactive hash paths**:  Reactive dictionary object for all hash paths.
-+ **Programatic navigation**:  Use the the `navigate()` method to trigger navigation programatically.
+Most people only need the normal or "lite" version.  Use the full version to battle/counter foreign routers
+(micro-frontend scenarios, most likely).
 
 #### In Full Mode...
 
-+ **Cancellable `beforeNavigate` event**:  Get notified of navigation events, and cancel when appropriate.
-+ **`navigationCancelled` event**:  Get notified whenever navigation is cancelled.
 + **History API interception**:  Gain control over the history object to avoid external code/routers from 
 de-synchronizing state.
-+ **Micro-frontends**:  Full mode's features are great for micro-frontend scenarios where other routers (from 
-potentially other technologies) might interfere with the router's functionality.
++ **Cancellable `beforeNavigate` event**:  Get notified of navigation events, and cancel when appropriate.
++ **`navigationCancelled` event**:  Get notified whenever navigation is cancelled.
 
 ## Quickstart
 
@@ -95,36 +68,47 @@ potentially other technologies) might interfere with the router's functionality.
 ### Install the package
 
 ```bash
-npm i @wjfe/n-savant
+npm i @svelte-router/core
 ```
 
 ### Initialize the Library
 
 ```typescript
 // In your main.ts, or somewhere BEFORE any routers are created:
-import { init } from "@wjfe/n-savant";
+import { init } from "@svelte-router/core";
 
-// Default:  Lite mode, implicit path routing, no router hierarchy tracing, single hash mode.
-init();
+/*
+Default:
 
-// If all you care about is (traditional) hash routing, the recommendation is to change the implicit mode:
+- Lite mode
+- Implicit path routing
+- No router hierarchy tracing
+- Single hash mode
+- Log to console.
+*/
+init(); // Or use initFull() for full-mode.
+
+// Common case:  "I just need good, old-fashioned hash routing."
 init({ implicitMode: 'hash' });
 ```
 
 #### Electron Variant
 
-In Electron, we must immediately navigate to the homepage (or your preferred initial route) right after initializing if you use path routing:
+In Electron, we must immediately navigate to the homepage (or your preferred initial route) right after initializing 
+if you use path routing:
 
 ```typescript
-import { init, location } from "@wjfe/n-savant";
+import { init, location } from "@svelte-router/core";
 
 init();
 location.goTo('/');
 ```
 
-For applications that also run in the browser, condition the navigation to Electron only.  See the [Electron page](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/introduction/electron-support) online for more details.
-
 > **⚠️ Important:** Hash routing doesn't require this extra navigation step.
+
+For applications that also run in the browser, condition the navigation to Electron only.  See the 
+[Electron page](https://wjfe-n-savant.hashnode.space/wjfe-n-savant/introduction/electron-support) online for more 
+details.
 
 ### Define the Routes
 
@@ -133,7 +117,7 @@ For applications that also run in the browser, condition the navigation to Elect
 
 ```svelte
 <script lang="ts">
-  import { Router, Route } from "@wjfe/n-savant";
+  import { Router, Route } from "@svelte-router/core";
   import NavBar from "./lib/NavBar.svelte";
   import UserView from "./lib/UserView.svelte";
 </script>
@@ -165,7 +149,7 @@ functionality.  Still, this is not mandatory.
 ```svelte
 <!-- NavBar.svelte -->
 <script lang="ts">
-  import { Link } from "@wjfe/n-savant";
+  import { Link } from "@svelte-router/core";
 </script>
 
 <nav>
@@ -203,7 +187,7 @@ name, while specialty MFE's could route using the path in the hash part of the U
 
 ### Multi-Hash Routing
 
-As of February 2025, no other router in the world can do this.
+As of November 2025, no other router in the world can do this to the best of our knowledge.
 
 Imagine a scenario where your MFE application would like to show side-by-side two micro-frontends that are 
 router-enabled (meaning they use or need to work with a path).  With traditional routing, you could not have this setup 
@@ -222,8 +206,8 @@ abandon the use of `registerApplication()` and `start()` and just mount parcels 
 
 ## Unobtrusive Philosophy
 
-This mini router library imposes minimal restrictions.  Here are some features provided by other much larger codebases 
-that are not provided here because Svelte already has the capability.
+This router library imposes minimal restrictions.  Here are some features provided by other much larger codebases that 
+are not provided here because Svelte already has the capability.
 
 ### Transitions
 
@@ -238,9 +222,6 @@ Nothing prevents you to add transitions to anything.
   {/snippet}
 </Route>
 ```
-
-> **📝 Note:** This one item might be worthwhile revisiting for the cases where synchronized transitions are desired.  This, 
-> however, won't be looked at until Svelte attachments become a thing.
 
 ### Guarded Routes
 
@@ -289,7 +270,7 @@ There are no navigation events defined.  Simply write effects or derived computa
 object's `url`, `state` or `hashPaths` properties, which are reactive.
 
 ```typescript
-import { location } from "@wjfe/n-savant";
+import { location } from "@svelte-router/core";
 
 // Or $derived, whichever you need.
 $effect(() => {
@@ -348,7 +329,7 @@ property of router engines (which is reactive) by binding to a router's `router`
 
 ```svelte
 <script lang="ts">
-  import { RouterEngine } from "@wjfe/n-savant/core";
+  import { RouterEngine } from "@svelte-router/core/kernel";
 
   let router: $state<RouterEngine>();
 
@@ -370,10 +351,6 @@ property of router engines (which is reactive) by binding to a router's `router`
 
 ## Navigation
 
-> Since **v0.4.0**
-
-> **💥 BREAKING CHANGE:**  Navigation has been re-done in v0.4.0.
-
 The recommended way of navigating is to create `<Link>` component instances to render links on the document(s).  If 
 needed, however, there are 2 navigation functions in the `location` object:  `navigate()` and `goTo()`.
 
@@ -382,7 +359,7 @@ needed, however, there are 2 navigation functions in the `location` object:  `na
 This is the preferred method for programmatic navigation as it understands routing universes and properly manages state:
 
 ```typescript
-import { location } from "@wjfe/n-savant";
+import { location } from "@svelte-router/core";
 
 // Path routing navigation:
 location.navigate('/new/path', { 
@@ -422,7 +399,7 @@ The `navigate()` method automatically:
 This method provides direct URL navigation without routing universe awareness:
 
 ```typescript
-import { location } from "@wjfe/n-savant";
+import { location } from "@svelte-router/core";
 
 // Direct URL navigation:
 location.goTo('https://example.com/new/path', { 
@@ -439,14 +416,15 @@ location.goTo('/new/path', {
 });
 ```
 
-**⚠️ Important:** `goTo()` requires you to provide a complete `State` object and does not understand routing universes. Use `navigate()` unless you specifically need direct URL control.
+**⚠️ Important:** `goTo()` requires you to provide a complete `State` object and does not understand routing 
+universes. Use `navigate()` unless you specifically need direct URL control.
 
 ### Options Reference
 
 Both methods support these common options:
 
 - **`replace?: boolean`** - Replace current URL instead of pushing new entry (default: `false`)
-- **`preserveQuery?: PreserveQuery`** - Preserve current query parameters
+- **`preserveQuery?: PreserveQuery`** - Preserve current query parameters (default: `false`)
   - `true` - Preserve all query parameters
   - `string` - Preserve specific parameter by name  
   - `string[]` - Preserve multiple specific parameters
@@ -462,10 +440,10 @@ Additional `goTo()` options:
 
 1. **Use `<Link>` components** for user-triggered navigation
 2. **Use `navigate()`** for programmatic navigation within routing universes
-3. **Use `goTo()`** only for direct URL manipulation or external navigation
-4. **Always specify `hash`** in `navigate()` to ensure proper state management
+3. **Use `goTo()`** only for direct URL manipulation
+4. **Try to specify `hash`** in `navigate()` instead of relying on the implicit mode whenever possible
 
-Just in case you are wondering:  The navigation logic is already there in `<Link>` components:
+Just in case you are wondering:  This navigation logic is already there in `<Link>` components:
 
 ```svelte
 <!-- Path Routing => https://example.com/new/path -->
@@ -479,12 +457,14 @@ Just in case you are wondering:  The navigation logic is already there in `<Link
 <Link hash="path1" href="/new/path">Click Me!</Link>
 ```
 
-> **⚠️ Important:** Not setting the `hash` property is **not the same** as setting it to `false`.  When `hash` is `undefined`, either 
-> because the property is not specified at all, or its value is set to `undefined` explicitly, the value of the 
-> `implicitMode` routing option, which is set when the library is initialized, will be used to resolve a `true` or 
-> `false` value.
+As seen, the value of the `href` property never changes.  It's always a path, regardless of the routing universe.
+
+> **⚠️ Important:** Not setting the `hash` property is **not the same** as setting it to `false`.  When `hash` is 
+> `undefined`, either because the property is not specified at all, or its value is set to `undefined` explicitly, the 
+> value of the `implicitMode` library option, which is set when the library is initialized, will be used to resolve a 
+> `true` or `false` value.
 >
-> This is true for all components.
+> This is true for all components that support the `hash` property.
 
 ## Playing with Fire
 
@@ -493,6 +473,6 @@ on the router layouts, again, **at your own risk**.
 
 ---
 
-[Full Documentation @ Hashnode Space](https://wjfe-n-savant.hashnode.space)
+[Issues Here](https://github.com/WJSoftware/svelte-router-core/issues)
 
-If you would like to report a bug or request a feature, head to the [Issues page](https://github.com/WJSoftware/wjfe-n-savant/issues).
+[Questions, Polls, Show & Tell, etc. Here](https://github.com/WJSoftware/svelte-router-core/discussions)

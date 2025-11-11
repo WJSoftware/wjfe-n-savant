@@ -2,7 +2,7 @@
     import Router from "$lib/Router/Router.svelte";
     import Route from "$lib/Route/Route.svelte";
 	import RouterTrace from "$lib/RouterTrace/RouterTrace.svelte";
-	import { RouterEngine } from "$lib/core/RouterEngine.svelte.js";
+	import { RouterEngine } from "$lib/kernel/RouterEngine.svelte.js";
 
     const x = new RouterEngine();
 </script>

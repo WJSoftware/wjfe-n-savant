@@ -9,7 +9,7 @@ export { default as Router } from "./Router/Router.svelte";
 export * from "./Fallback/Fallback.svelte";
 export { default as Fallback } from "./Fallback/Fallback.svelte";
 export type * from "./types.js";
-export { location } from "./core/Location.js";
+export { location } from "./kernel/Location.js";
 export * from './RouterTrace/RouterTrace.svelte';
 export { default as RouterTrace } from './RouterTrace/RouterTrace.svelte';
 export * from "./public-utils.js";

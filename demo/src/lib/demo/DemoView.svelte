@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Route, Router, RouterTrace } from '@wjfe/n-savant';
+	import { Route, Router, RouterTrace } from '@svelte-router/core';
 	import NavBar from './NavBar.svelte';
 	import RouterFeaturesView from './RouterFeaturesView.svelte';
 	import RouteFeaturesView from './RouteFeaturesView.svelte';

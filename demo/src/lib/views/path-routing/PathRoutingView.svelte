@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Router, Route } from '@wjfe/n-savant';
+	import { Router, Route } from '@svelte-router/core';
 	import HomeView from './views/HomeView.svelte';
 	import ViewSkeleton from '../ViewSkeleton.svelte';
 	import DemoView from '../../demo/DemoView.svelte';

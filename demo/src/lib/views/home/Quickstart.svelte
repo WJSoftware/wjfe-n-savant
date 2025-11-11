@@ -21,14 +21,14 @@
         <p>Install the package:</p>
         <CodeSnippet 
             language={bash} 
-            code="npm install @wjfe/n-savant"
+            code="npm install @svelte-router/core"
             title="Installation"
         />
         <p>Then, in your Svelte app:</p>
         <CodeSnippet 
             language={typescript} 
             code={`<scr` + `ipt lang="ts">
-    import { Router, Route } from '@wjfe/n-savant';
+    import { Router, Route } from '@svelte-router/core';
     import Hero from './lib/Hero.svelte';
     import Features from './lib/Features.svelte';
 </script>

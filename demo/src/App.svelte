@@ -2,7 +2,7 @@
 	import './app.scss';
 	import NavBar from './lib/NavBar.svelte';
 	import Tooltip from './lib/Tooltip.svelte';
-	import { Router, Route, Fallback, RouterTrace, activeBehavior } from '@wjfe/n-savant';
+	import { Router, Route, Fallback, RouterTrace, activeBehavior } from '@svelte-router/core';
 	import NotFound from './lib/NotFound.svelte';
 	import HomeView from './lib/views/home/HomeView.svelte';
 	import PathRoutingView from './lib/views/path-routing/PathRoutingView.svelte';
@@ -37,7 +37,7 @@
 						{#snippet reference(ref)}
 							<NavBar {@attach ref} />
 						{/snippet}
-						Use these navigation links to test-drive the routing capabilities of @wjfe/n-savant.
+						Use these navigation links to test-drive the routing capabilities of @svelte-router/core.
 					</Tooltip>
 					<div class="breadcrumb">
 						<span>

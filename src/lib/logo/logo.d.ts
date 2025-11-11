@@ -1,14 +1,14 @@
-declare module '@wjfe/n-savant/logo' {
+declare module '@svelte-router/core/logo' {
   const content: string;
   export default content;
 }
 
-declare module '@wjfe/n-savant/logo64' {
+declare module '@svelte-router/core/logo64' {
   const content: string;
   export default content;
 }
 
-declare module '@wjfe/n-savant/logo48' {
+declare module '@svelte-router/core/logo48' {
   const content: string;
   export default content;
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Link } from "@wjfe/n-savant";
+    import { Link } from "@svelte-router/core";
     import { routingMode } from "../../../hash-routing";
 
     const href = $derived(routingMode === 'single' ?

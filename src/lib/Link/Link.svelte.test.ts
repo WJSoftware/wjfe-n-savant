@@ -1,14 +1,14 @@
 import { init } from "$lib/init.js";
-import { location } from "$lib/core/Location.js";
+import { location } from "$lib/kernel/Location.js";
 import { describe, test, expect, beforeAll, afterAll, beforeEach, vi, afterEach } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
 import Link from "./Link.svelte";
 import { createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES, createWindowMock, setupBrowserMocks, type RoutingUniverse, addMatchingRoute } from "../../testing/test-utils.js";
 import { flushSync } from "svelte";
-import { resetRoutingOptions, setRoutingOptions } from "$lib/core/options.js";
+import { resetRoutingOptions, setRoutingOptions } from "$lib/kernel/options.js";
 import type { ExtendedRoutingOptions } from "$lib/types.js";
 import { linkCtxKey, type ILinkContext } from "$lib/LinkContext/LinkContext.svelte";
-import { calculateHref } from "$lib/core/calculateHref.js";
+import { calculateHref } from "$lib/kernel/calculateHref.js";
 
 function basicLinkTests(setup: ReturnType<typeof createRouterTestSetup>) {
     const linkText = "Test Link";

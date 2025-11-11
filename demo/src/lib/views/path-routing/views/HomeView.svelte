@@ -31,7 +31,7 @@
 				</CardHeader>
 				<CardBody>
 					<p>
-						Path routing is the default mode in <code>@wjfe/n-savant</code>. It feels natural 
+						Path routing is the default mode in <code>@svelte-router/core</code>. It feels natural 
 						because it works just like regular websites - but faster!
 					</p>
 					<CodeSnippet 

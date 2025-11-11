@@ -1,10 +1,10 @@
-# N-Savant Routing Library
+# Svelte Router Routing Library
 
 ## Library Architecture Overview
 
 ### Routing Universes Concept
 
-The @wjfe/n-savant routing library supports simultaneous path and hash routing through "routing universes":
+The @svelte-router/core routing library supports simultaneous path and hash routing through "routing universes":
 
 - **Path Routing** (`hash: false`): Uses URL pathname
 - **Single Hash Routing** (`hash: true`): Uses URL hash as a single path (e.g., `#/path/to/route`)

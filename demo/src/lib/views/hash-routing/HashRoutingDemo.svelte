@@ -4,7 +4,7 @@
 	import CardBody from "../../CardBody.svelte";
 	import CardHeader from "../../CardHeader.svelte";
 	import { routingMode, toggleRoutingMode } from "../../hash-routing";
-    import { Route, Router, location } from "@wjfe/n-savant";
+    import { Route, Router, location } from "@svelte-router/core";
 	import ViewSkeleton from "../ViewSkeleton.svelte";
 	import DemoView from "../../demo/DemoView.svelte";
 	import CodeSnippet from "../../CodeSnippet.svelte";
@@ -172,7 +172,7 @@
 				<div class="modal-body">
 					<p class="mb-3">
 						Here's a simplified example showing how to create a live hash display using 
-						<code>@wjfe/n-savant</code>'s reactive location object:
+						<code>@svelte-router/core</code>'s reactive location object:
 					</p>
 					<CodeSnippet 
 						language={xml} 

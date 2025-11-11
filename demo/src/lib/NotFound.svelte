@@ -1,5 +1,5 @@
 <script>
-    import { location } from "@wjfe/n-savant";
+    import { location } from "@svelte-router/core";
 </script>
 
 <div class="text-center">

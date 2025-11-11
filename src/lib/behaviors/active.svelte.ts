@@ -2,7 +2,7 @@ import type { Attachment } from "svelte/attachments";
 import type { ActiveState, RouteStatus } from "../types.js";
 import { joinStyles } from "$lib/utils.js";
 import { isRouteActive } from "$lib/public-utils.js";
-import type { RouterEngine } from "$lib/core/RouterEngine.svelte.js";
+import type { RouterEngine } from "$lib/kernel/RouterEngine.svelte.js";
 import { clsx } from "clsx";
 
 /**
@@ -16,7 +16,7 @@ import { clsx } from "clsx";
  * @example
  * ```svelte
  * <script lang="ts">
- *   import { activeBehavior, Router } from '@wjfe/n-savant';
+ *   import { activeBehavior, Router } from '@svelte-router/core';
  * </script>
  * <Router>
  *   {#snippet children(_, rs)}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Link, LinkContext } from '@wjfe/n-savant';
+	import { Link, LinkContext } from '@svelte-router/core';
 
 	type Props = {
 		hash?: boolean | string;

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { assertAllowedRoutingMode } from "./utils.js";
 import { ALL_HASHES } from "../testing/test-utils.js";
-import { resetRoutingOptions, setRoutingOptions } from "./core/options.js";
+import { resetRoutingOptions, setRoutingOptions } from "./kernel/options.js";
 import type { ExtendedRoutingOptions, Hash } from "./types.js";
 
 const hashValues = Object.values(ALL_HASHES).filter(x => x !== undefined);

@@ -1,6 +1,6 @@
 import { mount } from 'svelte'
 import App from './App.svelte'
-import { init } from '@wjfe/n-savant';
+import { init } from '@svelte-router/core';
 import { routingMode } from './lib/hash-routing';
 
 init({

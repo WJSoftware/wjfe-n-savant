@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Link, LinkContext, Route } from '@wjfe/n-savant';
-	import logo from '@wjfe/n-savant/logo64';
+	import { Link, LinkContext, Route } from '@svelte-router/core';
+	import logo from '@svelte-router/core/logo64';
 	import SubNav from './SubNav.svelte';
 	import { routingMode } from './hash-routing';
 	import type { HTMLAttributes } from 'svelte/elements';
@@ -24,7 +24,7 @@
 	<div class="container-fluid">
 		<Link class="navbar-brand fw-bold" href="/" id="logoLink">
 			<img src={logo} alt="N-Savant Compass Logo" style:height="1.7em" />
-			@wjfe/n-savant
+			@svelte-router/core
 		</Link>
 		<button
 			class="navbar-toggler"

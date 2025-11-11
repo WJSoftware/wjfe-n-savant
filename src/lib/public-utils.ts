@@ -1,4 +1,4 @@
-import { RouterEngine } from "./core/RouterEngine.svelte.js";
+import { RouterEngine } from "./kernel/RouterEngine.svelte.js";
 import type { RouteStatus } from "./types.js";
 
 /**
