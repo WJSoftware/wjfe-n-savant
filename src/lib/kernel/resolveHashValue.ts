@@ -1,3 +1,4 @@
+import type { Hash } from "$lib/types.js";
 import { routingOptions } from "./options.js";
 
 /**
@@ -5,9 +6,9 @@ import { routingOptions } from "./options.js";
  * @param hash Hash value to resolve.
  * @returns The resolved hash value.
  */
-export function resolveHashValue(hash: boolean | string | undefined) {
+export function resolveHashValue(hash: Hash | undefined): Hash {
     if (hash === undefined) {
-        return routingOptions.implicitMode === 'hash';
+        return routingOptions.defaultHash;
     }
     return hash;
 }

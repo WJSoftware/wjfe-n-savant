@@ -48,9 +48,9 @@ function calculateMultiHashHref(hashId: string, newPath: string) {
  * by the given HREF's, or preserved from the current environment's URL.
  *
  * Calculation is done assuming the resultant HREF will be for the routing universe specified in the library's
- * `implicitMode` option.
- * @param hrefs The HREF's used to calculate the final HREF for the routing universe implied by the library's implicit 
- * mode.
+ * `defaultHash` option.
+ * @param hrefs The HREF's used to calculate the final HREF for the routing universe implied by the library's default 
+ * hash.
  */
 export function calculateHref(...hrefs: (string | undefined)[]): string;
 /**
@@ -58,7 +58,7 @@ export function calculateHref(...hrefs: (string | undefined)[]): string;
  * by the given HREF's, or preserved from the current environment's URL.
  *
  * Calculation is done assuming the resultant HREF will be for the routing universe specified by the options' `hash` 
- * property.  If the option is not specified, then a value will be resolved based on the library's `implicitMode` 
+ * property.  If the option is not specified, then a value will be resolved based on the library's `defaultHash` 
  * option.
  * @param options Desired options that control how the resultant HREF is calculated.
  * @param hrefs The HREF's used to calculate the final HREF for the desired routing universe.

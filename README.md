@@ -21,7 +21,7 @@
 
 + **Always-on path and hash routing**:  Simultaneous, independent and always-on routing modes.
 + **Multi hash routing**:  Doing micro-frontends?  Routing tabs or dialogs using the URL?  Have as many paths as needed.
-+ **Sveltekit support**: Add hash routing on top of Sveltekit's path routing Via 
++ **Sveltekit support**: Add hash routing on top of Sveltekit's path routing via 
 [@svelte-router/kit](https://github.com/WJSoftware/svelte-router-kit)
 + **Electron support**:  Works with Electron (all routing modes)
 + **Reactivity-based**:  All data is reactive, reducing the need for events and imperative programming.
@@ -43,7 +43,7 @@
 + `RouterEngine.routes`
 + `RouterEngine.routeStatus`
 
-All data is a Svelte signal.  Add routes dynamically or reactively, change route conditions on the fly, and more pieces 
+All data is a Svelte signal.  Add routes dynamically or reactively, change route conditions on the fly, add more pieces 
 of user interface on-demand, etc.  All works reactively.
 
 ### Two Library Modes
@@ -89,7 +89,7 @@ Default:
 init(); // Or use initFull() for full-mode.
 
 // Common case:  "I just need good, old-fashioned hash routing."
-init({ implicitMode: 'hash' });
+init({ defaultHash: true });
 ```
 
 #### Electron Variant
@@ -441,7 +441,7 @@ Additional `goTo()` options:
 1. **Use `<Link>` components** for user-triggered navigation
 2. **Use `navigate()`** for programmatic navigation within routing universes
 3. **Use `goTo()`** only for direct URL manipulation
-4. **Try to specify `hash`** in `navigate()` instead of relying on the implicit mode whenever possible
+4. **Try to specify `hash`** in `navigate()` instead of relying on the default hash whenever possible
 
 Just in case you are wondering:  This navigation logic is already there in `<Link>` components:
 
@@ -461,8 +461,7 @@ As seen, the value of the `href` property never changes.  It's always a path, re
 
 > **⚠️ Important:** Not setting the `hash` property is **not the same** as setting it to `false`.  When `hash` is 
 > `undefined`, either because the property is not specified at all, or its value is set to `undefined` explicitly, the 
-> value of the `implicitMode` library option, which is set when the library is initialized, will be used to resolve a 
-> `true` or `false` value.
+> value of the `defaultHash` library option, which is set when the library is initialized, will be used instead.
 >
 > This is true for all components that support the `hash` property.
 

@@ -60,7 +60,7 @@
 						overlays, and client-side navigation. Also works great in Electron apps!
 					</p>
 					<p class="small text-muted mb-3">
-						💡 <strong>Pro tip:</strong> Set <code>implicitMode: 'hash'</code> during initialization 
+						💡 <strong>Pro tip:</strong> Set <code>defaultHash: true</code> during initialization 
 						to avoid repeating <code>hash</code> on every component!
 					</p>
 					<CodeSnippet 

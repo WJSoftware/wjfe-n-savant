@@ -57,7 +57,7 @@ describe('initCore', () => {
         const initialLoggerIsOffLogger = logger !== globalThis.console;
         const initialRoutingOptions = {
             hashMode: routingOptions.hashMode,
-            implicitMode: routingOptions.implicitMode
+            defaultHash: routingOptions.defaultHash
         };
         const initialTraceOptions = {
             routerHierarchy: traceOptions.routerHierarchy
@@ -66,7 +66,7 @@ describe('initCore', () => {
         // Act - Initialize with custom options
         cleanup = initCore(locationMock, {
             hashMode: 'multi',
-            implicitMode: 'hash',
+            defaultHash: true,
             logger: customLogger,
             trace: {
                 routerHierarchy: true
@@ -76,7 +76,7 @@ describe('initCore', () => {
         // Assert - Check that options were applied
         expect(logger).toBe(customLogger);
         expect(routingOptions.hashMode).toBe('multi');
-        expect(routingOptions.implicitMode).toBe('hash');
+        expect(routingOptions.defaultHash).toBe(true);
         expect(traceOptions.routerHierarchy).toBe(true);
         expect(location).toBeDefined();
 
@@ -87,7 +87,7 @@ describe('initCore', () => {
         // Assert - Check that everything was rolled back
         expect(logger !== globalThis.console).toBe(initialLoggerIsOffLogger); // Back to offLogger
         expect(routingOptions.hashMode).toBe(initialRoutingOptions.hashMode);
-        expect(routingOptions.implicitMode).toBe(initialRoutingOptions.implicitMode);
+        expect(routingOptions.defaultHash).toBe(initialRoutingOptions.defaultHash);
         expect(traceOptions.routerHierarchy).toBe(initialTraceOptions.routerHierarchy);
         expect(location).toBeNull();
     });
@@ -107,14 +107,14 @@ describe('initCore', () => {
             const uninitializedLogger = logger;
             cleanup = initCore(locationMock, {
                 hashMode: 'multi',
-                implicitMode: 'hash',
+                defaultHash: true,
                 trace: {
                     routerHierarchy: !defaultTraceOptions.routerHierarchy
                 }
             });
             // Verify options were applied
             expect(routingOptions.hashMode).toBe('multi');
-            expect(routingOptions.implicitMode).toBe('hash');
+            expect(routingOptions.defaultHash).toBe(true);
             expect(logger).not.toBe(uninitializedLogger);
             expect(traceOptions.routerHierarchy).toBe(!defaultTraceOptions.routerHierarchy);
 
@@ -124,7 +124,7 @@ describe('initCore', () => {
 
             // Assert - Check that routing options were reset to defaults
             expect(routingOptions.hashMode).toBe('single');
-            expect(routingOptions.implicitMode).toBe('path');
+            expect(routingOptions.defaultHash).toBe(false);
             expect(logger).toBe(uninitializedLogger);
             expect(traceOptions).toEqual(defaultTraceOptions);
         });

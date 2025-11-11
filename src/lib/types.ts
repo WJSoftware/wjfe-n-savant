@@ -377,33 +377,25 @@ export type RoutingOptions = {
      */
     hashMode?: 'single' | 'multi';
     /**
-     * Mode routers operate when their `hash` property is not set (left `undefined`).
+     * Default hash value to use in components and other library functions when the `hash` property or parameter is not
+     * set (left `undefined`).
      * 
-     * In short:  It tells the library what type of routing is assumed when no `hash` property is specified in `Router`, 
-     * `Route`, `Fallback`, `Link`, or `RouterTrace` components.
+     * It works exactly as described for the `hash` property of components, but its scope is global to all components 
+     * and functions in the library.
      * 
-     * When set to `'path'`, create components for hash routing by setting the `hash` property to `true` or a string 
-     * identifier; when set to `'hash'`, create components for path routing by setting the `hash` property to `false`.
+     * This allows for everything the `implicitMode` option used to provide, plus the ability to set a named routing 
+     * hash universe as the default one.
      * 
-     * @default 'path'
+     * ### Equivalency With the Removed `implicitMode` Option
      * 
-     * @example
-     * ```svelte
-     * // In main.ts:
-     * init({ implicitMode: 'hash' });
+     * This option supersedes the now-removed `implicitMode` option.  Setting this option to `false` is equivalent to 
+     * setting `implicitMode` to `'path'`; setting it to `true` is equivalent to setting `implicitMode` to `'hash'`.
+     * Also, its default is `false`, which means that it defaults to the same routing mode (universe) as the removed
+     * `implicitMode` option: `'path'`.
      * 
-     * // In App.svelte:
-     * <Router>
-     *    <Route path="/path1">
-     *        <View1 />
-     *    </Route>
-     * </Router>
-     * ```
-     * 
-     * Even though the `hash` property is not set in the `Router` or `Route` components, the library will treat both 
-     * as hash-routing components because the `implicitMode` option was set to `'hash'`.
+     * @default false
      */
-    implicitMode?: 'hash' | 'path';
+    defaultHash?: Hash;
 }
 
 /**

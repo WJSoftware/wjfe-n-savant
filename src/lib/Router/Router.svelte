@@ -87,7 +87,7 @@
 		 * 
 		 * If `false`, the component will be a router for path routing.
 		 * 
-         * If left undefined, it will resolve to one of the previous values based on the `implicitMode` routing option.
+         * If left undefined, it will resolve to one of the previous values based on the `defaultHash` routing option.
 		 * 
 		 * **IMPORTANT**:  Because the router is set as context for child routers to pick it up, and the context 
 		 * depends on the value of the `hash` prop, it cannot be reactively set to different values at will.  If you

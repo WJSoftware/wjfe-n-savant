@@ -5,7 +5,7 @@ import type { ExtendedRoutingOptions } from "../types.js";
  */
 export const defaultRoutingOptions: Required<ExtendedRoutingOptions> = {
     hashMode: 'single',
-    implicitMode: 'path',
+    defaultHash: false,
     disallowPathRouting: false,
     disallowHashRouting: false,
     disallowMultiHashRouting: false,
@@ -24,7 +24,7 @@ export const routingOptions: Required<ExtendedRoutingOptions> = structuredClone(
  */
 export function setRoutingOptions(options?: Partial<ExtendedRoutingOptions>): void {
     routingOptions.hashMode = options?.hashMode ?? routingOptions.hashMode;
-    routingOptions.implicitMode = options?.implicitMode ?? routingOptions.implicitMode;
+    routingOptions.defaultHash = options?.defaultHash ?? routingOptions.defaultHash;
     routingOptions.disallowPathRouting = options?.disallowPathRouting ?? routingOptions.disallowPathRouting;
     routingOptions.disallowHashRouting = options?.disallowHashRouting ?? routingOptions.disallowHashRouting;
     routingOptions.disallowMultiHashRouting = options?.disallowMultiHashRouting ?? routingOptions.disallowMultiHashRouting;

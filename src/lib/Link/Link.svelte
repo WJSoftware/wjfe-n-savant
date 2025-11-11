@@ -23,7 +23,7 @@
 			 *
 			 * If `false`, the component will search for the immediate parent router configured for path routing.
 			 *
-			 * If left undefined, it will resolve to one of the previous values based on the `implicitMode` routing option.
+			 * If left undefined, it will resolve to one of the previous values based on the `defaultHash` routing option.
 			 *
 			 * **IMPORTANT**:  Because the hash value directly affects the search for the parent router, it cannot be
 			 * reactively set to different values at will.  If you must do this, destroy and recreate the component

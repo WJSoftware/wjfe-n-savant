@@ -5,7 +5,7 @@ import { RouterEngine } from "$lib/kernel/RouterEngine.svelte.js";
  */
 export type RoutingUniverse = {
     hash: Hash | undefined;
-    implicitMode: RoutingOptions['implicitMode'];
+    defaultHash: Hash;
     hashMode: Exclude<RoutingOptions['hashMode'], undefined>;
     /**
      * Short universe identifier.  Used in test titles and descriptions.
