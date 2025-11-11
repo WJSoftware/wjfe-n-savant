@@ -1,6 +1,8 @@
 <script lang="ts" module>
 	import type { ActiveState, PreserveQuery } from '$lib/types.js';
+	import { expandAriaAttributes } from '$lib/utils.js';
 	import { getContext, setContext, type Snippet } from 'svelte';
+	import type { AriaAttributes } from 'svelte/elements';
 
 	export type ILinkContext = {
 		/**
@@ -40,6 +42,10 @@
 		 * **IMPORTANT**:  This only works if the component is within a `Router` component.
 		 */
 		activeState?: ActiveState;
+		/**
+		 * Gets an object with expanded aria- attributes based on the `activeState.aria` property.
+		 */
+		readonly activeStateAria?: AriaAttributes;
 	};
 
 	class _LinkContext implements ILinkContext {
@@ -47,12 +53,14 @@
 		prependBasePath;
 		preserveQuery;
 		activeState;
+		activeStateAria;
 
 		constructor(replace: boolean | undefined, prependBasePath: boolean | undefined, preserveQuery: PreserveQuery | undefined, activeState: ActiveState | undefined) {
 			this.replace = $state(replace);
 			this.prependBasePath = $state(prependBasePath);
 			this.preserveQuery = $state(preserveQuery);
 			this.activeState = $state(activeState);
+			this.activeStateAria = $derived(expandAriaAttributes(this.activeState?.aria));
 		}
 	}
 

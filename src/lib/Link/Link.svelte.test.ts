@@ -311,6 +311,65 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
         expect(anchor?.getAttribute('aria-current')).toBe('page');
     });
 
+    test("Should apply aria-current with value 'page' when route is active and no aria object is provided.", () => {
+        // Arrange.
+        const { hash, router, context } = setup;
+        const href = "/test/path";
+        const activeKey = "test-route";
+        // Mock active route status
+        if (router) {
+            Object.defineProperty(router, 'routeStatus', {
+                value: { [activeKey]: { match: true } },
+                configurable: true
+            });
+        }
+
+        // Act.
+        const { container } = render(Link, {
+            props: {
+                hash,
+                href,
+                activeFor: activeKey,
+                children: content
+            },
+            context
+        });
+        const anchor = container.querySelector('a');
+
+        // Assert.
+        expect(anchor?.getAttribute('aria-current')).toBe('page');
+    });
+
+    test("Should not apply aria-current when route is active and activeState.aria is set to an empty object.", () => {
+        // Arrange.
+        const { hash, router, context } = setup;
+        const href = "/test/path";
+        const activeKey = "test-route";
+        // Mock active route status
+        if (router) {
+            Object.defineProperty(router, 'routeStatus', {
+                value: { [activeKey]: { match: true } },
+                configurable: true
+            });
+        }
+
+        // Act.
+        const { container } = render(Link, {
+            props: {
+                hash,
+                href,
+                activeFor: activeKey,
+                activeState: { aria: {} },
+                children: content
+            },
+            context
+        });
+        const anchor = container.querySelector('a');
+
+        // Assert.
+        expect(anchor?.getAttribute('aria-current')).toBeNull();
+    });
+
     test("Should not apply active styles when route is not active.", async () => {
         // Arrange.
         const { hash, router, context } = setup;

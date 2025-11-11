@@ -1,6 +1,6 @@
-import type { ActiveState, Hash } from "./types.js";
+import type { ActiveState, ActiveStateAriaAttributes, Hash } from "./types.js";
 import { routingOptions } from "./kernel/options.js";
-import type { HTMLAnchorAttributes } from "svelte/elements";
+import type { AriaAttributes, HTMLAnchorAttributes } from "svelte/elements";
 
 /**
  * Asserts that the specified routing mode is allowed by the current routing options.
@@ -44,4 +44,23 @@ export function joinStyles(
     const calculatedStyle = Object.entries(addedStyle)
         .reduce((acc, [key, value]) => acc + `${key}: ${value}; `, '');
     return baseStyle ? `${baseStyle} ${calculatedStyle}` : calculatedStyle;
+}
+
+/**
+ * Expands the keys of an `ActiveStateAriaAttributes` object into full `aria-` attributes.
+ * @param aria Shortcut version of an `AriaAttributes` object.
+ * @returns An `AriaAttributes` object that can be spread over HTML elements.
+ */
+export function expandAriaAttributes(aria: ActiveStateAriaAttributes | undefined): AriaAttributes | undefined {
+    if (!aria) {
+        return undefined;
+    }
+    const result = {} as AriaAttributes;
+    for (let [k, v] of Object.entries(aria)) {
+        if (v !== undefined) {
+            // @ts-expect-error TS7053 - We know this construction is correct.
+            result[`aria-${k}`] = v;
+        }
+    }
+    return result;
 }

@@ -3,6 +3,7 @@ import { render } from "@testing-library/svelte";
 import { linkCtxKey, type ILinkContext } from "./LinkContext.svelte";
 import TestLinkContextWithContextSpy from "../../testing/TestLinkContextWithContextSpy.svelte";
 import { flushSync } from "svelte";
+import type { ActiveStateAriaAttributes } from "$lib/types.js";
 
 describe("LinkContext", () => {
     afterEach(() => {
@@ -26,6 +27,7 @@ describe("LinkContext", () => {
         expect(linkCtx?.prependBasePath).toBeUndefined();
         expect(linkCtx?.preserveQuery).toBeUndefined();
         expect(linkCtx?.activeState).toBeUndefined();
+        expect(linkCtx?.activeStateAria).toBeUndefined();
     });
 
     test("Should transmit via context the explicitly set properties.", () => {
@@ -35,7 +37,7 @@ describe("LinkContext", () => {
             replace: true,
             prependBasePath: true,
             preserveQuery: ['search', 'filter'],
-            activeState: { class: "active-link", style: "color: red;", aria: { 'aria-current': 'page' } }
+            activeState: { class: "active-link", style: "color: red;", aria: { current: 'page' } }
         }
 
         // Act.
@@ -61,7 +63,7 @@ describe("LinkContext", () => {
             replace: true,
             prependBasePath: true,
             preserveQuery: ['search', 'filter'],
-            activeState: { class: "active-link", style: "color: red;", aria: { 'aria-current': 'page' } }
+            activeState: { class: "active-link", style: "color: red;", aria: { current: 'page' } }
         };
         const context = new Map();
         context.set(linkCtxKey, parentCtx);
@@ -109,7 +111,7 @@ describe("LinkContext", () => {
             parentValue: false,
             value: true,
         },
-    ])("Should override the parent context value for $property when set as a property.", ({property, parentValue, value}) => {
+    ])("Should override the parent context value for $property when set as a property.", ({ property, parentValue, value }) => {
         // Arrange.
         const parentCtx: ILinkContext = {
             replace: true,
@@ -186,11 +188,73 @@ describe("LinkContext", () => {
             expect(linkCtx).toBeDefined();
             expect(linkCtx?.[property]).toEqual(updated);
         });
+        test("Should calculate expanded aria attributes from the values in activeState.aria.", () => {
+            // Arrange.
+            let linkCtx: ILinkContext | undefined;
+            const ctxProps: ILinkContext = {
+                activeState: { aria: { current: 'location' } }
+            };
+
+            // Act.
+            render(TestLinkContextWithContextSpy, {
+                props: {
+                    ...ctxProps,
+                    get linkCtx() { return linkCtx; },
+                    set linkCtx(v) { linkCtx = v; }
+                }
+            });
+
+            // Assert.
+            expect(linkCtx).toBeDefined();
+            expect(linkCtx?.activeStateAria).toEqual({ 'aria-current': 'location' });
+        });
+        test("Should update activeStateAria when activeState.aria changes (re-render).", async () => {
+            // Arrange.
+            let linkCtx: ILinkContext | undefined;
+            const { rerender } = render(TestLinkContextWithContextSpy, {
+                props: {
+                    activeState: { aria: { current: 'location' } },
+                    get linkCtx() { return linkCtx; },
+                    set linkCtx(v) { linkCtx = v; }
+                }
+            });
+            expect(linkCtx).toBeDefined();
+            expect(linkCtx?.activeStateAria).toEqual({ 'aria-current': 'location' });
+
+            // Act.
+            await rerender({ activeState: { aria: { current: 'page' } } });
+
+            // Assert.
+            expect(linkCtx).toBeDefined();
+            expect(linkCtx?.activeStateAria).toEqual({ 'aria-current': 'page' });
+        });
+        test("Should update activeStateAria when activeState.aria changes (state change).", () => {
+            // Arrange.
+            let linkCtx: ILinkContext | undefined;
+            let aria = $state<ActiveStateAriaAttributes>({ current: 'location' });
+            render(TestLinkContextWithContextSpy, {
+                props: {
+                    activeState: { aria },
+                    get linkCtx() { return linkCtx; },
+                    set linkCtx(v) { linkCtx = v; }
+                }
+            });
+            expect(linkCtx).toBeDefined();
+            expect(linkCtx?.activeStateAria).toEqual({ 'aria-current': 'location' });
+
+            // Act.
+            aria.current = 'page';
+            flushSync();
+
+            // Assert.
+            expect(linkCtx).toBeDefined();
+            expect(linkCtx?.activeStateAria).toEqual({ 'aria-current': 'page' });
+        });
     });
 
     describe('Parent Context Reactivity', () => {
         test.each<{
-            property: keyof ILinkContext,
+            property: Exclude<keyof ILinkContext, 'activeStateAria'>,
             initial: any,
             updated: any
         }>([
