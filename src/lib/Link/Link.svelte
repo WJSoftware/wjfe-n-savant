@@ -9,7 +9,7 @@
 	import type { Hash, RouteStatus } from '$lib/types.js';
 	import { assertAllowedRoutingMode, joinStyles } from '$lib/utils.js';
 	import { type Snippet } from 'svelte';
-	import type { HTMLAnchorAttributes } from 'svelte/elements';
+	import type { AriaAttributes, HTMLAnchorAttributes } from 'svelte/elements';
 
 	type Props = HTMLAnchorAttributes &
 		ILinkContext & {
@@ -98,10 +98,17 @@
 		const result = { ...activeState };
 		result.class ??= linkContext?.activeState?.class;
 		result.style ??= linkContext?.activeState?.style;
-		result.aria = {
+		return result;
+	});
+	const calcActiveStateAria = $derived.by(() => {
+		const result = {} as AriaAttributes;
+		for (let [k, v] of Object.entries({
 			...linkContext?.activeState?.aria,
-			...activeState.aria
-		};
+			...activeState?.aria
+		})) {
+			// @ts-expect-error TS7053 - Since k is typed as string, the relationship can't be established.
+			result[`aria-${k}`] = v;
+		}
 		return result;
 	});
 	const isActive = $derived(isRouteActive(router, activeFor));
@@ -128,7 +135,7 @@
 	class={[cssClass, (isActive && calcActiveState?.class) || undefined]}
 	style={isActive ? joinStyles(style, calcActiveState?.style) : style}
 	onclick={handleClick}
-	{...(isActive ? calcActiveState?.aria : undefined)}
+	{...(isActive ? calcActiveStateAria : undefined)}
 	{...restProps}
 >
 	{@render children?.(location.getState(resolvedHash), router?.routeStatus)}

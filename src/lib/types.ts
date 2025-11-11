@@ -295,6 +295,16 @@ export type NavigationCancelledEvent = NavigationEvent & {
 };
 
 /**
+ * Friendlier type mapping of ARIA attributes for use in the `ActiveState.aria` property.
+ * 
+ * Instead of asking the user to write `{ aria: { 'aria-selected': true } }`, they can simply write
+ * `{ aria: { selected: true } }`.
+ */
+export type ActiveStateAriaAttributes = {
+    [K in keyof AriaAttributes as K extends `aria-${infer N}` ? `${N}` : never]?: AriaAttributes[K];
+}
+
+/**
  * Defines the possible settings that can be set in `Link` components to control when they are considered active and 
  * how they look like when active.
  */
@@ -329,7 +339,7 @@ export type ActiveState = {
      * 
      * [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-current)
      */
-    aria?: AriaAttributes;
+    aria?: ActiveStateAriaAttributes;
 }
 
 /**

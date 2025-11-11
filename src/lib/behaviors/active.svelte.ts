@@ -52,7 +52,7 @@ export function activeBehavior(
             }
             if (activeState.aria) {
                 for (let [attr, value] of Object.entries(activeState.aria)) {
-                    el.setAttribute(attr, value);
+                    el.setAttribute(`aria-${attr}`, (value ?? '').toString());
                 }
             }
             return () => {
@@ -62,7 +62,7 @@ export function activeBehavior(
                 }
                 if (activeState.aria) {
                     for (let attr of Object.keys(activeState.aria)) {
-                        el.removeAttribute(attr);
+                        el.removeAttribute(`aria-${attr}`);
                     }
                 }
             };

@@ -422,7 +422,7 @@ describe("activeBehavior", () => {
                 key: routeKey,
                 class: "active-class",
                 style: "color: red;",
-                aria: { "aria-current": "page", "aria-selected": "true" }
+                aria: { current: "page", selected: "true" }
             };
 
             // Act
@@ -440,7 +440,7 @@ describe("activeBehavior", () => {
             const activeState: ActiveState & { key: string } = {
                 key: "test-route",
                 class: "active-class",
-                aria: { "aria-current": "page", "aria-selected": "true" }
+                aria: { current: "page", selected: "true" }
             };
 
             // Act
@@ -464,7 +464,7 @@ describe("activeBehavior", () => {
             const activeState: ActiveState & { key: string } = {
                 key: routeKey,
                 class: "active-class",
-                aria: { "aria-current": "page", "aria-selected": "true" }
+                aria: { current: "page", selected: "true" }
             };
 
             // Act
@@ -579,7 +579,7 @@ describe("activeBehavior", () => {
 
             test("Should apply new ARIA attributes whenever 'activeState.aria' changes.", async () => {
                 // Arrange.
-                const newAria = { "aria-current": "page" as const, "aria-selected": true };
+                const newAria = { current: "page" as const, selected: true };
                 const routeKey = "home";
                 const routeStatus: Record<string, RouteStatus> = {
                     [routeKey]: {
@@ -838,7 +838,7 @@ describe("activeBehavior", () => {
 
             test("Should apply new ARIA attributes whenever 'activeState.aria' changes.", () => {
                 // Arrange.
-                const newAria = { "aria-current": "page" as const, "aria-selected": true };
+                const newAria = { current: "page" as const, selected: true };
                 const routeKey = "home";
                 const routeStatus = $state<Record<string, RouteStatus>>({
                     [routeKey]: {
