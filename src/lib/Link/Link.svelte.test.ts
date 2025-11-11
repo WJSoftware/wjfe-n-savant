@@ -259,8 +259,8 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
                 activeFor: activeKey,
                 activeState: {
                     aria: {
-                        'aria-selected': 'true',
-                        'aria-current': 'page'
+                        selected: 'true',
+                        current: 'page'
                     }
                 },
                 children: content
@@ -296,8 +296,8 @@ function activeStateTests(setup: ReturnType<typeof createRouterTestSetup>) {
                 activeFor: activeKey,
                 activeState: {
                     aria: {
-                        'aria-selected': 'true',
-                        'aria-current': 'page'
+                        selected: 'true',
+                        current: 'page'
                     }
                 },
                 children: content
@@ -761,7 +761,7 @@ function linkContextTests(ru: RoutingUniverse) {
         const linkCtx: ILinkContext = {
             activeState: {
                 class: 'context-active',
-                aria: { 'aria-current': 'page' }
+                aria: { current: 'page' }
             }
         };
         const activeFor = 'test-route';
