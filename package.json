@@ -59,6 +59,13 @@
 			"default": "./dist/logo/logo-48.svg"
 		}
 	},
+	"keywords": [
+		"svelte",
+		"router",
+		"svelte-router",
+		"spa",
+		"micro-frontend"
+	],
 	"peerDependencies": {
 		"svelte": "^5.31.0"
 	},
