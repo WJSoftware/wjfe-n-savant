@@ -7,7 +7,7 @@
 	import { isRouteActive } from '$lib/public-utils.js';
 	import { getRouterContext } from '$lib/Router/Router.svelte';
 	import type { Hash, RouteStatus } from '$lib/types.js';
-	import { assertAllowedRoutingMode, joinStyles } from '$lib/utils.js';
+	import { assertAllowedRoutingMode, expandAriaAttributes, joinStyles } from '$lib/utils.js';
 	import { type Snippet } from 'svelte';
 	import type { AriaAttributes, HTMLAnchorAttributes } from 'svelte/elements';
 
@@ -101,15 +101,14 @@
 		return result;
 	});
 	const calcActiveStateAria = $derived.by(() => {
-		const result = {} as AriaAttributes;
-		for (let [k, v] of Object.entries({
-			...linkContext?.activeState?.aria,
-			...activeState?.aria
-		})) {
-			// @ts-expect-error TS7053 - Since k is typed as string, the relationship can't be established.
-			result[`aria-${k}`] = v;
+		if (!linkContext?.activeStateAria && !activeState?.aria) {
+			return { 'aria-current': 'page' } as AriaAttributes;
 		}
-		return result;
+		const localAria = expandAriaAttributes(activeState?.aria);
+		return {
+			...linkContext?.activeStateAria,
+			...localAria
+		};
 	});
 	const isActive = $derived(isRouteActive(router, activeFor));
 	const calcHref = $derived(href === '' ? location.url.href : calculateHref(
