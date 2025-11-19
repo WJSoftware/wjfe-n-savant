@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { assertAllowedRoutingMode, expandAriaAttributes } from "./utils.js";
-import { ALL_HASHES } from "../testing/test-utils.js";
+import { ALL_HASHES } from "$test/test-utils.js";
 import { resetRoutingOptions, setRoutingOptions } from "./kernel/options.js";
 import type { ActiveStateAriaAttributes, ExtendedRoutingOptions, Hash } from "./types.js";
 import type { AriaAttributes } from "svelte/elements";

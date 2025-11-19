@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
 import { LocationLite } from "./LocationLite.svelte.js";
 import type { ExtendedRoutingOptions, Hash, HistoryApi, PreserveQuery } from "../types.js";
-import { setupBrowserMocks, ALL_HASHES } from "../../testing/test-utils.js";
+import { setupBrowserMocks, ALL_HASHES } from "$test/test-utils.js";
 import { SvelteURL } from "svelte/reactivity";
 import { setLocation } from "./Location.js";
 import { resetRoutingOptions, setRoutingOptions } from "./options.js";

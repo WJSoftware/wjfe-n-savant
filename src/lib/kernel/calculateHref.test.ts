@@ -2,7 +2,7 @@ import { describe, test, expect, beforeAll, afterAll, beforeEach } from "vitest"
 import { calculateHref, type CalculateHrefOptions } from "./calculateHref.js";
 import { init } from "../init.js";
 import { location } from "./Location.js";
-import { ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
+import { ROUTING_UNIVERSES, ALL_HASHES } from "$test/test-utils.js";
 
 describe("calculateHref", () => {
     describe("(...paths) Overload", () => {

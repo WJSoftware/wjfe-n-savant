@@ -4,7 +4,7 @@ import { init } from "../init.js";
 import { registerRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
 import type { State, RouteInfo, ExtendedRoutingOptions } from "../types.js";
-import { setupBrowserMocks, addRoutes, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
+import { setupBrowserMocks, addRoutes, ROUTING_UNIVERSES, ALL_HASHES } from "$test/test-utils.js";
 import { resetRoutingOptions, setRoutingOptions } from "./options.js";
 
 describe("RouterEngine", () => {

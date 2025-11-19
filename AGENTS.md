@@ -262,7 +262,7 @@ Use data-driven testing across **all 5 routing universes**:
 
 ```typescript
 // Import the complete universe definitions
-import { ROUTING_UNIVERSES } from "../testing/test-utils.js";
+import { ROUTING_UNIVERSES } from "$test/test-utils.js";
 
 ROUTING_UNIVERSES.forEach((ru) => {
     describe(`Component - ${ru.text}`, () => {
@@ -741,7 +741,7 @@ test("Should react to state changes.", () => {
 For testing components that rely on `window.location` and `window.history` (like `RouterEngine`), use the comprehensive browser mocking utilities:
 
 ```typescript
-import { setupBrowserMocks } from "../testing/test-utils.js";
+import { setupBrowserMocks } from "$test/test-utils.js";
 
 describe("Component requiring browser APIs", () => {
     beforeEach(() => {
@@ -807,7 +807,7 @@ Refer to `src/testing/test-utils.ts` for complete function signatures and type d
 **Complete test coverage across all 5 routing universes** using the standardized pattern:
 
 ```typescript
-import { ROUTING_UNIVERSES } from "../testing/test-utils.js";
+import { ROUTING_UNIVERSES } from "$test/test-utils.js";
 
 // ✅ Recommended: Test ALL universes with single loop
 ROUTING_UNIVERSES.forEach((universe) => {
@@ -856,7 +856,7 @@ Use dictionary-based constants for better maintainability:
 
 ```typescript
 // Import self-documenting hash values
-import { ALL_HASHES } from "../testing/test-utils.js";
+import { ALL_HASHES } from "$test/test-utils.js";
 
 // Usage in tests
 test("Should validate hash compatibility.", () => {

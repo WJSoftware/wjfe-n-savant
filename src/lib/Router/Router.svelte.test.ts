@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, vi, beforeAll, afterAll } from "vit
 import { render } from "@testing-library/svelte";
 import Router, { getRouterContextKey } from "./Router.svelte";
 import { RouterEngine } from "$lib/kernel/RouterEngine.svelte.js";
-import { createTestSnippet, createRouterTestSetup, ROUTING_UNIVERSES } from "../../testing/test-utils.js";
+import { createTestSnippet, createRouterTestSetup, ROUTING_UNIVERSES } from "$test/test-utils.js";
 import { flushSync } from "svelte";
 import { init } from "$lib/init.js";
 

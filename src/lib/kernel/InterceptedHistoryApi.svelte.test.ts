@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach, afterEach, vi } from "vitest";
 import { InterceptedHistoryApi } from "./InterceptedHistoryApi.svelte.js";
 import type { State, BeforeNavigateEvent } from "../types.js";
-import { setupBrowserMocks } from "../../testing/test-utils.js";
+import { setupBrowserMocks } from "$test/test-utils.js";
 
 describe("InterceptedHistoryApi", () => {
     const initialUrl = "http://example.com/";
