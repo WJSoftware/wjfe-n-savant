@@ -1,10 +1,10 @@
 import { describe, test, expect, beforeEach, vi, beforeAll, afterAll, afterEach } from "vitest";
 import { render } from "@testing-library/svelte";
 import Route from "./Route.svelte";
-import { createTestSnippet, createRouterTestSetup, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
+import { createTestSnippet, createRouterTestSetup, ROUTING_UNIVERSES, ALL_HASHES } from "$test/test-utils.js";
 import { init } from "$lib/init.js";
 import { location } from "$lib/kernel/Location.js";
-import TestRouteWithRouter from "../../testing/TestRouteWithRouter.svelte";
+import TestRouteWithRouter from "$test/TestRouteWithRouter.svelte";
 import { resetRoutingOptions, setRoutingOptions } from "$lib/kernel/options.js";
 import type { ExtendedRoutingOptions, InitOptions } from "$lib/types.js";
 

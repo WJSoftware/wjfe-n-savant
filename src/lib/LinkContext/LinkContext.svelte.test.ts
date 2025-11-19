@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, afterEach } from "vitest";
 import { render } from "@testing-library/svelte";
 import { linkCtxKey, type ILinkContext } from "./LinkContext.svelte";
-import TestLinkContextWithContextSpy from "../../testing/TestLinkContextWithContextSpy.svelte";
+import TestLinkContextWithContextSpy from "$test/TestLinkContextWithContextSpy.svelte";
 import { flushSync } from "svelte";
 import type { ActiveStateAriaAttributes } from "$lib/types.js";
 

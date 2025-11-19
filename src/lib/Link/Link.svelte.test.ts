@@ -3,7 +3,7 @@ import { location } from "$lib/kernel/Location.js";
 import { describe, test, expect, beforeAll, afterAll, beforeEach, vi, afterEach } from "vitest";
 import { render, fireEvent } from "@testing-library/svelte";
 import Link from "./Link.svelte";
-import { createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES, createWindowMock, setupBrowserMocks, type RoutingUniverse, addMatchingRoute } from "../../testing/test-utils.js";
+import { createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES, createWindowMock, setupBrowserMocks, type RoutingUniverse, addMatchingRoute } from "$test/test-utils.js";
 import { flushSync } from "svelte";
 import { resetRoutingOptions, setRoutingOptions } from "$lib/kernel/options.js";
 import type { ExtendedRoutingOptions } from "$lib/types.js";

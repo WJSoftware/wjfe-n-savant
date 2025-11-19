@@ -3,7 +3,7 @@ import { activeBehavior } from "./active.svelte.js";
 import { RouterEngine } from "$lib/kernel/RouterEngine.svelte.js";
 import type { ActiveState, RouteStatus } from "$lib/types.js";
 import { render } from "@testing-library/svelte";
-import TestActiveBehavior from "../../testing/TestActiveBehavior.svelte";
+import TestActiveBehavior from "$test/TestActiveBehavior.svelte";
 import { flushSync } from "svelte";
 import type { ClassValue } from "svelte/elements";
 import { clsx } from "clsx";

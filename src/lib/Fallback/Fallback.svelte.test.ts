@@ -2,7 +2,7 @@ import { init } from "$lib/init.js";
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { render } from "@testing-library/svelte";
 import Fallback from "./Fallback.svelte";
-import { addMatchingRoute, addRoutes, createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES } from "../../testing/test-utils.js";
+import { addMatchingRoute, addRoutes, createRouterTestSetup, createTestSnippet, ROUTING_UNIVERSES, ALL_HASHES } from "$test/test-utils.js";
 import { flushSync } from "svelte";
 import { resetRoutingOptions, setRoutingOptions } from "$lib/kernel/options.js";
 import type { ExtendedRoutingOptions } from "$lib/types.js";

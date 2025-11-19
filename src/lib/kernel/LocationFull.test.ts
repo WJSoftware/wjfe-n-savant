@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { LocationFull } from "./LocationFull.js";
 import type { State, Location, FullModeHistoryApi } from "../types.js";
-import { setupBrowserMocks, ALL_HASHES } from "../../testing/test-utils.js";
+import { setupBrowserMocks, ALL_HASHES } from "$test/test-utils.js";
 import { SvelteURL } from "svelte/reactivity";
 
 describe("LocationFull", () => {
