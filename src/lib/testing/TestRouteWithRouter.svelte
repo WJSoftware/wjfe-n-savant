@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Router from "../lib/Router/Router.svelte";
-    import Route from "../lib/Route/Route.svelte";
+    import Router from "$lib/Router/Router.svelte";
+    import Route from "$lib/Route/Route.svelte";
     import type { Snippet } from "svelte";
     
     interface Props {

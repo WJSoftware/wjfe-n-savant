@@ -1,5 +1,5 @@
 <script lang="ts">
-    import LinkContext, { type ILinkContext } from "../lib/LinkContext/LinkContext.svelte";
+    import LinkContext, { type ILinkContext } from "$lib/LinkContext/LinkContext.svelte";
 	import LinkContextSpy from "./LinkContextSpy.svelte";
     
     interface Props extends ILinkContext {
