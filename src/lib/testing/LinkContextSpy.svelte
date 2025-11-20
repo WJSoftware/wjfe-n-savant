@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getLinkContext, type ILinkContext } from "../lib/LinkContext/LinkContext.svelte";
+    import { getLinkContext, type ILinkContext } from "$lib/LinkContext/LinkContext.svelte";
     
     interface Props {
         linkCtx?: ILinkContext;
