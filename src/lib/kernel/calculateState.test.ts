@@ -120,8 +120,8 @@ describe('calculateState', () => {
                         const newState = calculateState(ALL_HASHES.path, { path: 'new' });
 
                         // Assert - All existing hash states should be preserved
-                        if (universe.text === 'IMP') {
-                            // IMP universe may not have existing state from setup
+                        if (universe.text === 'IPR') {
+                            // IPR universe may not have existing state from setup
                             expect(newState).toEqual({
                                 path: { path: 'new' },
                                 hash: {}
@@ -145,8 +145,8 @@ describe('calculateState', () => {
                         const newState = calculateState(ALL_HASHES.single, { single: 'new' });
 
                         // Assert - Path and other hash states should be preserved
-                        if (universe.text === 'IMP') {
-                            // IMP universe may not have existing state from setup
+                        if (universe.text === 'IPR') {
+                            // IPR universe may not have existing state from setup
                             expect(newState).toEqual({
                                 path: undefined,
                                 hash: { single: { single: 'new' } }
@@ -235,12 +235,18 @@ describe('calculateState', () => {
                         // Act - use single-parameter overload for implicit mode
                         const newState = calculateState(testState);
                         
-                        // Assert - calculateState preserves existing state
+                        // Assert - calculateState preserves existing state and updates correct universe
                         if (universe.defaultHash === false) {
+                            // Implicit resolves to path routing
                             expect(newState.path).toEqual(testState);
                             expect(newState.hash).toBeDefined(); // Hash state preserved
-                        } else {
+                        } else if (universe.defaultHash === true) {
+                            // Implicit resolves to single hash routing
                             expect(newState.hash.single).toEqual(testState);
+                            expect(newState.path).toBeDefined(); // Path state preserved
+                        } else if (typeof universe.defaultHash === 'string') {
+                            // Implicit resolves to multi-hash routing with specific hash ID
+                            expect(newState.hash[universe.defaultHash]).toEqual(testState);
                             expect(newState.path).toBeDefined(); // Path state preserved
                         }
                     });

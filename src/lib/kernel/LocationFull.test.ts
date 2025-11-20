@@ -110,7 +110,7 @@ describe("LocationFull", () => {
             // Assert.
             expect(location.getState(ALL_HASHES.path)).toEqual(state.path);
             expect(location.getState(ALL_HASHES.single)).toEqual(state.hash.single);
-            expect(location.getState('p1')).toEqual(state.hash.p1);
+            expect(location.getState('tp')).toEqual(state.hash.tp);
         });
     });
 });

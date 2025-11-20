@@ -21,7 +21,7 @@ describe("resolveHashValue", () => {
         expect(result).toBe(newDefaultHash);
     });
     test.each<Hash>([
-        'p1',
+        'tp',
         false,
         true
     ])("Should return the provided hash %s value when defined.", (hash) => {
