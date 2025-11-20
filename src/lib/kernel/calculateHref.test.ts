@@ -53,7 +53,7 @@ describe("calculateHref", () => {
             
             const basePath = "/base/path";
             const baseHash = universe.hashMode === 'multi' 
-                ? "#p1=path/one;p2=path/two" 
+                ? `#${universe.hash || universe.defaultHash}=path/one;p2=path/two` 
                 : "#base/hash";
             
             beforeEach(() => {
@@ -69,6 +69,11 @@ describe("calculateHref", () => {
                             if (universe.hash === ALL_HASHES.path) return '/sample/path';
                             if (universe.hash === ALL_HASHES.single) return '#/sample/path';
                             if (universe.hash === ALL_HASHES.implicit) {
+                                // Handle implicit routing
+                                if (universe.hashMode === 'multi' && typeof universe.defaultHash === 'string') {
+                                    // IMHR - implicit multi-hash routing
+                                    return `#${universe.defaultHash}=/sample/path;p2=path/two`;
+                                }
                                 return universe.defaultHash === false ? '/sample/path' : '#/sample/path';
                             }
                             // Multi-hash routing - preserves existing paths and adds/updates the specified hash
@@ -87,6 +92,11 @@ describe("calculateHref", () => {
                             if (universe.hash === ALL_HASHES.path) return `/sample/path${baseHash}`;
                             if (universe.hash === ALL_HASHES.single) return '#/sample/path';
                             if (universe.hash === ALL_HASHES.implicit) {
+                                // Handle implicit routing
+                                if (universe.hashMode === 'multi' && typeof universe.defaultHash === 'string') {
+                                    // IMHR - implicit multi-hash routing
+                                    return `#${universe.defaultHash}=/sample/path;p2=path/two`;
+                                }
                                 return universe.defaultHash === false ? `/sample/path${baseHash}` : '#/sample/path';
                             }
                             // Multi-hash routing - preserveHash doesn't apply to hash routing
@@ -121,6 +131,11 @@ describe("calculateHref", () => {
                             if (universe.hash === ALL_HASHES.path) return newPath;
                             if (universe.hash === ALL_HASHES.single) return `#${newPath}`;
                             if (universe.hash === ALL_HASHES.implicit) {
+                                // Handle implicit routing
+                                if (universe.hashMode === 'multi' && typeof universe.defaultHash === 'string') {
+                                    // IMHR - implicit multi-hash routing
+                                    return `#${universe.defaultHash}=${newPath};p2=path/two`;
+                                }
                                 return universe.defaultHash === false ? newPath : `#${newPath}`;
                             }
                             // Multi-hash routing
@@ -165,8 +180,8 @@ describe("calculateHref", () => {
                     test("Should preserve all existing paths when updating an existing path", () => {
                         // Arrange
                         const newPath = "/sample/path";
-                        const existingHashId = 'p1';
-                        const expected = baseHash.replace(/(p1=).+;/i, `$1${newPath};`);
+                        const existingHashId = universe.hash || universe.defaultHash; // Use the universe's hash ID
+                        const expected = baseHash.replace(new RegExp(`(${existingHashId}=)[^;]+`), `$1${newPath}`);
 
                         // Act
                         const href = calculateHref({ hash: existingHashId }, newPath);
@@ -182,7 +197,13 @@ describe("calculateHref", () => {
                     test("Should resolve implicit hash according to defaultHash", () => {
                         // Arrange
                         const newPath = "/sample/path";
-                        const expectedHref = universe.defaultHash === false ? newPath : `#${newPath}`;
+                        const expectedHref = (() => {
+                            if (universe.hashMode === 'multi' && typeof universe.defaultHash === 'string') {
+                                // IMHR - implicit multi-hash routing
+                                return `#${universe.defaultHash}=${newPath};p2=path/two`;
+                            }
+                            return universe.defaultHash === false ? newPath : `#${newPath}`;
+                        })();
 
                         // Act
                         const href = calculateHref({ hash: universe.hash }, newPath);

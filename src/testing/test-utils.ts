@@ -9,9 +9,18 @@ import { vi } from "vitest";
  * Defines the necessary information to call the library's `init()` function for testing, plus additional metadata.
  */
 export type RoutingUniverse = {
-    hash: Hash | undefined;
-    defaultHash: Hash;
-    hashMode: Exclude<RoutingOptions['hashMode'], undefined>;
+    /**
+     * Sample hash value for testing the routing universe.
+     */
+    hash?: Hash | undefined;
+    /**
+     * Default hash value that enables the routing universe implicitly.
+     */
+    defaultHash?: Hash;
+    /**
+     * Necessary hash mode for this routing universe.
+     */
+    hashMode?: RoutingOptions['hashMode'];
     /**
      * Short universe identifier.  Used in test titles and descriptions.
      */
@@ -22,25 +31,46 @@ export type RoutingUniverse = {
     name: string;
 };
 
-/**
- * Standard routing universe test configurations
- */
 export const ROUTING_UNIVERSES: RoutingUniverse[] = [
-    { hash: undefined, defaultHash: false, hashMode: 'single', text: "IMP", name: "Implicit Path Routing" },
-    { hash: undefined, defaultHash: true, hashMode: 'single', text: "IMH", name: "Implicit Hash Routing" },
-    { hash: false, defaultHash: false, hashMode: 'single', text: "PR", name: "Path Routing" },
-    { hash: true, defaultHash: false, hashMode: 'single', text: "HR", name: "Hash Routing" },
-    { hash: 'p1', defaultHash: false, hashMode: 'multi', text: "MHR", name: "Multi Hash Routing" },
+    {
+        text: "IPR",
+        name: "Implicit Path Routing",
+        defaultHash: false,
+    },
+    {
+        text: 'PR',
+        name: 'Path Routing',
+        hash: false,
+    },
+    {
+        text: "IHR",
+        name: "Implicit Hash Routing",
+        defaultHash: true,
+    },
+    {
+        text: "HR",
+        name: "Hash Routing",
+        hash: true,
+    },
+    {
+        text: "IMHR",
+        name: "Implicit Multi-Hash Routing",
+        defaultHash: 'tp',
+        hashMode: 'multi',
+    },
+    {
+        text: "MHR",
+        name: "Multi-Hash Routing",
+        hash: 'tp',
+        hashMode: 'multi',
+    }
 ] as const;
 
-/**
- * All possible hash values for testing hash compatibility
- */
 export const ALL_HASHES = {
-    path: false,        // Path routing
-    single: true,       // Hash routing (single)
-    multi: 'p1',        // Multi-hash routing
-    implicit: undefined // Implicit routing (depends on defaultHash)
+    path: false,
+    single: true,
+    multi: 'tp',
+    implicit: undefined,
 } as const;
 
 /**

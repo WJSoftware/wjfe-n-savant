@@ -3,7 +3,7 @@ import { routePatternsKey, RouterEngine } from "./RouterEngine.svelte.js";
 import { init } from "../init.js";
 import { registerRouter } from "./trace.svelte.js";
 import { location } from "./Location.js";
-import type { State, RouteInfo, ExtendedRoutingOptions } from "../types.js";
+import type { State, RouteInfo, ExtendedRoutingOptions, PatternRouteInfo } from "../types.js";
 import { setupBrowserMocks, addRoutes, ROUTING_UNIVERSES, ALL_HASHES } from "$test/test-utils.js";
 import { resetRoutingOptions, setRoutingOptions } from "./options.js";
 
@@ -295,7 +295,13 @@ ROUTING_UNIVERSES.forEach(universe => {
                     expectedState = state.hash[universe.hash];
                 } else {
                     // For implicit modes (hash === undefined), the behavior depends on defaultHash
-                    expectedState = universe.defaultHash === false ? state.path : state.hash.single;
+                    if (universe.defaultHash === false) {
+                        expectedState = state.path;
+                    } else if (universe.defaultHash === true) {
+                        expectedState = state.hash.single;
+                    } else if (typeof universe.defaultHash === 'string') {
+                        expectedState = state.hash[universe.defaultHash];
+                    }
                 }
                 expect(router.state).toBe(expectedState);
             });
